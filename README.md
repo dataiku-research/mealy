@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/simonamaggio/mea/master/doc/_static/mea.png" width="300">
+![Model Error Analysis Workflow](doc/_static/mea.png)
 
 ## Introduction
 
