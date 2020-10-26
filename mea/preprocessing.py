@@ -5,13 +5,22 @@ import numpy as np
 
 
 class FeatureNameTransformer(object):
-
+    """ Transformer of feature names from/to preprocessed feature names.
+        A categorical feature name is mapped to multiple feature names according to the encoding.
+        A numeric feature name is mapped to itself in case of simple feature preprocessor.
+        Args:
+            ct_preprocessor: ColumnTransformer preprocessor.
+            orig_feats: list of unprocessed feature names.
+        Attributes:
+            original_feature_names : list of unprocessed feature names.
+            preprocessed_feature_names : list of pre-processed feature names.
+    """
     def __init__(self, ct_preprocessor, orig_feats=None):
 
         self.original_feature_names = None
         self.preprocessed_feature_names = None
-        self.original2preprocessed = None
-        self.preprocessed2original = None
+        self._original2preprocessed = None
+        self._preprocessed2original = None
 
         self.categorical_features = []
 
@@ -28,8 +37,8 @@ class FeatureNameTransformer(object):
 
         assert len(feature_names) == len(self.original_feature_names)
 
-        self.original2preprocessed = dict()
-        self.preprocessed2original = dict()
+        self._original2preprocessed = dict()
+        self._preprocessed2original = dict()
         self.preprocessed_feature_names = list()
 
         len_preproc = 0
@@ -44,34 +53,34 @@ class FeatureNameTransformer(object):
                 for orig_id, orig_name in zip(orig_feats_ids, tr_feature_names):
                     part_out_feature_names = [i for i, name in enumerate(out_feature_names) if orig_name + '_' in name]
 
-                    self.original2preprocessed.update(
+                    self._original2preprocessed.update(
                         {orig_id: [len_preproc + i for i in range(len(part_out_feature_names))]})
-                    self.preprocessed2original.update(
+                    self._preprocessed2original.update(
                         {len_preproc + i: orig_id for i in range(len(part_out_feature_names))})
                     len_preproc += len(part_out_feature_names)
             except:
                 self.preprocessed_feature_names.extend(tr_feature_names)
 
-                self.original2preprocessed.update({in_i: len_preproc + i for i, in_i in enumerate(orig_feats_ids)})
-                self.preprocessed2original.update({len_preproc + i: in_i for i, in_i in enumerate(orig_feats_ids)})
+                self._original2preprocessed.update({in_i: len_preproc + i for i, in_i in enumerate(orig_feats_ids)})
+                self._preprocessed2original.update({len_preproc + i: in_i for i, in_i in enumerate(orig_feats_ids)})
                 len_preproc += len(tr_feature_names)
 
     def transform(self, index=None, name=None):
         if index is not None:
-            return self.original2preprocessed[index]
+            return self._original2preprocessed[index]
         elif name is not None:
             index = self.original_feature_names.index(name)
-            new_index = self.original2preprocessed[index]
+            new_index = self._original2preprocessed[index]
             return [self.preprocessed_feature_names[idx] for idx in new_index]
         else:
             raise ValueError("One of the input index or name should be specified.")
 
     def inverse_transform(self, index=None, name=None):
         if index is not None:
-            return self.preprocessed2original[index]
+            return self._preprocessed2original[index]
         elif name is not None:
             index = self.preprocessed_feature_names.index(name)
-            new_index = self.preprocessed2original[index]
+            new_index = self._preprocessed2original[index]
             return self.original_feature_names[new_index]
         else:
             raise ValueError("One of the input index or name should be specified.")
@@ -87,7 +96,13 @@ class FeatureNameTransformer(object):
 
 
 class PipelinePreprocessor(object):
-
+    """ Transformer of features from/to preprocessed features.
+        A categorical features is mapped to according to the encoding.
+        A numeric feature name is mapped according to its preprocessor (imputer, scaler, ...).
+        Args:
+            ct_preprocessor: ColumnTransformer preprocessor.
+            orig_feats: list of unprocessed feature names.
+    """
     def __init__(self, ct_preprocessor, orig_feats=None):
 
         self.fn_transformer = FeatureNameTransformer(ct_preprocessor, orig_feats)
@@ -101,7 +116,7 @@ class PipelinePreprocessor(object):
         orig_feats = self.fn_transformer.original_feature_names
 
         undo_prep_test_x = np.zeros((preprocessed_x.shape[0], len(orig_feats)), dtype='O')
-        prep_feat_idx = 0
+
         for (tr_name, tr, tr_feats) in self.ct_preprocessor.transformers_:
             try:
                 orig_feats_ids = np.where(np.in1d(orig_feats, tr_feats))[0]
