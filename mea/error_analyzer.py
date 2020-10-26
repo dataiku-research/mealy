@@ -4,11 +4,14 @@ import collections
 from sklearn import tree
 from sklearn.model_selection import GridSearchCV
 from sklearn.base import is_regressor
-from sklearn.utils.validation import check_is_fitted
 from sklearn.exceptions import NotFittedError
-from dku_error_analysis_mpp.kneed import KneeLocator
-from dku_error_analysis_utils import check_enough_data, ErrorAnalyzerConstants
-from dku_error_analysis_mpp.metrics import mpp_report
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.base import BaseEstimator
+from mea.kneed import KneeLocator
+from mea.dku_error_analysis_utils import check_enough_data, ErrorAnalyzerConstants
+from mea.metrics import mpp_report
+from mea.preprocessing import PipelinePreprocessor
 
 import logging
 
@@ -25,13 +28,30 @@ class ErrorAnalyzer(object):
     """
 
     def __init__(self, predictor, feature_names=None, seed=65537):
-        self._predictor = predictor
+        if isinstance(predictor, Pipeline):
+            estimator = predictor.steps[-1][1]
+            if not isinstance(estimator, BaseEstimator):
+                raise NotImplementedError("The last step of the pipeline has to be a BaseEstimator.")
+            self._predictor = estimator
+
+            ct_preprocessor = Pipeline(predictor.steps[:-1]).steps[0][1]
+
+            if not isinstance(ct_preprocessor, ColumnTransformer):
+                raise NotImplementedError("The input preprocessor has to be a ColumnTransformer.")
+            self.pipeline_preprocessor = PipelinePreprocessor(ct_preprocessor, feature_names)
+
+            self._features_in_model_performance_predictor = self.pipeline_preprocessor.fn_transformer.preprocessed_feature_names
+
+        else:
+            self._predictor = predictor
+            self._features_in_model_performance_predictor = feature_names
+            self.pipeline_preprocessor = None
+
         self._is_regression = is_regressor(self._predictor)
 
         self._error_clf = None
         self._error_train_x = None
         self._error_train_y = None
-        self._features_in_model_performance_predictor = feature_names
 
         self._error_train_leaf_id = None
         self._leaf_ids = None
@@ -39,6 +59,9 @@ class ErrorAnalyzer(object):
         self._impurity = None
         self._quantized_impurity = None
         self._difference = None
+
+        self._error_clf_thresholds = None
+        self._error_clf_features = None
 
         self._seed = seed
 
@@ -261,32 +284,97 @@ class ErrorAnalyzer(object):
 
     def _get_path_to_node(self, node_id):
         """ Return path to node as a list of split steps from the nodes of the sklearn Tree object """
-        feature_names = self.model_performance_predictor_features
+        if self.pipeline_preprocessor is None:
+            feature_names = self.model_performance_predictor_features
+        else:
+            feature_names = self.pipeline_preprocessor.fn_transformer.original_feature_names
 
         children_left = self.model_performance_predictor.tree_.children_left
         children_right = self.model_performance_predictor.tree_.children_right
-        feature = self.model_performance_predictor.tree_.feature
-        threshold = self.model_performance_predictor.tree_.threshold
+        # feature = self.model_performance_predictor.tree_.feature
+        # threshold = self.model_performance_predictor.tree_.threshold
+
+        threshold = self.inverse_transform_thresholds()
+        feature = self.inverse_transform_features()
 
         cur_node_id = node_id
         path_to_node = collections.deque()
         while cur_node_id > 0:
-            decision_rule = ''
+
             if cur_node_id in children_left:
-                decision_rule += ' <= '
                 parent_id = list(children_left).index(cur_node_id)
             else:
-                decision_rule += " > "
                 parent_id = list(children_right).index(cur_node_id)
 
             feat = feature[parent_id]
             thresh = threshold[parent_id]
 
-            decision_rule = str(feature_names[feat]) + decision_rule + ("%.2f" % thresh)
+            is_categorical = False
+            if self.pipeline_preprocessor is not None:
+                is_categorical = self.pipeline_preprocessor.fn_transformer.is_categorical(feat)
+
+            thresh = thresh if is_categorical else ("%.2f" % thresh)
+
+            decision_rule = ''
+            if cur_node_id in children_left:
+                decision_rule += ' <= ' if not is_categorical else ' != '
+            else:
+                decision_rule += " > " if not is_categorical else ' == '
+
+            decision_rule = str(feature_names[feat]) + decision_rule + thresh
             path_to_node.appendleft(decision_rule)
             cur_node_id = parent_id
 
         return path_to_node
+
+    def inverse_transform_features(self):
+        if self.pipeline_preprocessor is None:
+            return self._error_clf.tree_.feature
+
+        if self._error_clf_features is not None:
+            return self._error_clf_features
+
+        feats_idx = self._error_clf.tree_.feature.copy()
+
+        for i, f in enumerate(feats_idx):
+            if f > 0:
+                feats_idx[i] = self.pipeline_preprocessor.fn_transformer.inverse_transform(f)
+
+        self._error_clf_features = feats_idx
+
+        return self._error_clf_features
+
+    def inverse_transform_thresholds(self):
+
+        if self.pipeline_preprocessor is None:
+            return self._error_clf.tree_.threshold
+
+        if self._error_clf_thresholds is not None:
+            return self._error_clf_thresholds
+
+        feats_idx = self._error_clf.tree_.feature[self._error_clf.tree_.feature > 0]
+        thresholds = self._error_clf.tree_.threshold.copy().astype('O')
+        thresh = thresholds[self._error_clf.tree_.feature > 0]
+
+        n_rows = np.count_nonzero(self._error_clf.tree_.feature[self._error_clf.tree_.feature > 0])
+        n_cols = self._error_train_x.shape[1]
+        dummy_x = np.zeros((n_rows, n_cols))
+
+        indices = []
+        i = 0
+        for f, t in zip(feats_idx, thresh):
+            dummy_x[i, f] = t
+            indices.append((i, self.pipeline_preprocessor.fn_transformer.inverse_transform(f)))
+            i += 1
+        undo_dummy_x = self.pipeline_preprocessor.inverse_transform(dummy_x)
+
+        descaled_thresh = [undo_dummy_x[i, j] for i, j in indices]
+
+        thresholds[self._error_clf.tree_.feature > 0] = descaled_thresh
+
+        self._error_clf_thresholds = thresholds
+
+        return self._error_clf_thresholds
 
     #TODO: rewrite this method using the ranking arrays
     def error_node_summary(self, leaf_selector='all_errors', add_path_to_leaves=False, print_summary=False):
