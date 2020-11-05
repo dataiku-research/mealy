@@ -1,0 +1,33 @@
+.. Please when editing this file make sure to keep it matching the
+   docs in ../configuration.rst:reference_to_examples
+
+mea.error_visualizer
+====================
+
+.. automodule:: mea.error_visualizer
+
+   
+   
+   
+
+   
+   
+
+   Classes
+   -------
+
+   
+   .. autoclass:: ErrorVisualizer
+      :members:
+
+   .. include:: backreferences/mea.error_visualizer.ErrorVisualizer.examples
+
+   .. raw:: html
+
+	       <div class="sphx-glr-clear"></div>
+   
+   
+
+   
+   
+   

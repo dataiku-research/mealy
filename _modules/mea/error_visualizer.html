@@ -1,0 +1,478 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mea.error_visualizer &mdash; mea 0.0.1-git documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/theme_override.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> mea
+          
+
+          
+            
+            <img src="../../_static/mea.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+      <span class="rst-current-version" data-toggle="rst-current-version">
+        <span class="fa fa-book"> Versions</span>
+        v: stable
+        <span class="fa fa-caret-down"></span>
+      </span>
+      <div class="rst-other-versions">
+        <dl>
+          <dt>Versions</dt>
+          
+            <dd><a href="https://sphinx-gallery.github.io/dev">dev</a></dd>
+          
+            <dd><a href="https://sphinx-gallery.github.io/stable">stable</a></dd>
+          
+        </dl>
+      </div>
+    </div>
+
+    
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Model Error Analysis</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction to Model Error Analysis</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Example galleries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Examples</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API and developer reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference.html">mea’s API Reference</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/dataiku/mea">Fork mea on Github</a></li>
+</ul>
+
+            
+          
+
+  
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">mea</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>mea.error_visualizer</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mea.error_visualizer</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">graphviz</span> <span class="k">as</span> <span class="nn">gv</span>
+<span class="kn">import</span> <span class="nn">pydotplus</span>
+<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">export_graphviz</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;agg&#39;</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">mea.dku_error_analysis_utils</span> <span class="kn">import</span> <span class="n">ErrorAnalyzerConstants</span><span class="p">,</span> <span class="n">rank_features_by_error_correlation</span>
+<span class="kn">from</span> <span class="nn">mea.error_analyzer</span> <span class="kn">import</span> <span class="n">ErrorAnalyzer</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;Error Analysis Plugin | </span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;font&#39;</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s2">&quot;sans-serif&quot;</span><span class="p">)</span>
+<span class="n">SMALL_SIZE</span><span class="p">,</span> <span class="n">MEDIUM_SIZE</span><span class="p">,</span> <span class="n">BIGGER_SIZE</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">12</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;axes&#39;</span><span class="p">,</span> <span class="n">titlesize</span><span class="o">=</span><span class="n">BIGGER_SIZE</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="n">MEDIUM_SIZE</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;xtick&#39;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="n">SMALL_SIZE</span><span class="p">)</span> 
+<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;ytick&#39;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="n">SMALL_SIZE</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;legend&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">SMALL_SIZE</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s2">&quot;hatch&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">_BaseErrorVisualizer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_analyzer</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error_analyzer</span><span class="p">,</span> <span class="n">ErrorAnalyzer</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;You need to input an ErrorAnalyzer object.&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span> <span class="o">=</span> <span class="n">error_analyzer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_ranked_leaf_ids</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">leaf_selector</span><span class="p">,</span> <span class="n">rank_by</span><span class="p">:</span> <span class="n">error_analyzer</span><span class="o">.</span><span class="n">get_ranked_leaf_ids</span><span class="p">(</span><span class="n">leaf_selector</span><span class="p">,</span> <span class="n">rank_by</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_plot_histograms</span><span class="p">(</span><span class="n">hist_data</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+        <span class="n">bottom</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">class_value</span><span class="p">,</span> <span class="n">bar_heights</span> <span class="ow">in</span> <span class="n">hist_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="n">bar_heights</span><span class="p">,</span>
+                    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">class_value</span><span class="p">,</span> <span class="n">label</span><span class="p">),</span>
+                    <span class="n">color</span><span class="o">=</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">ERROR_TREE_COLORS</span><span class="p">[</span><span class="n">class_value</span><span class="p">],</span>
+                    <span class="n">bottom</span><span class="o">=</span><span class="n">bottom</span><span class="p">,</span>
+                    <span class="n">align</span><span class="o">=</span><span class="s2">&quot;edge&quot;</span><span class="p">,</span>
+                    <span class="n">alpha</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+            <span class="n">bottom</span> <span class="o">=</span> <span class="n">bar_heights</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_add_new_plot</span><span class="p">(</span><span class="n">figsize</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">feature_name</span><span class="p">,</span> <span class="n">leaf_id</span><span class="p">):</span>
+        <span class="n">x_ticks</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">x_ticks</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="n">bins</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature_name</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Proportion of samples&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Distribution of </span><span class="si">{}</span><span class="s1"> in leaf </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature_name</span><span class="p">,</span> <span class="n">leaf_id</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">x_ticks</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_plot_feature_distribution</span><span class="p">(</span><span class="n">x_ticks</span><span class="p">,</span> <span class="n">feature_is_numerical</span><span class="p">,</span> <span class="n">leaf_data</span><span class="p">,</span> <span class="n">root_data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">width</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">x_ticks</span>
+        <span class="k">if</span> <span class="n">root_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">width</span> <span class="o">/=</span> <span class="mi">2</span>
+            <span class="k">if</span> <span class="n">feature_is_numerical</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">x_ticks</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">_BaseErrorVisualizer</span><span class="o">.</span><span class="n">_plot_histograms</span><span class="p">(</span><span class="n">root_data</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;global data&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">hatch</span><span class="o">=</span><span class="s2">&quot;///&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=-</span><span class="n">width</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">feature_is_numerical</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x_ticks</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">_BaseErrorVisualizer</span><span class="o">.</span><span class="n">_plot_histograms</span><span class="p">(</span><span class="n">leaf_data</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;leaf data&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ErrorVisualizer"><a class="viewcode-back" href="../../gen_modules/mea.error_visualizer.html#mea.error_visualizer.ErrorVisualizer">[docs]</a><span class="k">class</span> <span class="nc">ErrorVisualizer</span><span class="p">(</span><span class="n">_BaseErrorVisualizer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ErrorVisualizer provides visual utilities to analyze the error classifier in ErrorAnalyzer</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_analyzer</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ErrorVisualizer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">error_analyzer</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span> <span class="o">=</span> <span class="n">error_analyzer</span><span class="o">.</span><span class="n">model_performance_predictor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_error_train_x</span> <span class="o">=</span> <span class="n">error_analyzer</span><span class="o">.</span><span class="n">error_train_x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_error_train_y</span> <span class="o">=</span> <span class="n">error_analyzer</span><span class="o">.</span><span class="n">error_train_y</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span> <span class="o">=</span> <span class="n">error_analyzer</span><span class="o">.</span><span class="n">pipeline_preprocessor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span> <span class="o">=</span> <span class="n">error_analyzer</span><span class="o">.</span><span class="n">inverse_transform_thresholds</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="n">error_analyzer</span><span class="o">.</span><span class="n">inverse_transform_features</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpp_feature_names</span> <span class="o">=</span> <span class="n">error_analyzer</span><span class="o">.</span><span class="n">model_performance_predictor_features</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">original_feature_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mpp_feature_names</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">numerical_feature_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mpp_feature_names</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">original_feature_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">fn_transformer</span><span class="o">.</span><span class="n">original_feature_names</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">numerical_feature_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_feature_names</span> <span class="k">if</span>
+                                            <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">fn_transformer</span><span class="o">.</span><span class="n">is_categorical</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">f</span><span class="p">)]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_train_leaf_ids</span> <span class="o">=</span> <span class="n">error_analyzer</span><span class="o">.</span><span class="n">train_leaf_ids</span>
+
+<div class="viewcode-block" id="ErrorVisualizer.plot_error_tree"><a class="viewcode-back" href="../../gen_modules/mea.error_visualizer.html#mea.error_visualizer.ErrorVisualizer.plot_error_tree">[docs]</a>    <span class="k">def</span> <span class="nf">plot_error_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Plot the graph of the decision tree &quot;&quot;&quot;</span>
+        <span class="n">digraph_tree</span> <span class="o">=</span> <span class="n">export_graphviz</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="p">,</span>
+                                       <span class="n">feature_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpp_feature_names</span><span class="p">,</span>
+                                       <span class="n">class_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="o">.</span><span class="n">classes_</span><span class="p">,</span>
+                                       <span class="n">node_ids</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                       <span class="n">proportion</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                       <span class="n">rotate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                       <span class="n">out_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                       <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                       <span class="n">rounded</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">pydot_graph</span> <span class="o">=</span> <span class="n">pydotplus</span><span class="o">.</span><span class="n">graph_from_dot_data</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">digraph_tree</span><span class="p">))</span>
+
+        <span class="c1"># descale threshold value</span>
+        <span class="n">thresholds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span>
+        <span class="n">features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">features</span>
+
+        <span class="n">nodes</span> <span class="o">=</span> <span class="n">pydot_graph</span><span class="o">.</span><span class="n">get_node_list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">get_label</span><span class="p">():</span>
+                <span class="n">node_label</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get_label</span><span class="p">()</span>
+
+                <span class="k">if</span> <span class="s1">&#39; &lt;= &#39;</span> <span class="ow">in</span> <span class="n">node_label</span><span class="p">:</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">node_label</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;node #&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">lte_split</span> <span class="o">=</span> <span class="n">node_label</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &lt;= &#39;</span><span class="p">)</span>
+                    <span class="n">entropy_split</span> <span class="o">=</span> <span class="n">lte_split</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">nentropy&#39;</span><span class="p">)</span>
+
+                    <span class="n">split_feature</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_feature_names</span><span class="p">[</span><span class="n">features</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span>
+
+                    <span class="n">descaled_value</span> <span class="o">=</span> <span class="n">thresholds</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+                    <span class="k">if</span> <span class="n">split_feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">numerical_feature_names</span><span class="p">:</span>
+                        <span class="n">descaled_value</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">descaled_value</span>
+                        <span class="n">lte_modified</span> <span class="o">=</span> <span class="s1">&#39; &lt;= &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">lte_split</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">descaled_value</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">lte_split_without_feature</span> <span class="o">=</span> <span class="n">lte_split</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="n">lte_split_with_new_feature</span> <span class="o">=</span> <span class="n">lte_split_without_feature</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n&#39;</span> <span class="o">+</span> <span class="n">split_feature</span>
+                        <span class="n">lte_modified</span> <span class="o">=</span> <span class="s1">&#39; != &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">lte_split_with_new_feature</span><span class="p">,</span> <span class="n">descaled_value</span><span class="p">])</span>
+                    <span class="n">new_label</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">nentropy&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">lte_modified</span><span class="p">,</span> <span class="n">entropy_split</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+
+                    <span class="n">node</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">new_label</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">pydot_graph</span><span class="o">.</span><span class="n">set_size</span><span class="p">(</span><span class="s1">&#39;&quot;</span><span class="si">%d</span><span class="s1">,</span><span class="si">%d</span><span class="s1">!&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">gvz_graph</span> <span class="o">=</span> <span class="n">gv</span><span class="o">.</span><span class="n">Source</span><span class="p">(</span><span class="n">pydot_graph</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">gvz_graph</span></div>
+
+<div class="viewcode-block" id="ErrorVisualizer.plot_feature_distributions_on_leaves"><a class="viewcode-back" href="../../gen_modules/mea.error_visualizer.html#mea.error_visualizer.ErrorVisualizer.plot_feature_distributions_on_leaves">[docs]</a>    <span class="k">def</span> <span class="nf">plot_feature_distributions_on_leaves</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">leaf_selector</span><span class="o">=</span><span class="s1">&#39;all_errors&#39;</span><span class="p">,</span>
+                                             <span class="n">top_k_features</span><span class="o">=</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">TOP_K_FEATURES</span><span class="p">,</span>
+                                             <span class="n">show_global</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_class</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rank_leaves_by</span><span class="o">=</span><span class="s2">&quot;purity&quot;</span><span class="p">,</span> <span class="n">nr_bins</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                                             <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">)):</span>
+        <span class="sd">&quot;&quot;&quot; Return plot of error node feature distribution and compare to global baseline &quot;&quot;&quot;</span>
+
+        <span class="n">error_class_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="o">.</span><span class="n">classes_</span> <span class="o">==</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">WRONG_PREDICTION</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">correct_class_idx</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">error_class_idx</span>
+
+        <span class="n">ranked_feature_ids</span> <span class="o">=</span> <span class="n">rank_features_by_error_correlation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="o">.</span><span class="n">feature_importances_</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">top_k_features</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">ranked_feature_ids</span> <span class="o">=</span> <span class="n">ranked_feature_ids</span><span class="p">[:</span><span class="n">top_k_features</span><span class="p">]</span>
+
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_train_x</span><span class="p">[:,</span> <span class="n">ranked_feature_ids</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_train_y</span>
+            <span class="n">min_values</span><span class="p">,</span> <span class="n">max_values</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">feature_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mpp_feature_names</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ranked_feature_ids</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">fn_transformer</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span>
+                                  <span class="n">ranked_feature_ids</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">top_k_features</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">ranked_feature_ids</span> <span class="o">=</span> <span class="n">ranked_feature_ids</span><span class="p">[:</span><span class="n">top_k_features</span><span class="p">]</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_train_x</span><span class="p">)[:,</span>
+                   <span class="n">ranked_feature_ids</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_train_y</span>
+            <span class="c1"># TODO</span>
+            <span class="n">min_values</span><span class="p">,</span> <span class="n">max_values</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">feature_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_feature_names</span>
+
+        <span class="n">global_error_sample_ids</span> <span class="o">=</span> <span class="n">y</span> <span class="o">==</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">WRONG_PREDICTION</span>
+        <span class="n">nr_wrong</span><span class="p">,</span> <span class="n">nr_correct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">value</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">error_class_idx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">value</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span>
+                                                                                   <span class="n">correct_class_idx</span><span class="p">]</span>
+
+        <span class="n">leaf_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ranked_leaf_ids</span><span class="p">(</span><span class="n">leaf_selector</span><span class="p">,</span> <span class="n">rank_leaves_by</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">leaf</span> <span class="ow">in</span> <span class="n">leaf_nodes</span><span class="p">:</span>
+            <span class="n">leaf_sample_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_leaf_ids</span> <span class="o">==</span> <span class="n">leaf</span>
+            <span class="n">nr_leaf_samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">leaf_sample_ids</span><span class="p">)</span>
+            <span class="n">proba_wrong_leaf</span><span class="p">,</span> <span class="n">proba_correct_leaf</span> <span class="o">=</span> <span class="n">nr_wrong</span><span class="p">[</span><span class="n">leaf</span><span class="p">]</span> <span class="o">/</span> <span class="n">nr_leaf_samples</span><span class="p">,</span> <span class="n">nr_correct</span><span class="p">[</span><span class="n">leaf</span><span class="p">]</span> <span class="o">/</span> <span class="n">nr_leaf_samples</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Leaf </span><span class="si">{}</span><span class="s1"> (Wrong prediction: </span><span class="si">{:.3f}</span><span class="s1">, Correct prediction: </span><span class="si">{:.3f}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">leaf</span><span class="p">,</span> <span class="n">proba_wrong_leaf</span><span class="p">,</span>
+                                                                                          <span class="n">proba_correct_leaf</span><span class="p">))</span>
+
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">feature_idx</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ranked_feature_ids</span><span class="p">):</span>
+
+                <span class="n">feature_name</span> <span class="o">=</span> <span class="n">feature_names</span><span class="p">[</span><span class="n">feature_idx</span><span class="p">]</span>
+                <span class="n">feature_is_numerical</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span>
+                    <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">fn_transformer</span><span class="o">.</span><span class="n">is_categorical</span><span class="p">(</span><span class="n">feature_idx</span><span class="p">))</span>
+
+                <span class="n">feature_column</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">feature_is_numerical</span><span class="p">:</span>
+                    <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">min_values</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">max_values</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">nr_bins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+                    <span class="n">histogram_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">f_samples</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">f_samples</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+                <span class="k">else</span><span class="p">:</span>
+
+                    <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">feature_column</span><span class="p">)[:</span><span class="n">nr_bins</span><span class="p">]</span>
+                    <span class="n">histogram_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">f_samples</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="n">f_samples</span><span class="p">),</span>
+                                                                   <span class="n">minlength</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">))[:</span><span class="n">nr_bins</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">show_global</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">show_class</span><span class="p">:</span>
+                        <span class="n">root_hist_data</span> <span class="o">=</span> <span class="p">{</span>
+                            <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">WRONG_PREDICTION</span><span class="p">:</span>
+                                <span class="n">histogram_func</span><span class="p">(</span><span class="n">feature_column</span><span class="p">[</span><span class="n">global_error_sample_ids</span><span class="p">]),</span>
+                            <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">CORRECT_PREDICTION</span><span class="p">:</span>
+                                <span class="n">histogram_func</span><span class="p">(</span><span class="n">feature_column</span><span class="p">[</span><span class="o">~</span><span class="n">global_error_sample_ids</span><span class="p">])</span>
+                        <span class="p">}</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">root_prediction</span> <span class="o">=</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">CORRECT_PREDICTION</span> <span class="k">if</span> <span class="n">nr_correct</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">nr_wrong</span><span class="p">[</span>
+                            <span class="mi">0</span><span class="p">]</span> <span class="k">else</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">WRONG_PREDICTION</span>
+                        <span class="n">root_hist_data</span> <span class="o">=</span> <span class="p">{</span><span class="n">root_prediction</span><span class="p">:</span> <span class="n">histogram_func</span><span class="p">(</span><span class="n">feature_column</span><span class="p">)}</span>
+
+                <span class="n">leaf_hist_data</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">if</span> <span class="n">show_class</span><span class="p">:</span>
+                    <span class="n">leaf_hist_data</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">WRONG_PREDICTION</span><span class="p">:</span>
+                            <span class="n">histogram_func</span><span class="p">(</span><span class="n">feature_column</span><span class="p">[</span><span class="n">leaf_sample_ids</span> <span class="o">&amp;</span> <span class="n">global_error_sample_ids</span><span class="p">]),</span>
+                        <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">CORRECT_PREDICTION</span><span class="p">:</span>
+                            <span class="n">histogram_func</span><span class="p">(</span><span class="n">feature_column</span><span class="p">[</span><span class="n">leaf_sample_ids</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">global_error_sample_ids</span><span class="p">])</span>
+                    <span class="p">}</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">leaf_prediction</span> <span class="o">=</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">CORRECT_PREDICTION</span> <span class="k">if</span> <span class="n">proba_correct_leaf</span> <span class="o">&gt;</span> <span class="n">proba_wrong_leaf</span> <span class="k">else</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">WRONG_PREDICTION</span>
+                    <span class="n">leaf_hist_data</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="n">leaf_prediction</span><span class="p">:</span> <span class="n">histogram_func</span><span class="p">(</span><span class="n">feature_column</span><span class="p">[</span><span class="n">leaf_sample_ids</span><span class="p">])}</span>
+
+                <span class="n">x_ticks</span> <span class="o">=</span> <span class="n">_BaseErrorVisualizer</span><span class="o">.</span><span class="n">_add_new_plot</span><span class="p">(</span><span class="n">figsize</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">feature_name</span><span class="p">,</span> <span class="n">leaf</span><span class="p">)</span>
+                <span class="n">_BaseErrorVisualizer</span><span class="o">.</span><span class="n">_plot_feature_distribution</span><span class="p">(</span><span class="n">x_ticks</span><span class="p">,</span> <span class="n">feature_is_numerical</span><span class="p">,</span> <span class="n">leaf_hist_data</span><span class="p">,</span>
+                                                                <span class="n">root_hist_data</span> <span class="k">if</span> <span class="n">show_global</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020-2020, Dataiku
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    <!-- Theme Analytics -->
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-169600606-1', 'auto');
+    ga('send', 'pageview');
+    </script>
+
+    
+   
+
+</body>
+</html>

@@ -1,13 +1,15 @@
 """
-Model Error Analysis on Boston house
+Model Error Analysis for the Boston houses dataset
 ===================================================================
 
-Here we train a primary model to predict the price of houses in Boston.
-Then we build a Model Performance Predictor, a Decision Tree trained to
-predict on what samples the primary model will yield Wrong or Correct
-predictions. We then use the Model Performance Predictor to understand
-what are the problematic samples and features where the majority of
-model failures occurs.
+Here we train a RandomForestRegressor to predict the price of the houses
+in Boston. This is our primary model. Then we build a secondary model,
+called Model Performance Predictor (MPP), to predict on what samples
+the primary model returns wrong or correct predictions. The MPP is a
+DecisionTree returning a binary outcome success/failure. The leaf nodes
+yielding failure outcome gather the samples mis-predicted by the primary
+model. Plotting the feature distributions of these samples and comparing
+to the whole data highlights the subpopulations where the model works poorly.
 """
 
 
@@ -23,30 +25,29 @@ import numpy as np
 from mea.error_analyzer import ErrorAnalyzer
 from mea.error_visualizer import ErrorVisualizer
 
-np.random.seed(7)
+np.random.seed(100)
 
 ##############################################################################
-# Load the Boston houses dataset
+# Load Boston houses dataset
 
 dataset = load_boston()
 X = dataset.data
 y = dataset.target
 feature_names = dataset.feature_names
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1)
+X_train, X_test, y_train, y_test = train_test_split(X, y)
 
 ##############################################################################
-# Train a RandomForestRegressor to predict the price.
-# This is the primary model.
+# Train a RandomForestRegressor
 
 model = RandomForestRegressor()
 model.fit(X_train, y_train)
 
 r2_score = model.score(X_test, y_test)
-print("R^2: {:.2f}".format(r2_score))
+print("R2 = %.2f" % r2_score)
 
 ##############################################################################
-# Fit a Model Performance Predictor on the primary model performances
+# Fit a Model Performance Predictor on the model performances
 
 error_analyzer = ErrorAnalyzer(model, feature_names=feature_names)
 error_analyzer.fit(X_test, y_test)
@@ -60,12 +61,12 @@ print(error_analyzer.mpp_summary(X_test, y_test, output_dict=False))
 # Plot the Model Performance Predictor Decision Tree
 
 error_visualizer = ErrorVisualizer(error_analyzer)
-error_visualizer.plot_error_tree()
+error_visualizer.plot_error_tree(size=(5, 5))
 
 ##############################################################################
 # Print the details regarding the decision tree nodes containing the majority of errors
 
-error_analyzer.error_node_summary(leaf_selector="all_errors", add_path_to_leaves=True, print_summary=True)
+error_analyzer.error_node_summary(leaf_selector="all_errors", add_path_to_leaves=True, print_summary=True);
 
 ##############################################################################
 # Plot the feature distributions of samples in the nodes containing the majority of errors
@@ -73,28 +74,33 @@ error_analyzer.error_node_summary(leaf_selector="all_errors", add_path_to_leaves
 
 error_visualizer.plot_feature_distributions_on_leaves(leaf_selector="all_errors", top_k_features=3)
 
-
 ##############################################################################
 # Discussion
 # ----------
 #
 # Model Performance Predictor Metrics
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# We are facing a regression problem, but the primary predictions are thresholded
-# and categorized into Wrong/Correct predictions. In this context, the primary task is
-# translated into a binary classification and the primary model can be scored using an
-# accuracy as the the average number of samples predicted as close enough to the true price.
-# This accuracy in this example is of 92.9%, that is correctly learnt by the MPP
-# estimating the very same value. The analysis will focus than on those 7.1% of test samples
-# where the primary predictions failed, i.e. are not close enough to the true value.
 #
+# We are dealing with a regression task, but the metrics highlight the accuracy
+# of the primary model and its estimate given by the Model Performance Predictor.
+# Here the primary predictions of price have been categorized in two classes:
+# 'Correct prediction' and 'Wrong prediction' by thresholding the deviation of
+# the prediction from the true value. Close enough predictions are Correct prediction,
+# the others are Wrong prediction. For more details, have a look at the documentation.
+# The accuracy is then the number of Correct predictions over the total.
+# The MPP is representative of the behavior of the primary model as the true primary
+# accuracy and the one estimated by the MPP are close.
 #
 # Model Failures
 # ^^^^^^^^^^^^^^
 #
-# The majority of failures are highlighted first in the most relevant failure node, the LEAF 16.
-# From the feature distribution, we see that most failures occur for high values of feature RM and AGE.
-# In the next iteration of model design, we need a strategy to improve the primary model
-# on those sub-populations.
+# Let's focus on the nodes of the MPP DecisionTree, in particular the leaf nodes
+# of class 'Wrong prediction'. These leaves contain the majority of errors, each
+# leaf clustering a subpopulation of errors with different feature values. The largest
+# and purest failure nodes are highlighted when printing the error node summary, and
+# also when plotting the feature distributions in the node (``leaf_selector="all_errors"``).
+# From the feature distributions, sorted by correlation with the error, we can see that
+# the majority of problems occur for extreme values of features ``DIS`` and ``TAX``.
+# In the next iteration of model design, the primary model needs to be improved for these
+# subpopulations.
 #
-

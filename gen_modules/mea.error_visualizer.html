@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Computation times &mdash; mea 0.0.1-git documentation</title>
+  <title>mea.error_visualizer &mdash; mea 0.0.1-git documentation</title>
   
 
   
@@ -39,7 +39,8 @@
 
     
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="mea.error_analyzer" href="mea.error_analyzer.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -117,11 +118,18 @@
 </ul>
 <p class="caption"><span class="caption-text">Example galleries</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Examples</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API and developer reference</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../reference.html">mea’s API Reference</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../reference.html">mea’s API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="mea.error_analyzer.html">mea.error_analyzer</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">mea.error_visualizer</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#classes">Classes</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/dataiku/mea">Fork mea on Github</a></li>
 </ul>
 
@@ -159,7 +167,9 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../index.html">Docs</a> &raquo;</li>
       
-    <li>Computation times</li>
+          <li><a href="../reference.html">mea’s API Reference</a> &raquo;</li>
+      
+    <li>mea.error_visualizer</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -171,22 +181,29 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="computation-times">
-<span id="sphx-glr-auto-examples-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Permalink to this headline">¶</a></h1>
-<p><strong>00:06.620</strong> total execution time for <strong>auto_examples</strong> files:</p>
-<table class="docutils align-default">
-<colgroup>
-<col style="width: 74%" />
-<col style="width: 13%" />
-<col style="width: 12%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_mea.html#sphx-glr-auto-examples-plot-mea-py"><span class="std std-ref">Model Error Analysis for the Boston houses dataset</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_mea.py</span></code>)</p></td>
-<td><p>00:06.620</p></td>
-<td><p>104.0 MB</p></td>
-</tr>
-</tbody>
-</table>
+  <div class="section" id="module-mea.error_visualizer">
+<span id="mea-error-visualizer"></span><h1>mea.error_visualizer<a class="headerlink" href="#module-mea.error_visualizer" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="mea.error_visualizer.ErrorVisualizer">
+<em class="property">class </em><code class="sig-prename descclassname">mea.error_visualizer.</code><code class="sig-name descname">ErrorVisualizer</code><span class="sig-paren">(</span><em class="sig-param">error_analyzer</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/error_visualizer.html#ErrorVisualizer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.error_visualizer.ErrorVisualizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>ErrorVisualizer provides visual utilities to analyze the error classifier in ErrorAnalyzer</p>
+<dl class="method">
+<dt id="mea.error_visualizer.ErrorVisualizer.plot_error_tree">
+<code class="sig-name descname">plot_error_tree</code><span class="sig-paren">(</span><em class="sig-param">size=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/error_visualizer.html#ErrorVisualizer.plot_error_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.error_visualizer.ErrorVisualizer.plot_error_tree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the graph of the decision tree</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mea.error_visualizer.ErrorVisualizer.plot_feature_distributions_on_leaves">
+<code class="sig-name descname">plot_feature_distributions_on_leaves</code><span class="sig-paren">(</span><em class="sig-param">leaf_selector='all_errors'</em>, <em class="sig-param">top_k_features=3</em>, <em class="sig-param">show_global=True</em>, <em class="sig-param">show_class=False</em>, <em class="sig-param">rank_leaves_by='purity'</em>, <em class="sig-param">nr_bins=10</em>, <em class="sig-param">figsize=(15</em>, <em class="sig-param">10)</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/error_visualizer.html#ErrorVisualizer.plot_feature_distributions_on_leaves"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.error_visualizer.ErrorVisualizer.plot_feature_distributions_on_leaves" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return plot of error node feature distribution and compare to global baseline</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="sphx-glr-clear"></div></div>
 </div>
 
 
@@ -194,6 +211,13 @@
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="mea.error_analyzer.html" class="btn btn-neutral float-left" title="mea.error_analyzer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>

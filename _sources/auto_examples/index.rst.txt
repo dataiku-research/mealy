@@ -10,10 +10,9 @@ Examples
 Those examples show basic usage of mea.
 
 
-
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Here we train a primary model to predict the price of houses in Boston. Then we build a Model P...">
+    <div class="sphx-glr-thumbcontainer" tooltip="Here we train a RandomForestRegressor to predict the price of the houses in Boston. This is our...">
 
 .. only:: html
 

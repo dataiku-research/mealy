@@ -7,39 +7,41 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Computation times &mdash; mea 0.0.1-git documentation</title>
+  <title>mea’s API Reference &mdash; mea 0.0.1-git documentation</title>
   
 
   
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/theme_override.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_override.css" type="text/css" />
 
   
   
-    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
   
   
   
 
   
   <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
+    <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
     
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
     
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="mea.error_analyzer" href="gen_modules/mea.error_analyzer.html" />
+    <link rel="prev" title="Model Error Analysis for the Boston houses dataset" href="auto_examples/plot_mea.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -53,12 +55,12 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> mea
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> mea
           
 
           
             
-            <img src="../_static/mea.png" class="logo" alt="Logo"/>
+            <img src="_static/mea.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -73,7 +75,7 @@
 
           
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -113,15 +115,19 @@
             
               <p class="caption"><span class="caption-text">Model Error Analysis</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction to Model Error Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to Model Error Analysis</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Example galleries</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Examples</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API and developer reference</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../reference.html">mea’s API Reference</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">mea’s API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gen_modules/mea.error_analyzer.html">mea.error_analyzer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gen_modules/mea.error_visualizer.html">mea.error_visualizer</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/dataiku/mea">Fork mea on Github</a></li>
 </ul>
 
@@ -140,7 +146,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">mea</a>
+          <a href="index.html">mea</a>
         
       </nav>
 
@@ -157,9 +163,9 @@
 
 <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../index.html">Docs</a> &raquo;</li>
+    <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li>Computation times</li>
+    <li>mea’s API Reference</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -171,19 +177,22 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="computation-times">
-<span id="sphx-glr-auto-examples-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Permalink to this headline">¶</a></h1>
-<p><strong>00:06.620</strong> total execution time for <strong>auto_examples</strong> files:</p>
-<table class="docutils align-default">
+  <div class="section" id="mea-s-api-reference">
+<span id="reference"></span><h1>mea’s API Reference<a class="headerlink" href="#mea-s-api-reference" title="Permalink to this headline">¶</a></h1>
+<p>The mea project is automatically documented for
+every module.</p>
+<span class="target" id="module-mea"></span><p><a class="reference internal" href="#module-mea" title="mea"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mea</span></code></a>:</p>
+<table class="longtable docutils align-default">
 <colgroup>
-<col style="width: 74%" />
-<col style="width: 13%" />
-<col style="width: 12%" />
+<col style="width: 10%" />
+<col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_mea.html#sphx-glr-auto-examples-plot-mea-py"><span class="std std-ref">Model Error Analysis for the Boston houses dataset</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_mea.py</span></code>)</p></td>
-<td><p>00:06.620</p></td>
-<td><p>104.0 MB</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="gen_modules/mea.error_analyzer.html#module-mea.error_analyzer" title="mea.error_analyzer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">error_analyzer</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="gen_modules/mea.error_visualizer.html#module-mea.error_visualizer" title="mea.error_visualizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">error_visualizer</span></code></a></p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
@@ -194,6 +203,15 @@
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="gen_modules/mea.error_analyzer.html" class="btn btn-neutral float-right" title="mea.error_analyzer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="auto_examples/plot_mea.html" class="btn btn-neutral float-left" title="Model Error Analysis for the Boston houses dataset" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
