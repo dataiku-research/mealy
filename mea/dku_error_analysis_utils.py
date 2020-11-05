@@ -39,7 +39,7 @@ class ErrorAnalyzerConstants(object):
     MAX_DEPTH_GRID = [5, 10, 15, 20, 30, 50]
     TEST_SIZE = 0.2
 
-    MIN_NUM_ROWS = 500  # heuristic choice
+    MIN_NUM_ROWS = 100  # heuristic choice
     MAX_NUM_ROW = 100000  # heuristic choice
 
     MPP_ACCURACY_TOLERANCE = 0.1
