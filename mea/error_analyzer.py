@@ -128,7 +128,12 @@ class ErrorAnalyzer(object):
 
         np.random.seed(self._seed)
 
-        self._error_train_x, self._error_train_y = self._compute_primary_model_error(x, y, max_nr_rows)
+        if self.pipeline_preprocessor is None:
+            prep_x, prep_y = x, y
+        else:
+            prep_x, prep_y = self.pipeline_preprocessor.transform(x), np.array(y)
+
+        self._error_train_x, self._error_train_y = self._compute_primary_model_error(prep_x, prep_y, max_nr_rows)
 
         logger.info("Fitting the model performance predictor...")
 
@@ -154,7 +159,8 @@ class ErrorAnalyzer(object):
         check_enough_data(x, min_len=ErrorAnalyzerConstants.MIN_NUM_ROWS)
 
         if x.shape[0] > max_nr_rows:
-            logger.info("Rebalancing data: original dataset had {} rows, selecting the first {}.".format(x.shape[0], max_nr_rows))
+            logger.info("Rebalancing data: original dataset had {} rows, selecting the first {}.".format(x.shape[0],
+                                                                                                         max_nr_rows))
 
             x = x[:max_nr_rows, :]
             y = y[:max_nr_rows]
@@ -217,13 +223,16 @@ class ErrorAnalyzer(object):
         self._leaf_ids = np.where(self.model_performance_predictor.tree_.feature < 0)[0]
 
     def _get_error_leaves(self):
-        error_class_idx = np.where(self.model_performance_predictor.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
-        error_node_ids = np.where(self.model_performance_predictor.tree_.value[:, 0, :].argmax(axis=1) == error_class_idx)[0]
+        error_class_idx = \
+        np.where(self.model_performance_predictor.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
+        error_node_ids = \
+        np.where(self.model_performance_predictor.tree_.value[:, 0, :].argmax(axis=1) == error_class_idx)[0]
         return np.in1d(self.leaf_ids, error_node_ids)
 
     def _compute_ranking_arrays(self, n_purity_levels=ErrorAnalyzerConstants.NUMBER_PURITY_LEVELS):
         """ Compute ranking array """
-        error_class_idx = np.where(self.model_performance_predictor.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
+        error_class_idx = \
+        np.where(self.model_performance_predictor.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
         correct_class_idx = 1 - error_class_idx
 
         wrongly_predicted_samples = self.model_performance_predictor.tree_.value[self.leaf_ids, 0, error_class_idx]
@@ -242,7 +251,8 @@ class ErrorAnalyzer(object):
         if selected_leaves.size == 0:
             return selected_leaves
         if rank_by == 'purity':
-            sorted_ids = np.lexsort((apply_leaf_selector(self.difference), apply_leaf_selector(self.quantized_impurity)))
+            sorted_ids = np.lexsort(
+                (apply_leaf_selector(self.difference), apply_leaf_selector(self.quantized_impurity)))
         elif rank_by == 'class_difference':
             sorted_ids = np.lexsort((apply_leaf_selector(self.impurity), apply_leaf_selector(self.difference)))
         else:
@@ -376,7 +386,7 @@ class ErrorAnalyzer(object):
 
         return self._error_clf_thresholds
 
-    #TODO: rewrite this method using the ranking arrays
+    # TODO: rewrite this method using the ranking arrays
     def error_node_summary(self, leaf_selector='all_errors', add_path_to_leaves=False, print_summary=False):
         """ Return summary information regarding input nodes """
 
@@ -384,7 +394,8 @@ class ErrorAnalyzer(object):
 
         y = self._error_train_y
         n_total_errors = y[y == ErrorAnalyzerConstants.WRONG_PREDICTION].shape[0]
-        error_class_idx = np.where(self.model_performance_predictor.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
+        error_class_idx = \
+        np.where(self.model_performance_predictor.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
         correct_class_idx = 1 - error_class_idx
 
         leaves_summary = []
@@ -424,6 +435,11 @@ class ErrorAnalyzer(object):
 
     def mpp_summary(self, x_test, y_test, nr_max_rows=ErrorAnalyzerConstants.MAX_NUM_ROW, output_dict=False):
         """ Print ErrorAnalyzer summary metrics """
-        x_test, y_true = self._compute_primary_model_error(x_test, y_test, nr_max_rows)
-        y_pred = self.model_performance_predictor.predict(x_test)
+        if self.pipeline_preprocessor is None:
+            prep_x, prep_y = x_test, y_test
+        else:
+            prep_x, prep_y = self.pipeline_preprocessor.transform(x_test), np.array(y_test)
+
+        x_test, y_true = self._compute_primary_model_error(prep_x, prep_y, nr_max_rows)
+        y_pred = self.model_performance_predictor.predict(prep_x)
         return mpp_report(y_true, y_pred, output_dict)
