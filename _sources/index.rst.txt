@@ -6,6 +6,10 @@
 Welcome to mea's documentation!
 ================================================
 
+mea is a Python package to perform Model Error Analysis of scikit-learn models,
+leveraging a Model Performance Predictor, a Decision Tree predicting the failures
+and successes of a ML model.
+
 The code of the project is on Github: `mea <https://github.com/dataiku/mea>`_
 
 
