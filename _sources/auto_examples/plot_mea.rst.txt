@@ -1,0 +1,433 @@
+.. note::
+    :class: sphx-glr-download-link-note
+
+    Click :ref:`here <sphx_glr_download_auto_examples_plot_mea.py>` to download the full example code
+.. rst-class:: sphx-glr-example-title
+
+.. _sphx_glr_auto_examples_plot_mea.py:
+
+
+Model Error Analysis on Boston house
+===================================================================
+
+Here we train a primary model to predict the price of houses in Boston.
+Then we build a Model Performance Predictor, a Decision Tree trained to
+predict on what samples the primary model will yield Wrong or Correct
+predictions. We then use the Model Performance Predictor to understand
+what are the problematic samples and features where the majority of
+model failures occurs.
+
+Those are the necessary imports and initializations
+
+
+.. code-block:: python3
+
+
+    from sklearn.datasets import load_boston
+    from sklearn.model_selection import train_test_split
+    from sklearn.ensemble import RandomForestRegressor
+
+    import numpy as np
+
+    from mea.error_analyzer import ErrorAnalyzer
+    from mea.error_visualizer import ErrorVisualizer
+
+    np.random.seed(7)
+
+
+
+
+
+
+
+
+Load the Boston houses dataset
+
+
+.. code-block:: python3
+
+
+    dataset = load_boston()
+    X = dataset.data
+    y = dataset.target
+    feature_names = dataset.feature_names
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1)
+
+
+
+
+
+
+
+
+Train a RandomForestRegressor to predict the price.
+This is the primary model.
+
+
+.. code-block:: python3
+
+
+    model = RandomForestRegressor()
+    model.fit(X_train, y_train)
+
+    r2_score = model.score(X_test, y_test)
+    print("R^2: {:.2f}".format(r2_score))
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    R^2: 0.91
+
+
+
+
+Fit a Model Performance Predictor on the primary model performances
+
+
+.. code-block:: python3
+
+
+    error_analyzer = ErrorAnalyzer(model, feature_names=feature_names)
+    error_analyzer.fit(X_test, y_test)
+
+
+
+
+
+
+
+
+Print metrics regarding the Model Performance Predictor
+
+
+.. code-block:: python3
+
+
+    print(error_analyzer.mpp_summary(X_test, y_test, output_dict=False))
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    The MPP was trained with accuracy 81.89%.
+    The Decision Tree estimated the primary models accuracy to 78.74%.
+    The true accuracy of the primary model is 62.20.%
+    The Fidelity of the MPP is 83.46%.
+    Warning: the built MPP might not be representative of the primary model performances.
+    The MPP predicted model accuracy is considered too different from the true model accuracy.
+
+
+
+
+
+Plot the Model Performance Predictor Decision Tree
+
+
+.. code-block:: python3
+
+
+    error_visualizer = ErrorVisualizer(error_analyzer)
+    error_visualizer.plot_error_tree()
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    <graphviz.files.Source object at 0x12b1c4588>
+
+
+
+Print the details regarding the decision tree nodes containing the majority of errors
+
+
+.. code-block:: python3
+
+
+    error_analyzer.error_node_summary(leaf_selector="all_errors", add_path_to_leaves=True, print_summary=True)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    LEAF 4:
+         Correct predictions: 0 | Wrong predictions: 9 | Local error (purity): 1.00 | Global error: 0.19
+         Path to leaf:
+         TAX <= 267.00
+            B > 383.96
+               PTRATIO <= 18.10
+    LEAF 9:
+         Correct predictions: 0 | Wrong predictions: 3 | Local error (purity): 1.00 | Global error: 0.06
+         Path to leaf:
+         TAX <= 267.00
+            B > 383.96
+               PTRATIO > 18.10
+                  DIS > 5.73
+    LEAF 15:
+         Correct predictions: 0 | Wrong predictions: 3 | Local error (purity): 1.00 | Global error: 0.06
+         Path to leaf:
+         TAX > 267.00
+            B <= 385.84
+               NOX <= 0.70
+                  LSTAT <= 26.97
+                     DIS > 7.57
+    LEAF 16:
+         Correct predictions: 0 | Wrong predictions: 3 | Local error (purity): 1.00 | Global error: 0.06
+         Path to leaf:
+         TAX > 267.00
+            B <= 385.84
+               NOX <= 0.70
+                  LSTAT > 26.97
+    LEAF 19:
+         Correct predictions: 0 | Wrong predictions: 2 | Local error (purity): 1.00 | Global error: 0.04
+         Path to leaf:
+         TAX > 267.00
+            B <= 385.84
+               NOX > 0.70
+                  LSTAT <= 14.09
+                     DIS <= 1.93
+    LEAF 8:
+         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.02
+         Path to leaf:
+         TAX <= 267.00
+            B > 383.96
+               PTRATIO > 18.10
+                  DIS <= 5.73
+                     CRIM > 0.08
+    LEAF 30:
+         Correct predictions: 1 | Wrong predictions: 5 | Local error (purity): 0.83 | Global error: 0.10
+         Path to leaf:
+         TAX > 267.00
+            B > 385.84
+               AGE > 42.45
+                  RM > 6.61
+                     LSTAT > 2.72
+
+    [{'id': 4, 'n_corrects': 0.0, 'n_errors': 9.0, 'local_error': 1.0, 'global_error': 0.1875, 'path_to_leaf': deque(['TAX <= 267.00', 'B > 383.96', 'PTRATIO <= 18.10'])}, {'id': 9, 'n_corrects': 0.0, 'n_errors': 3.0, 'local_error': 1.0, 'global_error': 0.0625, 'path_to_leaf': deque(['TAX <= 267.00', 'B > 383.96', 'PTRATIO > 18.10', 'DIS > 5.73'])}, {'id': 15, 'n_corrects': 0.0, 'n_errors': 3.0, 'local_error': 1.0, 'global_error': 0.0625, 'path_to_leaf': deque(['TAX > 267.00', 'B <= 385.84', 'NOX <= 0.70', 'LSTAT <= 26.97', 'DIS > 7.57'])}, {'id': 16, 'n_corrects': 0.0, 'n_errors': 3.0, 'local_error': 1.0, 'global_error': 0.0625, 'path_to_leaf': deque(['TAX > 267.00', 'B <= 385.84', 'NOX <= 0.70', 'LSTAT > 26.97'])}, {'id': 19, 'n_corrects': 0.0, 'n_errors': 2.0, 'local_error': 1.0, 'global_error': 0.041666666666666664, 'path_to_leaf': deque(['TAX > 267.00', 'B <= 385.84', 'NOX > 0.70', 'LSTAT <= 14.09', 'DIS <= 1.93'])}, {'id': 8, 'n_corrects': 0.0, 'n_errors': 1.0, 'local_error': 1.0, 'global_error': 0.020833333333333332, 'path_to_leaf': deque(['TAX <= 267.00', 'B > 383.96', 'PTRATIO > 18.10', 'DIS <= 5.73', 'CRIM > 0.08'])}, {'id': 30, 'n_corrects': 1.0, 'n_errors': 5.0, 'local_error': 0.8333333333333334, 'global_error': 0.10416666666666667, 'path_to_leaf': deque(['TAX > 267.00', 'B > 385.84', 'AGE > 42.45', 'RM > 6.61', 'LSTAT > 2.72'])}]
+
+
+
+Plot the feature distributions of samples in the nodes containing the majority of errors
+Rank features by correlation to error
+
+
+.. code-block:: python3
+
+
+    error_visualizer.plot_feature_distributions_on_leaves(leaf_selector="all_errors", top_k_features=3)
+
+
+
+
+
+.. rst-class:: sphx-glr-horizontal
+
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_001.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_002.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_003.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_004.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_005.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_006.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_007.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_008.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_009.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_010.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_011.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_012.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_013.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_014.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_015.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_016.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_017.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_018.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_019.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_020.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_021.png
+            :class: sphx-glr-multi-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Leaf 4 (Wrong prediction: 1.000, Correct prediction: 0.000)
+    Leaf 9 (Wrong prediction: 1.000, Correct prediction: 0.000)
+    Leaf 15 (Wrong prediction: 1.000, Correct prediction: 0.000)
+    Leaf 16 (Wrong prediction: 1.000, Correct prediction: 0.000)
+    Leaf 19 (Wrong prediction: 1.000, Correct prediction: 0.000)
+    Leaf 8 (Wrong prediction: 1.000, Correct prediction: 0.000)
+    Leaf 30 (Wrong prediction: 0.833, Correct prediction: 0.167)
+    /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/mea-0.1-py3.6.egg/mea/error_visualizer.py:49: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`).
+      plt.figure(figsize=figsize)
+
+
+
+
+Discussion
+----------
+
+Model Performance Predictor Metrics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+We are facing a regression problem, but the primary predictions are thresholded
+and categorized into Wrong/Correct predictions. In this context, the primary task is
+translated into a binary classification and the primary model can be scored using an
+accuracy as the the average number of samples predicted as close enough to the true price.
+This accuracy in this example is of 92.9%, that is correctly learnt by the MPP
+estimating the very same value. The analysis will focus than on those 7.1% of test samples
+where the primary predictions failed, i.e. are not close enough to the true value.
+
+
+Model Failures
+^^^^^^^^^^^^^^
+
+The majority of failures are highlighted first in the most relevant failure node, the LEAF 16.
+From the feature distribution, we see that most failures occur for high values of feature RM and AGE.
+In the next iteration of model design, we need a strategy to improve the primary model
+on those sub-populations.
+
+
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  10.720 seconds)
+
+**Estimated memory usage:**  198 MB
+
+
+.. _sphx_glr_download_auto_examples_plot_mea.py:
+
+
+.. only :: html
+
+ .. container:: sphx-glr-footer
+    :class: sphx-glr-footer-example
+
+
+
+  .. container:: sphx-glr-download
+
+     :download:`Download Python source code: plot_mea.py <plot_mea.py>`
+
+
+
+  .. container:: sphx-glr-download
+
+     :download:`Download Jupyter notebook: plot_mea.ipynb <plot_mea.ipynb>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_
