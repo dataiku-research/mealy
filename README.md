@@ -9,8 +9,8 @@ The project is currently maintained by [Dataiku's](https://www.dataiku.com/) res
 ## Getting started
 
 MEA [documentation](https://dataiku.github.io/mea/) features some examples helping you getting started with Model Error Analysis:
-* [Error Analysis on scikit-learn model](https://dataiku.github.io/mea/auto_examples/sklearn_structured.html) presents a basic error analysis on a regression model for structured data
-* [Error Analysis on pipeline model](https://dataiku.github.io/mea/auto_examples/pipeline_structured.html) presents a basic error analysis on a pipeline regression model for structured data
+* [Error Analysis on scikit-learn model](https://dataiku.github.io/mea/auto_examples/plot_mea.html) presents a basic error analysis on a regression model for structured data
+* [Error Analysis on pipeline model](https://dataiku.github.io/mea/auto_examples/plot_mea_pipeline.html) presents a basic error analysis on a pipeline regression model for structured data
 * TODO: add examples from text data 
 
 ## Model Error Analysis
