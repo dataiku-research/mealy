@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Model Error Analysis's documentation!
+Welcome to mea's documentation!
 ================================================
 
 The code of the project is on Github: `mea <https://github.com/dataiku/mea>`_
@@ -41,6 +41,19 @@ Again, the preferred way is to use pip.
    :caption: Model Error Analysis
 
    introduction
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Example galleries
+
+   auto_examples/index
+
+.. toctree::
+   :maxdepth: 2
+   :caption: API and developer reference
+
+   reference
+   Fork mea on Github <https://github.com/dataiku/mea>
 
 
 Indices and tables
