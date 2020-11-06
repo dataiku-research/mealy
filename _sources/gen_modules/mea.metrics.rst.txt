@@ -1,0 +1,57 @@
+.. Please when editing this file make sure to keep it matching the
+   docs in ../configuration.rst:reference_to_examples
+
+mea.metrics
+===========
+
+.. automodule:: mea.metrics
+
+   
+   
+
+   Functions
+   ---------
+
+   
+
+   .. autofunction:: compute_confidence_decision
+
+   .. include:: backreferences/mea.metrics.compute_confidence_decision.examples
+
+   .. raw:: html
+
+	       <div class="sphx-glr-clear"></div>
+
+   .. autofunction:: compute_mpp_accuracy
+
+   .. include:: backreferences/mea.metrics.compute_mpp_accuracy.examples
+
+   .. raw:: html
+
+	       <div class="sphx-glr-clear"></div>
+
+   .. autofunction:: compute_primary_model_accuracy
+
+   .. include:: backreferences/mea.metrics.compute_primary_model_accuracy.examples
+
+   .. raw:: html
+
+	       <div class="sphx-glr-clear"></div>
+
+   .. autofunction:: mpp_report
+
+   .. include:: backreferences/mea.metrics.mpp_report.examples
+
+   .. raw:: html
+
+	       <div class="sphx-glr-clear"></div>
+   
+   
+
+   
+   
+   
+
+   
+   
+   

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Overview: module code &mdash; mea 0.0.1-git documentation</title>
+  <title>mea.dku_error_analysis_utils &mdash; mea 0.0.1-git documentation</title>
   
 
   
@@ -39,7 +39,8 @@
 
     
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="mea.preprocessing" href="mea.preprocessing.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -120,8 +121,19 @@
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Examples</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API and developer reference</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../reference.html">mea’s API Reference</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../reference.html">mea’s API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="mea.error_analyzer.html">mea.error_analyzer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mea.error_visualizer.html">mea.error_visualizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mea.metrics.html">mea.metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mea.preprocessing.html">mea.preprocessing</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">mea.dku_error_analysis_utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#classes">Classes</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/dataiku/mea">Fork mea on Github</a></li>
 </ul>
 
@@ -159,7 +171,9 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../index.html">Docs</a> &raquo;</li>
       
-    <li>Overview: module code</li>
+          <li><a href="../reference.html">mea’s API Reference</a> &raquo;</li>
+      
+    <li>mea.dku_error_analysis_utils</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -171,18 +185,65 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>All modules for which code is available</h1>
-<ul><li><a href="mea/dku_error_analysis_utils.html">mea.dku_error_analysis_utils</a></li>
-<li><a href="mea/error_analyzer.html">mea.error_analyzer</a></li>
-<li><a href="mea/error_visualizer.html">mea.error_visualizer</a></li>
-<li><a href="mea/metrics.html">mea.metrics</a></li>
-<li><a href="mea/preprocessing.html">mea.preprocessing</a></li>
-</ul>
+  <div class="section" id="module-mea.dku_error_analysis_utils">
+<span id="mea-dku-error-analysis-utils"></span><h1>mea.dku_error_analysis_utils<a class="headerlink" href="#module-mea.dku_error_analysis_utils" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="mea.dku_error_analysis_utils.check_enough_data">
+<code class="sig-prename descclassname">mea.dku_error_analysis_utils.</code><code class="sig-name descname">check_enough_data</code><span class="sig-paren">(</span><em class="sig-param">df</em>, <em class="sig-param">min_len</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/dku_error_analysis_utils.html#check_enough_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.dku_error_analysis_utils.check_enough_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check the input dataset is not too small.
+:param df: input dataset.
+:type df: dataframe
+:param min_len: minimum required length.
+:type min_len: int</p>
+</dd></dl>
+
+<div class="sphx-glr-clear"></div><dl class="function">
+<dt id="mea.dku_error_analysis_utils.rank_features_by_error_correlation">
+<code class="sig-prename descclassname">mea.dku_error_analysis_utils.</code><code class="sig-name descname">rank_features_by_error_correlation</code><span class="sig-paren">(</span><em class="sig-param">feature_importances</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/dku_error_analysis_utils.html#rank_features_by_error_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.dku_error_analysis_utils.rank_features_by_error_correlation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rank indices from the most to the least important according to the input weights.
+:param feature_importances: feature importance weights.
+:type feature_importances: ndarray</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>sorted_feature_indices</strong> – list of feature indices sorted from the most to the least important.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>array_like</p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="sphx-glr-clear"></div><dl class="function">
+<dt id="mea.dku_error_analysis_utils.safe_str">
+<code class="sig-prename descclassname">mea.dku_error_analysis_utils.</code><code class="sig-name descname">safe_str</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/dku_error_analysis_utils.html#safe_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.dku_error_analysis_utils.safe_str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="sphx-glr-clear"></div></div>
+<div class="section" id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="mea.dku_error_analysis_utils.ErrorAnalyzerConstants">
+<em class="property">class </em><code class="sig-prename descclassname">mea.dku_error_analysis_utils.</code><code class="sig-name descname">ErrorAnalyzerConstants</code><a class="reference internal" href="../_modules/mea/dku_error_analysis_utils.html#ErrorAnalyzerConstants"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.dku_error_analysis_utils.ErrorAnalyzerConstants" title="Permalink to this definition">¶</a></dt>
+<dd><p>ErrorAnalyzerConstants stores the values for the configuration parameters of ErrorAnalyzer and ErrorVisualizer.</p>
+</dd></dl>
+
+<div class="sphx-glr-clear"></div></div>
+</div>
+
 
            </div>
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="mea.preprocessing.html" class="btn btn-neutral float-left" title="mea.preprocessing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>

@@ -1,0 +1,63 @@
+.. Please when editing this file make sure to keep it matching the
+   docs in ../configuration.rst:reference_to_examples
+
+mea.dku_error_analysis_utils
+============================
+
+.. automodule:: mea.dku_error_analysis_utils
+
+   
+   
+
+   Functions
+   ---------
+
+   
+
+   .. autofunction:: check_enough_data
+
+   .. include:: backreferences/mea.dku_error_analysis_utils.check_enough_data.examples
+
+   .. raw:: html
+
+	       <div class="sphx-glr-clear"></div>
+
+   .. autofunction:: rank_features_by_error_correlation
+
+   .. include:: backreferences/mea.dku_error_analysis_utils.rank_features_by_error_correlation.examples
+
+   .. raw:: html
+
+	       <div class="sphx-glr-clear"></div>
+
+   .. autofunction:: safe_str
+
+   .. include:: backreferences/mea.dku_error_analysis_utils.safe_str.examples
+
+   .. raw:: html
+
+	       <div class="sphx-glr-clear"></div>
+   
+   
+
+   
+   
+
+   Classes
+   -------
+
+   
+   .. autoclass:: ErrorAnalyzerConstants
+      :members:
+
+   .. include:: backreferences/mea.dku_error_analysis_utils.ErrorAnalyzerConstants.examples
+
+   .. raw:: html
+
+	       <div class="sphx-glr-clear"></div>
+   
+   
+
+   
+   
+   

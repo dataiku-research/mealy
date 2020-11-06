@@ -1,0 +1,41 @@
+.. Please when editing this file make sure to keep it matching the
+   docs in ../configuration.rst:reference_to_examples
+
+mea.preprocessing
+=================
+
+.. automodule:: mea.preprocessing
+
+   
+   
+   
+
+   
+   
+
+   Classes
+   -------
+
+   
+   .. autoclass:: FeatureNameTransformer
+      :members:
+
+   .. include:: backreferences/mea.preprocessing.FeatureNameTransformer.examples
+
+   .. raw:: html
+
+	       <div class="sphx-glr-clear"></div>
+   .. autoclass:: PipelinePreprocessor
+      :members:
+
+   .. include:: backreferences/mea.preprocessing.PipelinePreprocessor.examples
+
+   .. raw:: html
+
+	       <div class="sphx-glr-clear"></div>
+   
+   
+
+   
+   
+   

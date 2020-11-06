@@ -20,3 +20,6 @@ every module.
 
    error_analyzer
    error_visualizer
+   metrics
+   preprocessing
+   dku_error_analysis_utils
