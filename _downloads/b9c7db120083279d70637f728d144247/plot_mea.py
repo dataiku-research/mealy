@@ -14,7 +14,7 @@ to the whole data highlights the subpopulations where the model works poorly.
 
 
 ##############################################################################
-# Those are the necessary imports and initializations
+# Those are the necessary imports and initializations.
 
 from sklearn.datasets import load_boston
 from sklearn.model_selection import train_test_split
@@ -35,7 +35,7 @@ np.random.seed(default_seed)
 random.seed(default_seed)
 
 ##############################################################################
-# Load Boston houses dataset
+# Load Boston houses dataset.
 
 dataset = load_boston()
 X = dataset.data
@@ -45,7 +45,7 @@ feature_names = dataset.feature_names
 X_train, X_test, y_train, y_test = train_test_split(X, y)
 
 ##############################################################################
-# Train a RandomForestRegressor
+# Train a RandomForestRegressor.
 
 model = RandomForestRegressor()
 model.fit(X_train, y_train)
@@ -54,18 +54,18 @@ r2_score = model.score(X_test, y_test)
 print("R2 = %.2f" % r2_score)
 
 ##############################################################################
-# Fit a Model Performance Predictor on the model performances
+# Fit a Model Performance Predictor on the model performances.
 
 error_analyzer = ErrorAnalyzer(model, feature_names=feature_names)
 error_analyzer.fit(X_test, y_test)
 
 ##############################################################################
-# Print metrics regarding the Model Performance Predictor
+# Print metrics regarding the Model Performance Predictor.
 
 print(error_analyzer.mpp_summary(X_test, y_test, output_dict=False))
 
 ##############################################################################
-# Plot the Model Performance Predictor Decision Tree
+# Plot the Model Performance Predictor Decision Tree.
 
 error_visualizer = ErrorVisualizer(error_analyzer)
 tree_src = error_visualizer.plot_error_tree()
@@ -81,15 +81,15 @@ plt.imshow(tree_img)
 plt.axis('off')
 
 ##############################################################################
-# Print the details regarding the decision tree nodes containing the majority of errors
+# Print the details regarding the decision tree nodes containing the majority of errors.
 
 error_analyzer.error_node_summary(leaf_selector="all_errors", add_path_to_leaves=True, print_summary=True);
 
 ##############################################################################
-# Plot the feature distributions of samples in the nodes containing the majority of errors
-# Rank features by correlation to error
+# Plot the feature distributions of samples in ``LEAF 12`` containing the majority of errors.
+# Rank features by correlation to error.
 
-error_visualizer.plot_feature_distributions_on_leaves(leaf_selector="all_errors", top_k_features=3)
+error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=12, top_k_features=3)
 
 ##############################################################################
 # Discussion
@@ -117,7 +117,7 @@ error_visualizer.plot_feature_distributions_on_leaves(leaf_selector="all_errors"
 # and purest failure nodes are highlighted when printing the error node summary, and
 # also when plotting the feature distributions in the node (``leaf_selector="all_errors"``).
 # From the feature distributions, sorted by correlation with the error, we can see that
-# the majority of problems occur for extreme values of features ``DIS`` and ``TAX``.
+# the majority of problems occur for extreme values of features ``LSTAT`` and ``AGE``.
 # In the next iteration of model design, the primary model needs to be improved for these
 # subpopulations.
 #

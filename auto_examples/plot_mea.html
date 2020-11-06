@@ -199,7 +199,7 @@ DecisionTree returning a binary outcome success/failure. The leaf nodes
 yielding failure outcome gather the samples mis-predicted by the primary
 model. Plotting the feature distributions of these samples and comparing
 to the whole data highlights the subpopulations where the model works poorly.</p>
-<p>Those are the necessary imports and initializations</p>
+<p>Those are the necessary imports and initializations.</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_boston.html#sklearn.datasets.load_boston" title="View documentation for sklearn.datasets.load_boston"><span class="n">load_boston</span></a>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html#sklearn.model_selection.train_test_split" title="View documentation for sklearn.model_selection.train_test_split"><span class="n">train_test_split</span></a>
 <span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html#sklearn.ensemble.RandomForestRegressor" title="View documentation for sklearn.ensemble.RandomForestRegressor"><span class="n">RandomForestRegressor</span></a>
@@ -219,7 +219,7 @@ to the whole data highlights the subpopulations where the model works poorly.</p
 <a href="https://docs.python.org/3/library/random.html#random.seed" title="View documentation for random.seed"><span class="n">random</span><span class="o">.</span><span class="n">seed</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">default_seed</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<p>Load Boston houses dataset</p>
+<p>Load Boston houses dataset.</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.utils.Bunch.html#sklearn.utils.Bunch" title="View documentation for sklearn.utils.Bunch"><span class="n">dataset</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_boston.html#sklearn.datasets.load_boston" title="View documentation for sklearn.datasets.load_boston"><span class="n">load_boston</span></a><span class="p">()</span>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">X</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.utils.Bunch.html#sklearn.utils.Bunch" title="View documentation for sklearn.utils.Bunch"><span class="n">dataset</span></a><span class="o">.</span><span class="n">data</span>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">y</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.utils.Bunch.html#sklearn.utils.Bunch" title="View documentation for sklearn.utils.Bunch"><span class="n">dataset</span></a><span class="o">.</span><span class="n">target</span>
@@ -228,7 +228,7 @@ to the whole data highlights the subpopulations where the model works poorly.</p
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">X_train</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">X_test</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">y_train</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">y_test</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html#sklearn.model_selection.train_test_split" title="View documentation for sklearn.model_selection.train_test_split"><span class="n">train_test_split</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">X</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">y</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<p>Train a RandomForestRegressor</p>
+<p>Train a RandomForestRegressor.</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html#sklearn.ensemble.RandomForestRegressor" title="View documentation for sklearn.ensemble.RandomForestRegressor"><span class="n">model</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html#sklearn.ensemble.RandomForestRegressor" title="View documentation for sklearn.ensemble.RandomForestRegressor"><span class="n">RandomForestRegressor</span></a><span class="p">()</span>
 <a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html#sklearn.ensemble.RandomForestRegressor.fit" title="View documentation for sklearn.ensemble.RandomForestRegressor.fit"><span class="n">model</span><span class="o">.</span><span class="n">fit</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">X_train</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">y_train</span></a><span class="p">)</span>
 
@@ -240,12 +240,12 @@ to the whole data highlights the subpopulations where the model works poorly.</p
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>R2 = 0.87
 </pre></div>
 </div>
-<p>Fit a Model Performance Predictor on the model performances</p>
+<p>Fit a Model Performance Predictor on the model performances.</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">error_analyzer</span> <span class="o">=</span> <span class="n">ErrorAnalyzer</span><span class="p">(</span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html#sklearn.ensemble.RandomForestRegressor" title="View documentation for sklearn.ensemble.RandomForestRegressor"><span class="n">model</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">feature_names</span></a><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">feature_names</span></a><span class="p">)</span>
 <span class="n">error_analyzer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">X_test</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">y_test</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<p>Print metrics regarding the Model Performance Predictor</p>
+<p>Print metrics regarding the Model Performance Predictor.</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">error_analyzer</span><span class="o">.</span><span class="n">mpp_summary</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">X_test</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">y_test</span></a><span class="p">,</span> <span class="n">output_dict</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -257,7 +257,7 @@ The Fidelity of the MPP is 98.43%.
 The MPP is considered representative of the primary model performances.
 </pre></div>
 </div>
-<p>Plot the Model Performance Predictor Decision Tree</p>
+<p>Plot the Model Performance Predictor Decision Tree.</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">error_visualizer</span> <span class="o">=</span> <span class="n">ErrorVisualizer</span><span class="p">(</span><span class="n">error_analyzer</span><span class="p">)</span>
 <span class="n">tree_src</span> <span class="o">=</span> <span class="n">error_visualizer</span><span class="o">.</span><span class="n">plot_error_tree</span><span class="p">()</span>
 
@@ -273,7 +273,7 @@ The MPP is considered representative of the primary model performances.
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_plot_mea_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_mea_001.png" />
-<p>Print the details regarding the decision tree nodes containing the majority of errors</p>
+<p>Print the details regarding the decision tree nodes containing the majority of errors.</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">error_analyzer</span><span class="o">.</span><span class="n">error_node_summary</span><span class="p">(</span><span class="n">leaf_selector</span><span class="o">=</span><span class="s2">&quot;all_errors&quot;</span><span class="p">,</span> <span class="n">add_path_to_leaves</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_summary</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -325,9 +325,9 @@ LEAF 21:
                  RM &lt;= 4.12
 </pre></div>
 </div>
-<p>Plot the feature distributions of samples in the nodes containing the majority of errors
-Rank features by correlation to error</p>
-<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">error_visualizer</span><span class="o">.</span><span class="n">plot_feature_distributions_on_leaves</span><span class="p">(</span><span class="n">leaf_selector</span><span class="o">=</span><span class="s2">&quot;all_errors&quot;</span><span class="p">,</span> <span class="n">top_k_features</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<p>Plot the feature distributions of samples in <code class="docutils literal notranslate"><span class="pre">LEAF</span> <span class="pre">12</span></code> containing the majority of errors.
+Rank features by correlation to error.</p>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">error_visualizer</span><span class="o">.</span><span class="n">plot_feature_distributions_on_leaves</span><span class="p">(</span><span class="n">leaf_selector</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">top_k_features</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
@@ -337,53 +337,9 @@ Rank features by correlation to error</p>
 </li>
 <li><img alt="../_images/sphx_glr_plot_mea_004.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_004.png" />
 </li>
-<li><img alt="../_images/sphx_glr_plot_mea_005.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_005.png" />
-</li>
-<li><img alt="../_images/sphx_glr_plot_mea_006.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_006.png" />
-</li>
-<li><img alt="../_images/sphx_glr_plot_mea_007.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_007.png" />
-</li>
-<li><img alt="../_images/sphx_glr_plot_mea_008.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_008.png" />
-</li>
-<li><img alt="../_images/sphx_glr_plot_mea_009.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_009.png" />
-</li>
-<li><img alt="../_images/sphx_glr_plot_mea_010.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_010.png" />
-</li>
-<li><img alt="../_images/sphx_glr_plot_mea_011.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_011.png" />
-</li>
-<li><img alt="../_images/sphx_glr_plot_mea_012.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_012.png" />
-</li>
-<li><img alt="../_images/sphx_glr_plot_mea_013.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_013.png" />
-</li>
-<li><img alt="../_images/sphx_glr_plot_mea_014.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_014.png" />
-</li>
-<li><img alt="../_images/sphx_glr_plot_mea_015.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_015.png" />
-</li>
-<li><img alt="../_images/sphx_glr_plot_mea_016.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_016.png" />
-</li>
-<li><img alt="../_images/sphx_glr_plot_mea_017.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_017.png" />
-</li>
-<li><img alt="../_images/sphx_glr_plot_mea_018.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_018.png" />
-</li>
-<li><img alt="../_images/sphx_glr_plot_mea_019.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_019.png" />
-</li>
-<li><img alt="../_images/sphx_glr_plot_mea_020.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_020.png" />
-</li>
-<li><img alt="../_images/sphx_glr_plot_mea_021.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_021.png" />
-</li>
-<li><img alt="../_images/sphx_glr_plot_mea_022.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_022.png" />
-</li>
 </ul>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Leaf 12 (Wrong prediction: 1.000, Correct prediction: 0.000)
-Leaf 14 (Wrong prediction: 1.000, Correct prediction: 0.000)
-Leaf 3 (Wrong prediction: 1.000, Correct prediction: 0.000)
-Leaf 9 (Wrong prediction: 1.000, Correct prediction: 0.000)
-Leaf 17 (Wrong prediction: 1.000, Correct prediction: 0.000)
-Leaf 19 (Wrong prediction: 1.000, Correct prediction: 0.000)
-Leaf 21 (Wrong prediction: 1.000, Correct prediction: 0.000)
-/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/mea-0.0.1-py3.6.egg/mea/error_visualizer.py:49: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`).
-  plt.figure(figsize=figsize)
 </pre></div>
 </div>
 <div class="section" id="discussion">
@@ -408,11 +364,11 @@ leaf clustering a subpopulation of errors with different feature values. The lar
 and purest failure nodes are highlighted when printing the error node summary, and
 also when plotting the feature distributions in the node (<code class="docutils literal notranslate"><span class="pre">leaf_selector=&quot;all_errors&quot;</span></code>).
 From the feature distributions, sorted by correlation with the error, we can see that
-the majority of problems occur for extreme values of features <code class="docutils literal notranslate"><span class="pre">DIS</span></code> and <code class="docutils literal notranslate"><span class="pre">TAX</span></code>.
+the majority of problems occur for extreme values of features <code class="docutils literal notranslate"><span class="pre">LSTAT</span></code> and <code class="docutils literal notranslate"><span class="pre">AGE</span></code>.
 In the next iteration of model design, the primary model needs to be improved for these
 subpopulations.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  11.753 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  318 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  4.064 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  196 MB</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-mea-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/b9c7db120083279d70637f728d144247/plot_mea.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_mea.py</span></code></a></p>

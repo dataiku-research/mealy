@@ -19,7 +19,7 @@ yielding failure outcome gather the samples mis-predicted by the primary
 model. Plotting the feature distributions of these samples and comparing
 to the whole data highlights the subpopulations where the model works poorly.
 
-Those are the necessary imports and initializations
+Those are the necessary imports and initializations.
 
 
 .. code-block:: python3
@@ -50,7 +50,7 @@ Those are the necessary imports and initializations
 
 
 
-Load Boston houses dataset
+Load Boston houses dataset.
 
 
 .. code-block:: python3
@@ -70,7 +70,7 @@ Load Boston houses dataset
 
 
 
-Train a RandomForestRegressor
+Train a RandomForestRegressor.
 
 
 .. code-block:: python3
@@ -97,7 +97,7 @@ Train a RandomForestRegressor
 
 
 
-Fit a Model Performance Predictor on the model performances
+Fit a Model Performance Predictor on the model performances.
 
 
 .. code-block:: python3
@@ -113,7 +113,7 @@ Fit a Model Performance Predictor on the model performances
 
 
 
-Print metrics regarding the Model Performance Predictor
+Print metrics regarding the Model Performance Predictor.
 
 
 .. code-block:: python3
@@ -141,7 +141,7 @@ Print metrics regarding the Model Performance Predictor
 
 
 
-Plot the Model Performance Predictor Decision Tree
+Plot the Model Performance Predictor Decision Tree.
 
 
 .. code-block:: python3
@@ -170,7 +170,7 @@ Plot the Model Performance Predictor Decision Tree
 
 
 
-Print the details regarding the decision tree nodes containing the majority of errors
+Print the details regarding the decision tree nodes containing the majority of errors.
 
 
 .. code-block:: python3
@@ -237,14 +237,14 @@ Print the details regarding the decision tree nodes containing the majority of e
 
 
 
-Plot the feature distributions of samples in the nodes containing the majority of errors
-Rank features by correlation to error
+Plot the feature distributions of samples in ``LEAF 12`` containing the majority of errors.
+Rank features by correlation to error.
 
 
 .. code-block:: python3
 
 
-    error_visualizer.plot_feature_distributions_on_leaves(leaf_selector="all_errors", top_k_features=3)
+    error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=12, top_k_features=3)
 
 
 
@@ -267,96 +267,6 @@ Rank features by correlation to error
       .. image:: /auto_examples/images/sphx_glr_plot_mea_004.png
             :class: sphx-glr-multi-img
 
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_mea_005.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_mea_006.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_mea_007.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_mea_008.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_mea_009.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_mea_010.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_mea_011.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_mea_012.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_mea_013.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_mea_014.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_mea_015.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_mea_016.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_mea_017.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_mea_018.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_mea_019.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_mea_020.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_mea_021.png
-            :class: sphx-glr-multi-img
-
-    *
-
-      .. image:: /auto_examples/images/sphx_glr_plot_mea_022.png
-            :class: sphx-glr-multi-img
-
 
 .. rst-class:: sphx-glr-script-out
 
@@ -365,14 +275,6 @@ Rank features by correlation to error
  .. code-block:: none
 
     Leaf 12 (Wrong prediction: 1.000, Correct prediction: 0.000)
-    Leaf 14 (Wrong prediction: 1.000, Correct prediction: 0.000)
-    Leaf 3 (Wrong prediction: 1.000, Correct prediction: 0.000)
-    Leaf 9 (Wrong prediction: 1.000, Correct prediction: 0.000)
-    Leaf 17 (Wrong prediction: 1.000, Correct prediction: 0.000)
-    Leaf 19 (Wrong prediction: 1.000, Correct prediction: 0.000)
-    Leaf 21 (Wrong prediction: 1.000, Correct prediction: 0.000)
-    /Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/mea-0.0.1-py3.6.egg/mea/error_visualizer.py:49: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`).
-      plt.figure(figsize=figsize)
 
 
 
@@ -402,7 +304,7 @@ leaf clustering a subpopulation of errors with different feature values. The lar
 and purest failure nodes are highlighted when printing the error node summary, and
 also when plotting the feature distributions in the node (``leaf_selector="all_errors"``).
 From the feature distributions, sorted by correlation with the error, we can see that
-the majority of problems occur for extreme values of features ``DIS`` and ``TAX``.
+the majority of problems occur for extreme values of features ``LSTAT`` and ``AGE``.
 In the next iteration of model design, the primary model needs to be improved for these
 subpopulations.
 
@@ -410,9 +312,9 @@ subpopulations.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  11.753 seconds)
+   **Total running time of the script:** ( 0 minutes  4.064 seconds)
 
-**Estimated memory usage:**  318 MB
+**Estimated memory usage:**  196 MB
 
 
 .. _sphx_glr_download_auto_examples_plot_mea.py:
