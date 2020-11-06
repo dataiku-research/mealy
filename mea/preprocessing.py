@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder
 from sklearn.pipeline import Pipeline

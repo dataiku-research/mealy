@@ -134,12 +134,14 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                     descaled_value = thresholds[idx]
 
                     if split_feature in self.numerical_feature_names:
+                        print('NUMERICAL')
                         descaled_value = '%.2f' % descaled_value
                         lte_modified = ' <= '.join([lte_split[0], descaled_value])
                     else:
+                        print('CATE')
                         lte_split_without_feature = lte_split[0].split('\\n')[0]
                         lte_split_with_new_feature = lte_split_without_feature + '\\n' + split_feature
-                        lte_modified = ' != '.join([lte_split_with_new_feature, descaled_value])
+                        lte_modified = ' != '.join([lte_split_with_new_feature, str(descaled_value)])
                     new_label = '\\nentropy'.join([lte_modified, entropy_split[1]])
 
                     node.set_label(new_label)
