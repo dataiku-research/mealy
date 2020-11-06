@@ -205,11 +205,18 @@ to the whole data highlights the subpopulations where the model works poorly.</p
 <span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html#sklearn.ensemble.RandomForestRegressor" title="View documentation for sklearn.ensemble.RandomForestRegressor"><span class="n">RandomForestRegressor</span></a>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.image</span> <span class="k">as</span> <span class="nn">mpimg</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="kn">from</span> <span class="nn">mea.error_analyzer</span> <span class="kn">import</span> <span class="n">ErrorAnalyzer</span>
 <span class="kn">from</span> <span class="nn">mea.error_visualizer</span> <span class="kn">import</span> <span class="n">ErrorVisualizer</span>
 
-<a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.seed.html#numpy.random.seed" title="View documentation for numpy.random.seed"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span></a><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+
+<a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">default_seed</span></a> <span class="o">=</span> <span class="mi">10</span>
+<a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.seed.html#numpy.random.seed" title="View documentation for numpy.random.seed"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">default_seed</span></a><span class="p">)</span>
+<a href="https://docs.python.org/3/library/random.html#random.seed" title="View documentation for random.seed"><span class="n">random</span><span class="o">.</span><span class="n">seed</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">default_seed</span></a><span class="p">)</span>
 </pre></div>
 </div>
 <p>Load Boston houses dataset</p>
@@ -243,54 +250,79 @@ to the whole data highlights the subpopulations where the model works poorly.</p
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>The MPP was trained with accuracy 96.85%.
-The Decision Tree estimated the primary models accuracy to 91.34%.
-The true accuracy of the primary model is 88.19.%
-The Fidelity of the MPP is 96.85%.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>The MPP was trained with accuracy 98.43%.
+The Decision Tree estimated the primary models accuracy to 86.61%.
+The true accuracy of the primary model is 85.04.%
+The Fidelity of the MPP is 98.43%.
 The MPP is considered representative of the primary model performances.
 </pre></div>
 </div>
 <p>Plot the Model Performance Predictor Decision Tree</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">error_visualizer</span> <span class="o">=</span> <span class="n">ErrorVisualizer</span><span class="p">(</span><span class="n">error_analyzer</span><span class="p">)</span>
-<span class="n">error_visualizer</span><span class="o">.</span><span class="n">plot_error_tree</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">tree_src</span> <span class="o">=</span> <span class="n">error_visualizer</span><span class="o">.</span><span class="n">plot_error_tree</span><span class="p">()</span>
+
+<span class="c1"># the output of ``plot_error_tree`` is rendered automatically in a python notebook</span>
+<span class="c1"># the following is for rendering in this sphynx gallery</span>
+<span class="n">tree_src</span><span class="o">.</span><span class="n">format</span> <span class="o">=</span> <span class="s1">&#39;png&#39;</span>
+<span class="n">tree_src</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s1">&#39;tree&#39;</span><span class="p">)</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">tree_img</span></a> <span class="o">=</span> <a href="https://matplotlib.org/api/image_api.html#matplotlib.image.imread" title="View documentation for matplotlib.image.imread"><span class="n">mpimg</span><span class="o">.</span><span class="n">imread</span></a><span class="p">(</span><span class="s1">&#39;tree.png&#39;</span><span class="p">)</span>
+
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.figure.html#matplotlib.pyplot.figure" title="View documentation for matplotlib.pyplot.figure"><span class="n">plt</span><span class="o">.</span><span class="n">figure</span></a><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.imshow.html#matplotlib.pyplot.imshow" title="View documentation for matplotlib.pyplot.imshow"><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">tree_img</span></a><span class="p">)</span>
+<a href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.axis.html#matplotlib.pyplot.axis" title="View documentation for matplotlib.pyplot.axis"><span class="n">plt</span><span class="o">.</span><span class="n">axis</span></a><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;graphviz.files.Source object at 0x12c3ebe80&gt;
-</pre></div>
-</div>
+<img alt="../_images/sphx_glr_plot_mea_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_mea_001.png" />
 <p>Print the details regarding the decision tree nodes containing the majority of errors</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">error_analyzer</span><span class="o">.</span><span class="n">error_node_summary</span><span class="p">(</span><span class="n">leaf_selector</span><span class="o">=</span><span class="s2">&quot;all_errors&quot;</span><span class="p">,</span> <span class="n">add_path_to_leaves</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_summary</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>LEAF 2:
-     Correct predictions: 0 | Wrong predictions: 5 | Local error (purity): 1.00 | Global error: 0.33
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>LEAF 12:
+     Correct predictions: 0 | Wrong predictions: 10 | Local error (purity): 1.00 | Global error: 0.53
      Path to leaf:
-     DIS &lt;= 1.51
-        LSTAT &lt;= 20.78
-LEAF 17:
-     Correct predictions: 0 | Wrong predictions: 3 | Local error (purity): 1.00 | Global error: 0.20
-     Path to leaf:
-     DIS &gt; 1.51
-        RM &gt; 8.00
-           NOX &lt;= 0.59
+     AGE &gt; 82.15
+        LSTAT &lt;= 8.96
+           RM &lt;= 8.21
 LEAF 14:
-     Correct predictions: 0 | Wrong predictions: 2 | Local error (purity): 1.00 | Global error: 0.13
+     Correct predictions: 0 | Wrong predictions: 2 | Local error (purity): 1.00 | Global error: 0.11
      Path to leaf:
-     DIS &gt; 1.51
-        RM &lt;= 8.00
-           NOX &gt; 0.51
-              DIS &gt; 2.89
-                 DIS &lt;= 3.34
-LEAF 5:
-     Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.07
+     AGE &gt; 82.15
+        LSTAT &lt;= 8.96
+           RM &gt; 8.21
+              AGE &lt;= 89.20
+LEAF 3:
+     Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.05
      Path to leaf:
-     DIS &lt;= 1.51
-        LSTAT &gt; 20.78
-           DIS &gt; 1.47
-
-[{&#39;id&#39;: 2, &#39;n_corrects&#39;: 0.0, &#39;n_errors&#39;: 5.0, &#39;local_error&#39;: 1.0, &#39;global_error&#39;: 0.3333333333333333, &#39;path_to_leaf&#39;: deque([&#39;DIS &lt;= 1.51&#39;, &#39;LSTAT &lt;= 20.78&#39;])}, {&#39;id&#39;: 17, &#39;n_corrects&#39;: 0.0, &#39;n_errors&#39;: 3.0, &#39;local_error&#39;: 1.0, &#39;global_error&#39;: 0.2, &#39;path_to_leaf&#39;: deque([&#39;DIS &gt; 1.51&#39;, &#39;RM &gt; 8.00&#39;, &#39;NOX &lt;= 0.59&#39;])}, {&#39;id&#39;: 14, &#39;n_corrects&#39;: 0.0, &#39;n_errors&#39;: 2.0, &#39;local_error&#39;: 1.0, &#39;global_error&#39;: 0.13333333333333333, &#39;path_to_leaf&#39;: deque([&#39;DIS &gt; 1.51&#39;, &#39;RM &lt;= 8.00&#39;, &#39;NOX &gt; 0.51&#39;, &#39;DIS &gt; 2.89&#39;, &#39;DIS &lt;= 3.34&#39;])}, {&#39;id&#39;: 5, &#39;n_corrects&#39;: 0.0, &#39;n_errors&#39;: 1.0, &#39;local_error&#39;: 1.0, &#39;global_error&#39;: 0.06666666666666667, &#39;path_to_leaf&#39;: deque([&#39;DIS &lt;= 1.51&#39;, &#39;LSTAT &gt; 20.78&#39;, &#39;DIS &gt; 1.47&#39;])}]
+     AGE &lt;= 82.15
+        LSTAT &lt;= 25.53
+           TAX &lt;= 204.50
+LEAF 9:
+     Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.05
+     Path to leaf:
+     AGE &lt;= 82.15
+        LSTAT &gt; 25.53
+LEAF 17:
+     Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.05
+     Path to leaf:
+     AGE &gt; 82.15
+        LSTAT &gt; 8.96
+           DIS &lt;= 1.32
+LEAF 19:
+     Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.05
+     Path to leaf:
+     AGE &gt; 82.15
+        LSTAT &gt; 8.96
+           DIS &gt; 1.32
+              TAX &lt;= 213.00
+LEAF 21:
+     Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.05
+     Path to leaf:
+     AGE &gt; 82.15
+        LSTAT &gt; 8.96
+           DIS &gt; 1.32
+              TAX &gt; 213.00
+                 RM &lt;= 4.12
 </pre></div>
 </div>
 <p>Plot the feature distributions of samples in the nodes containing the majority of errors
@@ -299,8 +331,6 @@ Rank features by correlation to error</p>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
-<li><img alt="../_images/sphx_glr_plot_mea_001.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_001.png" />
-</li>
 <li><img alt="../_images/sphx_glr_plot_mea_002.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_002.png" />
 </li>
 <li><img alt="../_images/sphx_glr_plot_mea_003.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_003.png" />
@@ -323,12 +353,37 @@ Rank features by correlation to error</p>
 </li>
 <li><img alt="../_images/sphx_glr_plot_mea_012.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_012.png" />
 </li>
+<li><img alt="../_images/sphx_glr_plot_mea_013.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_013.png" />
+</li>
+<li><img alt="../_images/sphx_glr_plot_mea_014.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_014.png" />
+</li>
+<li><img alt="../_images/sphx_glr_plot_mea_015.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_015.png" />
+</li>
+<li><img alt="../_images/sphx_glr_plot_mea_016.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_016.png" />
+</li>
+<li><img alt="../_images/sphx_glr_plot_mea_017.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_017.png" />
+</li>
+<li><img alt="../_images/sphx_glr_plot_mea_018.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_018.png" />
+</li>
+<li><img alt="../_images/sphx_glr_plot_mea_019.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_019.png" />
+</li>
+<li><img alt="../_images/sphx_glr_plot_mea_020.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_020.png" />
+</li>
+<li><img alt="../_images/sphx_glr_plot_mea_021.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_021.png" />
+</li>
+<li><img alt="../_images/sphx_glr_plot_mea_022.png" class="sphx-glr-multi-img" src="../_images/sphx_glr_plot_mea_022.png" />
+</li>
 </ul>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Leaf 2 (Wrong prediction: 1.000, Correct prediction: 0.000)
-Leaf 17 (Wrong prediction: 1.000, Correct prediction: 0.000)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Leaf 12 (Wrong prediction: 1.000, Correct prediction: 0.000)
 Leaf 14 (Wrong prediction: 1.000, Correct prediction: 0.000)
-Leaf 5 (Wrong prediction: 1.000, Correct prediction: 0.000)
+Leaf 3 (Wrong prediction: 1.000, Correct prediction: 0.000)
+Leaf 9 (Wrong prediction: 1.000, Correct prediction: 0.000)
+Leaf 17 (Wrong prediction: 1.000, Correct prediction: 0.000)
+Leaf 19 (Wrong prediction: 1.000, Correct prediction: 0.000)
+Leaf 21 (Wrong prediction: 1.000, Correct prediction: 0.000)
+/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages/mea-0.0.1-py3.6.egg/mea/error_visualizer.py:49: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`).
+  plt.figure(figsize=figsize)
 </pre></div>
 </div>
 <div class="section" id="discussion">
@@ -356,8 +411,8 @@ From the feature distributions, sorted by correlation with the error, we can see
 the majority of problems occur for extreme values of features <code class="docutils literal notranslate"><span class="pre">DIS</span></code> and <code class="docutils literal notranslate"><span class="pre">TAX</span></code>.
 In the next iteration of model design, the primary model needs to be improved for these
 subpopulations.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  6.620 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  104 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  11.753 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  318 MB</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-mea-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/b9c7db120083279d70637f728d144247/plot_mea.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_mea.py</span></code></a></p>
