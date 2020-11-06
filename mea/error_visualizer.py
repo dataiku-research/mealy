@@ -146,6 +146,21 @@ class ErrorVisualizer(_BaseErrorVisualizer):
 
                     node.set_label(new_label)
 
+                alpha = 0.0
+                node_class = ErrorAnalyzerConstants.CORRECT_PREDICTION
+                if 'value = [' in node_label:
+                    values = [float(ii) for ii in node_label.split('value = [')[1].split(']')[0].split(',')]
+                    node_arg_class = np.argmax(values)
+                    node_class = self._error_clf.classes_[node_arg_class]
+                    # transparency as the entropy value
+                    alpha = values[node_arg_class]
+                class_color = ErrorAnalyzerConstants.ERROR_TREE_COLORS[node_class].strip('#')
+                class_color_rgb = tuple(int(class_color[i:i + 2], 16) for i in (0, 2, 4))
+                # compute the color as alpha against white
+                color_rgb = [int(round(alpha * c + (1 - alpha) * 255, 0)) for c in class_color_rgb]
+                color = '#{:02x}{:02x}{:02x}'.format(color_rgb[0], color_rgb[1], color_rgb[2])
+                node.set_fillcolor(color)
+
         if size is not None:
             pydot_graph.set_size('"%d,%d!"' % (size[0], size[1]))
         gvz_graph = gv.Source(pydot_graph.to_string())
