@@ -187,8 +187,8 @@ and is usually performed manually.</p>
 <p>The mea package streamlines the analysis of the samples mostly contributing to model errors and provides the user with
 automatic tools to break down the model errors into meaningful groups, easier to analyze, and to highlight the most frequent
 type of errors, as well as the problematic features correlated with the failures.</p>
-<p>We call the model under investigation the _primary_ model.</p>
-<p>This approach relies on a Model Performance Predictor (MPP), a secondary model trained to predict whether the primary
+<p>We call the model under investigation the <em>primary</em> model.</p>
+<p>This approach relies on a <strong>Model Performance Predictor</strong> (MPP), a secondary model trained to predict whether the primary
 model prediction is correct or wrong, i.e. a success or a failure. More precisely, the MPP is a binary DecisionTree classifier
 predicting whether the primary model will yield a Correct Prediction or a Wrong Prediction.</p>
 <p>The MPP can be trained on any dataset meant to evaluate the primary model performances, thus containing ground truth labels.
@@ -197,22 +197,46 @@ to compute the MPP metrics.</p>
 <p>In classification tasks the model failure is a wrong predicted class, whereas in case of regression tasks the failure is
 defined as a large deviation of the predicted value from the true one. In the latter case, when the absolute difference
 between the predicted and the true value is higher than a threshold ε, the model outcome is considered as a Wrong Prediction.
-The threshold ε is computed as the knee point of the Regression Error Characteristic (REC) curve, ensuring the absolute error
+The threshold ε is computed as the knee point of the Regression Error Characteristic
+(<a class="reference external" href="http://homepages.rpi.edu/~bennek/papers/rec.pdf">REC</a>) curve, ensuring the absolute error
 of primary predictions to be within tolerable limits.</p>
 <p>The leaves of the MPP decision tree break down the test dataset into smaller segments with similar features and similar
 model performances. Analyzing the sub-population in the error leaves, and comparing with the global population, provides
 insights about critical features correlated with the model failures.</p>
 <p>The mea package leads the user to focus on what are the problematic features and what are the typical values of these features
-for the mis-predicted samples. This information can later be exploited to support the strategy selected by the user :
-* improve model design: removing a problematic feature, removing samples likely to be mislabeled, ensemble with a model trained
-on a problematic subpopulation, …
-* enhance data collection: gather more data regarding the most erroneous under-represented populations,
-* select critical samples for manual inspection thanks to the MPP and avoid primary predictions on them, generating model assertions.</p>
+for the mis-predicted samples. This information can later be exploited to support the strategy selected by the user :</p>
+<ul class="simple">
+<li><p>improve model design: removing a problematic feature, removing samples likely to be mislabeled, ensemble with a model trained on a problematic subpopulation, …</p></li>
+<li><p>enhance data collection: gather more data regarding the most erroneous under-represented populations,</p></li>
+<li><p>select critical samples for manual inspection thanks to the MPP and avoid primary predictions on them, generating model assertions.</p></li>
+</ul>
 <p>The typical workflow in the iterative model design supported by error analysis is illustrated in the figure below.</p>
 <img alt="Model Error Analysis workflow" src="_images/mea_flow.png" />
 </div>
 <div class="section" id="metrics">
 <h2>Metrics<a class="headerlink" href="#metrics" title="Permalink to this headline">¶</a></h2>
+<p>The <strong>actual accuracy</strong> of the primary model is the proportion of samples in the test set the primary model predicts correctly
+(or close enough to the true value in case of regression).</p>
+<p>The Model Performance Predictor provides an estimation of this accuracy, referred to as <strong>estimated accuracy</strong>. This is
+the proportion of samples in the test set the MPP estimates as Correct Prediction</p>
+<p>If the estimated accuracy of the primary model is too far from the actual one, a warning is triggered.
+Indeed this means that the decision tree is not representative of the primary model performance,
+making the whole error analysis invalid. The metric measuring how the MPP is representative of the primary model
+is the <strong>Fidelity</strong> (<cite>1-|actual_acc - estimated_acc|</cite>). The chosen threshold for fidelity is <cite>0.9</cite>,
+below which the MPP predicted model accuracy is considered too different from the true model accuracy.</p>
+<p>As the Model Performance Predictor is simply a tree, it can be visualized and further analyzed by looking at its nodes,
+especially the leaf nodes. The color of a node represents whether the majority of samples falling in the node are
+Correct Prediction (blue) or Wrong Prediction (red).</p>
+<p>In particular the blue leaves represent the subpopulation of the dataset that the primary model managed to predict correctly.
+Vice versa, the red leaves are the Failure Nodes and represent observations for which the model gives bad predictions.
+Those points are particularly interesting as they give us insight on the reasons behind the model errors.</p>
+<p>There are four informations characterizing a node in the tree:</p>
+<ul class="simple">
+<li><p><em>Correct predictions</em>: number of samples the primary model predicts correctly</p></li>
+<li><p><em>Wrong predictions</em>: number of samples the primary model predicts wrongly</p></li>
+<li><p><em>Local error</em>: the ratio <cite>Wrong / (Wrong + Correct)</cite>. This is equivalent to the purity of a leaf node of class Wrong prediction.</p></li>
+<li><p><em>Global error</em>: the ratio between the number of errors in this node vs the number of total errors</p></li>
+</ul>
 </div>
 </div>
 
