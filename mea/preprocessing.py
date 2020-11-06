@@ -139,8 +139,9 @@ class PipelinePreprocessor(object):
                         except Exception as e:
                             logger.info(e)
                             logger.info("Step does not support inverse_transform. Skipping.")
-                            assert (len(prep_feats_ids) == len(orig_feats_ids))
-                            undo_prep_test_x[:, orig_feats_ids] = preprocessed_x[:, prep_feats_ids]
+                            if len(prep_feats_ids) == len(orig_feats_ids):
+                                logger.info("Apply identity transformation.")
+                                undo_prep_test_x[:, orig_feats_ids] = preprocessed_x[:, prep_feats_ids]
                             continue
                 else:
                     undo_prep_test_x[:, orig_feats_ids] = tr.inverse_transform(preprocessed_x[:, prep_feats_ids])
