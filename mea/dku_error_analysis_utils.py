@@ -11,13 +11,11 @@ def safe_str(val):
 
 
 def check_enough_data(df, min_len):
-    """
-    Compare length of dataframe to minimum lenght of the test data.
-    Used in the relevance of the measure.
-
-    :param df: Input dataframe
-    :param min_len:
-    :return:
+    """Check the input dataset is not too small.
+    Parameters
+    ----------
+    df : pandas.DataFrame, input dataset.
+    min_len: int, minimum required length.
     """
     if df.shape[0] < min_len:
         raise ValueError(
@@ -26,6 +24,16 @@ def check_enough_data(df, min_len):
 
 
 def rank_features_by_error_correlation(feature_importances):
+    """Rank indices from the most to the least important according to the input weights.
+    Parameters
+    ----------
+    feature_importances : numpy.array, feature importance weights.
+
+    Returns
+    -------
+    sorted_feature_indices: list, list of feature indices sorted from the most to the least important.
+
+    """
     sorted_feature_indices = np.argsort(- feature_importances)
     cut = len(np.where(feature_importances != 0)[0])
     sorted_feature_indices = sorted_feature_indices[:cut]
@@ -33,7 +41,9 @@ def rank_features_by_error_correlation(feature_importances):
 
 
 class ErrorAnalyzerConstants(object):
-
+    """
+    ErrorAnalyzerConstants stores the values for the configuration parameters of ErrorAnalyzer and ErrorVisualizer.
+    """
     WRONG_PREDICTION = "Wrong prediction"
     CORRECT_PREDICTION = "Correct prediction"
     MAX_DEPTH_GRID = [5, 10, 15, 20, 30, 50]

@@ -9,7 +9,18 @@ logging.basicConfig(level=logging.INFO, format='Error Analysis Plugin | %(leveln
 
 
 class FeatureNameTransformer(object):
+    """ Transformer of feature names and indices.
+        A FeatureNameTransformer parses an input Pipeline preprocessor and generate
+        a mapping between the input unprocessed feature names/indices and the output
+        preprocessed feature names/indices.
+        Args:
+            ct_preprocessor: sklearn Pipeline containing a ColumnTransformer with the preprocessing steps
+            orig_feats: list of original unpreprocessed feature names, default=None.
+        Attributes:
+            original_feature_names : list of original unpreprocessed feature names.
+            preprocessed_feature_names: list of preprocessed feature names
 
+    """
     def __init__(self, ct_preprocessor, orig_feats=None):
 
         self.original_feature_names = None
@@ -72,6 +83,19 @@ class FeatureNameTransformer(object):
                 len_preproc += len(tr_feature_names)
 
     def transform(self, index=None, name=None):
+        """Transform the unprocessed feature name at given index or with given name
+        into the output preprocessed feature names or indices.
+        Parameters
+        ----------
+        index : int, feature index.
+        name : string, feature name.
+
+        Returns
+        -------
+        list of indices (resp. names) of the preprocessed features corresponding to the input feature index (resp.name)
+
+        If both index and name are provided, the index is retained and output indices are returned.
+        """
         if index is not None:
             return self.original2preprocessed[index]
         elif name is not None:
@@ -82,6 +106,19 @@ class FeatureNameTransformer(object):
             raise ValueError("One of the input index or name should be specified.")
 
     def inverse_transform(self, index=None, name=None):
+        """Transform the preprocessed feature name at given index or with given name
+        back into the original unprocessed feature name or index.
+        Parameters
+        ----------
+        index : int, feature index.
+        name : string, feature name.
+
+        Returns
+        -------
+        index (resp. name) of the unprocessed feature corresponding to the input preprocessed feature index (resp.name)
+
+        If both index and name are provided, the index is retained and an output index is returned.
+        """
         if index is not None:
             return self.preprocessed2original[index]
         elif name is not None:
@@ -92,6 +129,18 @@ class FeatureNameTransformer(object):
             raise ValueError("One of the input index or name should be specified.")
 
     def is_categorical(self, index=None, name=None):
+        """Check whether an unprocessed feature at a given index or with a given name is categorical.
+        Parameters
+        ----------
+        index : int, feature index.
+        name : string, feature name.
+
+        Returns
+        -------
+        True if the input feature is categorical, else False
+
+        If both index and name are provided, the index is retained.
+        """
         if index is not None:
             name = self.original_feature_names[index]
             return name in self.categorical_features
@@ -102,16 +151,46 @@ class FeatureNameTransformer(object):
 
 
 class PipelinePreprocessor(object):
+    """ Transformer of feature values from the original values to preprocessed ones.
+        A PipelinePreprocessor parses an input Pipeline preprocessor and generate
+        a mapping between the input unprocessed feature values and the output
+        preprocessed feature values.
+        Args:
+            ct_preprocessor: sklearn Pipeline containing a ColumnTransformer with the preprocessing steps
+            orig_feats: list of original unpreprocessed feature names, default=None.
+        Attributes:
+            fn_transformer : FeatureNameTransformer managing the mapping between original and preprocessed
+            feature names.
 
+    """
     def __init__(self, ct_preprocessor, orig_feats=None):
 
         self.fn_transformer = FeatureNameTransformer(ct_preprocessor, orig_feats)
         self.ct_preprocessor = ct_preprocessor
 
     def transform(self, x):
+        """Transform the input feature values according to the preprocessing pipeline.
+        Parameters
+        ----------
+        x : numpy.array or pandas.DataFrame, input feature values.
+
+        Returns
+        -------
+        numpy array with transformed feature values
+        """
         return self.ct_preprocessor.transform(x).toarray()
 
     def inverse_transform(self, preprocessed_x):
+        """Invert the preprocessing pipeline and inverse transform feature values.
+        Parameters
+        ----------
+        preprocessed_x : numpy.array, preprocessed feature values.
+
+        Returns
+        -------
+        undo_prep_test_x: numpy.array, feature values without preprocessing
+
+        """
 
         orig_feats = self.fn_transformer.original_feature_names
 

@@ -35,6 +35,10 @@ def mpp_report(y_true, y_pred, output_dict=False):
         [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].
     output_dict : bool (default = False)
         If True, return output as dict
+
+    Returns
+    -------
+    dict or string with metrics regarding the Model Performance Predictor.
     """
 
     mpp_accuracy_score = compute_mpp_accuracy(y_true, y_pred)
