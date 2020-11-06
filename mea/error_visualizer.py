@@ -74,8 +74,9 @@ class _BaseErrorVisualizer(object):
 class ErrorVisualizer(_BaseErrorVisualizer):
     """
     ErrorVisualizer provides visual utilities to analyze the Model Performance Predictor in ErrorAnalyzer
+
     Args:
-        error_analyzer: fitted ErrorAnalyzer representing the performance of a primary model.
+        error_analyzer (ErrorAnalyzer): fitted ErrorAnalyzer representing the performance of a primary model.
     """
 
     def __init__(self, error_analyzer):
@@ -105,13 +106,12 @@ class ErrorVisualizer(_BaseErrorVisualizer):
 
     def plot_error_tree(self, size=None):
         """Plot the graph of the decision tree.
-        Parameters
-        ----------
-        size : tuple, size of the output plot.
 
-        Returns
-        -------
-        gvz_graph: graphviz.Source, graph of the Model Performance Predictor decision tree.
+        Args:
+            size (tuple): size of the output plot.
+
+        Return:
+            graphviz.Source: graph of the Model Performance Predictor decision tree.
 
         """
         digraph_tree = export_graphviz(self._error_clf,
@@ -166,23 +166,32 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                                              show_global=True, show_class=False, rank_leaves_by="purity", nr_bins=10,
                                              figsize=(15, 10)):
         """Return plot of error node feature distribution and compare to global baseline.
+
         The top-k features are sorted by importance in the Model Performance Predictor.
         The most important are more correlated with the errors. When no specific node is selected,
         the leaf nodes are ranked by an importance criterium and presented in relevance order.
-        Parameters
-        ----------
-        leaf_selector : int, list/array or string. The desired leaf nodes to visualize. When int it represents the
-        number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid values are
-        either 'all_error' to plot all leaves of class 'Wrong prediction' or 'all' to plot all leaf nodes.
-        top_k_features : int, number of features to plot per node.
-        show_global : bool, plot the feature distribution of samples in a node vs. samples in the whole data
-        (global baseline).
-        show_class : bool, show the proportion of Wrongly and Correctly predicted samples in the feature distributions.
-        rank_leaves_by : string, ranking criterium for the leaf nodes. It can be either 'purity' to rank by the leaf
-        node purity (ratio of wrongly predicted samples over the total for an error node) or 'class_difference'
-        (difference of number of wrongly and correctly predicted samples in a node).
-        nr_bins : int, number of bins in the feature distribution plots.
-        figsize: tuple, size of the plots.
+
+        Args:
+
+            leaf_selector (int or list or str): the desired leaf nodes to visualize. When int it represents the
+                number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid values
+                are either 'all_error' to plot all leaves of class 'Wrong prediction' or 'all' to plot all leaf nodes.
+
+            top_k_features (int): number of features to plot per node.
+
+            show_global (bool): plot the feature distribution of samples in a node vs. samples in the whole data
+                (global baseline).
+
+            show_class (bool): show the proportion of Wrongly and Correctly predicted samples in the feature
+                distributions.
+
+            rank_leaves_by (str): ranking criterium for the leaf nodes. It can be either 'purity' to rank by the leaf
+                node purity (ratio of wrongly predicted samples over the total for an error node) or 'class_difference'
+                (difference of number of wrongly and correctly predicted samples in a node).
+
+            nr_bins (int): number of bins in the feature distribution plots.
+
+            figsize (tuple): size of the plots.
 
         """
 

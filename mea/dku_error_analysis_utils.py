@@ -12,10 +12,10 @@ def safe_str(val):
 
 def check_enough_data(df, min_len):
     """Check the input dataset is not too small.
-    Parameters
-    ----------
-    df : pandas.DataFrame, input dataset.
-    min_len: int, minimum required length.
+
+    Args:
+        df (pandas.DataFrame): input dataset.
+        min_len (int): minimum required length.
     """
     if df.shape[0] < min_len:
         raise ValueError(
@@ -25,13 +25,12 @@ def check_enough_data(df, min_len):
 
 def rank_features_by_error_correlation(feature_importances):
     """Rank indices from the most to the least important according to the input weights.
-    Parameters
-    ----------
-    feature_importances : numpy.array, feature importance weights.
 
-    Returns
-    -------
-    sorted_feature_indices: list, list of feature indices sorted from the most to the least important.
+    Args:
+        feature_importances (numpy.ndarray): feature importance weights.
+
+    Return:
+        numpy.ndarray: list of feature indices sorted from the most to the least important.
 
     """
     sorted_feature_indices = np.argsort(- feature_importances)

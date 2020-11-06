@@ -25,20 +25,16 @@ def compute_primary_model_accuracy(y):
 
 def mpp_report(y_true, y_pred, output_dict=False):
     """Build a text report showing the main Model Performance Predictor (MPP) metrics.
-    Parameters
-    ----------
-    y_true : 1d array-like
-        Ground truth values of wrong/correct predictions of the MPP primary model. Expected values in
-        [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].
-    y_pred : 1d array-like
-        Estimated targets as returned by a Model Performance Predictor. Expected values in
-        [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].
-    output_dict : bool (default = False)
-        If True, return output as dict
 
-    Returns
-    -------
-    dict or string with metrics regarding the Model Performance Predictor.
+    Args:
+        y_true (numpy.ndarray): Ground truth values of wrong/correct predictions of the MPP primary model.
+            Expected values in [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].
+        y_pred (numpy.ndarray): Estimated targets as returned by a Model Performance Predictor. Expected values in
+            [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].
+        output_dict (bool): If True, return output as dict (default = False).
+
+    Return:
+        dict or str: metrics regarding the Model Performance Predictor.
     """
 
     mpp_accuracy_score = compute_mpp_accuracy(y_true, y_pred)
