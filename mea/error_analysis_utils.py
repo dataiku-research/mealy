@@ -1,14 +1,4 @@
-import sys
 import numpy as np
-
-
-def safe_str(val):
-    if sys.version_info > (3, 0):
-        return str(val)
-    if isinstance(val, unicode):
-        return val.encode("utf-8")
-    return str(val)
-
 
 def check_enough_data(df, min_len):
     """
