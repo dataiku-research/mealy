@@ -192,40 +192,63 @@
 <dl class="class">
 <dt id="mea.preprocessing.FeatureNameTransformer">
 <em class="property">class </em><code class="sig-prename descclassname">mea.preprocessing.</code><code class="sig-name descname">FeatureNameTransformer</code><span class="sig-paren">(</span><em class="sig-param">ct_preprocessor</em>, <em class="sig-param">orig_feats=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/preprocessing.html#FeatureNameTransformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.preprocessing.FeatureNameTransformer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transformer of feature names and indices.
-A FeatureNameTransformer parses an input Pipeline preprocessor and generate
+<dd><p>Transformer of feature names and indices.</p>
+<p>A FeatureNameTransformer parses an input Pipeline preprocessor and generate
 a mapping between the input unprocessed feature names/indices and the output
-preprocessed feature names/indices.
-:param ct_preprocessor: sklearn Pipeline containing a ColumnTransformer with the preprocessing steps
-:param orig_feats: list of original unpreprocessed feature names, default=None.</p>
+preprocessed feature names/indices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ct_preprocessor</strong> (<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html#sklearn.compose.ColumnTransformer" title="(in scikit-learn v0.23)"><em>sklearn.compose.ColumnTransformer</em></a>) – preprocessor</p></li>
+<li><p><strong>orig_feats</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – list of original unpreprocessed feature names, default=None.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="attribute">
 <dt id="mea.preprocessing.FeatureNameTransformer.original_feature_names">
 <code class="sig-name descname">original_feature_names</code><a class="headerlink" href="#mea.preprocessing.FeatureNameTransformer.original_feature_names" title="Permalink to this definition">¶</a></dt>
 <dd><p>list of original unpreprocessed feature names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="mea.preprocessing.FeatureNameTransformer.preprocessed_feature_names">
 <code class="sig-name descname">preprocessed_feature_names</code><a class="headerlink" href="#mea.preprocessing.FeatureNameTransformer.preprocessed_feature_names" title="Permalink to this definition">¶</a></dt>
 <dd><p>list of preprocessed feature names</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="mea.preprocessing.FeatureNameTransformer.inverse_transform">
 <code class="sig-name descname">inverse_transform</code><span class="sig-paren">(</span><em class="sig-param">index=None</em>, <em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/preprocessing.html#FeatureNameTransformer.inverse_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.preprocessing.FeatureNameTransformer.inverse_transform" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transform the preprocessed feature name at given index or with given name
-back into the original unprocessed feature name or index.
-:param index: feature index.
-:type index: int
-:param name: feature name.
-:type name: str</p>
+<dd><p>Undo preprocessing of feature name.</p>
+<p>Transform the preprocessed feature name at given index or with given name
+back into the original unprocessed feature name or index.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>feature</strong> – index (resp. name) of the unprocessed feature corresponding to the input preprocessed feature index
-(resp.name). If both index and name are provided, the index is retained and an output index is returned.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – feature index.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – feature name.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>index (resp. name) of the unprocessed feature corresponding to the input preprocessed feature</dt><dd><p>index (resp.name). If both index and name are provided, the index is retained and an output index is
+returned.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -233,18 +256,23 @@ back into the original unprocessed feature name or index.
 <dl class="method">
 <dt id="mea.preprocessing.FeatureNameTransformer.is_categorical">
 <code class="sig-name descname">is_categorical</code><span class="sig-paren">(</span><em class="sig-param">index=None</em>, <em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/preprocessing.html#FeatureNameTransformer.is_categorical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.preprocessing.FeatureNameTransformer.is_categorical" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check whether an unprocessed feature at a given index or with a given name is categorical.
-:param index: feature index.
-:type index: int
-:param name: feature name.
-:type name: str</p>
+<dd><p>Check whether an unprocessed feature at a given index or with a given name is categorical.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>is_cat</strong> – True if the input feature is categorical, else False. If both index and name are provided, the index is
-retained.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – feature index.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – feature name.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>True if the input feature is categorical, else False. If both index and name are provided, the index</dt><dd><p>is retained.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -252,19 +280,25 @@ retained.</p>
 <dl class="method">
 <dt id="mea.preprocessing.FeatureNameTransformer.transform">
 <code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param">index=None</em>, <em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/preprocessing.html#FeatureNameTransformer.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.preprocessing.FeatureNameTransformer.transform" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transform the unprocessed feature name at given index or with given name
-into the output preprocessed feature names or indices.
-:param index: feature index.
-:type index: int
-:param name: feature name.
-:type name: str</p>
+<dd><p>Apply preprocessing to feature name.</p>
+<p>Transform the unprocessed feature name at given index or with given name
+into the output preprocessed feature names or indices.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>indices</strong> – list of indices (resp. names) of the preprocessed features corresponding to the input feature index
-(resp.name). If both index and name are provided, the index is retained and output indices are returned.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – feature index.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – feature name.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>array_like</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>list of indices (resp. names) of the preprocessed features corresponding to the input feature index</dt><dd><p>(resp.name). If both index and name are provided, the index is retained and output indices are returned.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -274,39 +308,43 @@ into the output preprocessed feature names or indices.
 <div class="sphx-glr-clear"></div><dl class="class">
 <dt id="mea.preprocessing.PipelinePreprocessor">
 <em class="property">class </em><code class="sig-prename descclassname">mea.preprocessing.</code><code class="sig-name descname">PipelinePreprocessor</code><span class="sig-paren">(</span><em class="sig-param">ct_preprocessor</em>, <em class="sig-param">orig_feats=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/preprocessing.html#PipelinePreprocessor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.preprocessing.PipelinePreprocessor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transformer of feature values from the original values to preprocessed ones.
-A PipelinePreprocessor parses an input Pipeline preprocessor and generate
+<dd><p>Transformer of feature values from the original values to preprocessed ones.</p>
+<p>A PipelinePreprocessor parses an input Pipeline preprocessor and generate
 a mapping between the input unprocessed feature values and the output
-preprocessed feature values.
-:param ct_preprocessor: sklearn.Pipeline</p>
-<blockquote>
-<div><p>pipeline containing a ColumnTransformer with the preprocessing steps</p>
-</div></blockquote>
+preprocessed feature values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>orig_feats</strong> – array_like
-list of original unpreprocessed feature names, default=None.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ct_preprocessor</strong> (<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html#sklearn.compose.ColumnTransformer" title="(in scikit-learn v0.23)"><em>sklearn.compose.ColumnTransformer</em></a>) – preprocessing steps</p></li>
+<li><p><strong>orig_feats</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – list of original unpreprocessed feature names, default=None.</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="attribute">
 <dt id="mea.preprocessing.PipelinePreprocessor.fn_transformer">
 <code class="sig-name descname">fn_transformer</code><a class="headerlink" href="#mea.preprocessing.PipelinePreprocessor.fn_transformer" title="Permalink to this definition">¶</a></dt>
-<dd><p>mea.FeatureNameTransformer
-transformer managing the mapping between original and preprocessed feature names.</p>
+<dd><p>transformer managing the mapping between original and
+preprocessed feature names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#mea.preprocessing.FeatureNameTransformer" title="mea.preprocessing.FeatureNameTransformer">FeatureNameTransformer</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="mea.preprocessing.PipelinePreprocessor.inverse_transform">
 <code class="sig-name descname">inverse_transform</code><span class="sig-paren">(</span><em class="sig-param">preprocessed_x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/preprocessing.html#PipelinePreprocessor.inverse_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.preprocessing.PipelinePreprocessor.inverse_transform" title="Permalink to this definition">¶</a></dt>
-<dd><p>Invert the preprocessing pipeline and inverse transform feature values.
-:param preprocessed_x: preprocessed feature values.
-:type preprocessed_x: ndarray</p>
+<dd><p>Invert the preprocessing pipeline and inverse transform feature values.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>undo_prep_test_x</strong> – feature values without preprocessing</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>preprocessed_x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – preprocessed feature values.</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>ndarray</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>feature values without preprocessing</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -314,15 +352,16 @@ transformer managing the mapping between original and preprocessed feature names
 <dl class="method">
 <dt id="mea.preprocessing.PipelinePreprocessor.transform">
 <code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/preprocessing.html#PipelinePreprocessor.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.preprocessing.PipelinePreprocessor.transform" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transform the input feature values according to the preprocessing pipeline.
-:param x: input feature values.
-:type x: ndarray or dataframe</p>
+<dd><p>Transform the input feature values according to the preprocessing pipeline.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>x_transformed</strong> – transformed feature values</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.1.4)"><em>pandas.DataFrame</em></a>) – input feature values.</p>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>ndarray</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>transformed feature values</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>

@@ -192,111 +192,138 @@
 <dl class="class">
 <dt id="mea.error_analyzer.ErrorAnalyzer">
 <em class="property">class </em><code class="sig-prename descclassname">mea.error_analyzer.</code><code class="sig-name descname">ErrorAnalyzer</code><span class="sig-paren">(</span><em class="sig-param">predictor</em>, <em class="sig-param">feature_names=None</em>, <em class="sig-param">seed=65537</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/error_analyzer.html#ErrorAnalyzer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.error_analyzer.ErrorAnalyzer" title="Permalink to this definition">¶</a></dt>
-<dd><p>ErrorAnalyzer analyzes the errors of a prediction model on a test set.
-It uses model predictions and ground truth target to compute the model errors on the test set.
+<dd><p>ErrorAnalyzer analyzes the errors of a prediction model on a test set.</p>
+<p>It uses model predictions and ground truth target to compute the model errors on the test set.
 It then trains a Decision Tree, called a Model Performance Predictor, on the same test set by using the model error
-as target. The nodes of the decision tree are different segments of errors to be studied individually.
-:param predictor: sklearn.BaseEstimator or sklearn.Pipeline</p>
-<blockquote>
-<div><p>a sklearn model to analyze. Either an estimator or a Pipeline containing a ColumnTransformer with
-the preprocessing steps and an estimator as last step.</p>
-</div></blockquote>
+as target. The nodes of the decision tree are different segments of errors to be studied individually.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>feature_names</strong> – list
-list of feature names, default=None.</p></li>
-<li><p><strong>seed</strong> – int
-random seed.</p></li>
+<li><p><strong>predictor</strong> (<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator" title="(in scikit-learn v0.23)"><em>sklearn.base.BaseEstimator</em></a><em> or </em><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v0.23)"><em>sklearn.pipeline.Pipeline</em></a>) – a sklearn model to analyze. Either an estimator
+or a Pipeline containing a ColumnTransformer with the preprocessing steps and an estimator as last step.</p></li>
+<li><p><strong>feature_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – list of feature names, default=None.</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – random seed.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="attribute">
 <dt id="mea.error_analyzer.ErrorAnalyzer.error_train_x">
 <code class="sig-name descname">error_train_x</code><a class="headerlink" href="#mea.error_analyzer.ErrorAnalyzer.error_train_x" title="Permalink to this definition">¶</a></dt>
-<dd><p>ndarray
-features used to train the Model performance Predictor.</p>
+<dd><p>features used to train the Model performance Predictor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="mea.error_analyzer.ErrorAnalyzer.error_train_y">
 <code class="sig-name descname">error_train_y</code><a class="headerlink" href="#mea.error_analyzer.ErrorAnalyzer.error_train_y" title="Permalink to this definition">¶</a></dt>
-<dd><p>ndarray
-target used to train the Model performance Predictor, it is abinary variable
+<dd><p>target used to train the Model performance Predictor, it is abinary variable
 representing whether the input predictor predicted correctly or incorrectly the samples in error_train_x.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="mea.error_analyzer.ErrorAnalyzer.model_performance_predictor_features">
 <code class="sig-name descname">model_performance_predictor_features</code><a class="headerlink" href="#mea.error_analyzer.ErrorAnalyzer.model_performance_predictor_features" title="Permalink to this definition">¶</a></dt>
-<dd><p>array_like
-feature names used in the Model Performance Predictor.</p>
+<dd><p>feature names used in the Model Performance Predictor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="mea.error_analyzer.ErrorAnalyzer.model_performance_predictor">
 <code class="sig-name descname">model_performance_predictor</code><a class="headerlink" href="#mea.error_analyzer.ErrorAnalyzer.model_performance_predictor" title="Permalink to this definition">¶</a></dt>
-<dd><p>DecisionTree
-performance predictor decision tree.</p>
+<dd><p>performance predictor decision tree.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier" title="(in scikit-learn v0.23)">sklearn.tree.DecisionTreeClassifier</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="mea.error_analyzer.ErrorAnalyzer.train_leaf_ids">
 <code class="sig-name descname">train_leaf_ids</code><a class="headerlink" href="#mea.error_analyzer.ErrorAnalyzer.train_leaf_ids" title="Permalink to this definition">¶</a></dt>
-<dd><p>ndarray
-indices of leaf in the Model Performance Predictor, where each of the training</p>
+<dd><p>indices of leaf in the Model Performance Predictor, where each of the training
+sample falls.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
+</dd>
+</dl>
 </dd></dl>
-
-<dl class="attribute">
-<dt>
-<code class="sig-name descname">sample falls.</code></dt>
-<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="mea.error_analyzer.ErrorAnalyzer.impurity">
 <code class="sig-name descname">impurity</code><a class="headerlink" href="#mea.error_analyzer.ErrorAnalyzer.impurity" title="Permalink to this definition">¶</a></dt>
-<dd><p>ndarray
-impurity of leaf nodes (used for ranking the nodes).</p>
+<dd><p>impurity of leaf nodes (used for ranking the nodes).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="mea.error_analyzer.ErrorAnalyzer.quantized_impurity">
 <code class="sig-name descname">quantized_impurity</code><a class="headerlink" href="#mea.error_analyzer.ErrorAnalyzer.quantized_impurity" title="Permalink to this definition">¶</a></dt>
-<dd><p>ndarray
-quantized impurity of leaf nodes (used for ranking the nodes).</p>
+<dd><p>quantized impurity of leaf nodes (used for ranking the nodes).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="mea.error_analyzer.ErrorAnalyzer.difference">
 <code class="sig-name descname">difference</code><a class="headerlink" href="#mea.error_analyzer.ErrorAnalyzer.difference" title="Permalink to this definition">¶</a></dt>
-<dd><p>ndarray
-difference of number of correctly and incorrectly predicted samples in leaf nodes (used for ranking the
-nodes).</p>
+<dd><p>difference of number of correctly and incorrectly predicted samples in leaf nodes
+(used for ranking the nodes).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="mea.error_analyzer.ErrorAnalyzer.leaf_ids">
 <code class="sig-name descname">leaf_ids</code><a class="headerlink" href="#mea.error_analyzer.ErrorAnalyzer.leaf_ids" title="Permalink to this definition">¶</a></dt>
-<dd><p>ndarray
-list of all leaf nodes indices.</p>
+<dd><p>list of all leaf nodes indices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="mea.error_analyzer.ErrorAnalyzer.error_node_summary">
 <code class="sig-name descname">error_node_summary</code><span class="sig-paren">(</span><em class="sig-param">leaf_selector='all_errors'</em>, <em class="sig-param">add_path_to_leaves=False</em>, <em class="sig-param">print_summary=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/error_analyzer.html#ErrorAnalyzer.error_node_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.error_analyzer.ErrorAnalyzer.error_node_summary" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return summary information regarding input nodes</p>
+<dd><p>Return summary information regarding input nodes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>leaf_selector</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><em>array_like</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – the desired leaf nodes to visualize. When int it represents the
-number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid values are
-either ‘all_error’ to plot all leaves of class ‘Wrong prediction’ or ‘all’ to plot all leaf nodes.</p></li>
+<li><p><strong>leaf_selector</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – the desired leaf nodes to visualize. When int it represents the
+number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid values
+are either ‘all_error’ to plot all leaves of class ‘Wrong prediction’ or ‘all’ to plot all leaf nodes.</p></li>
 <li><p><strong>add_path_to_leaves</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – add information of the feature path across the tree till the selected node.</p></li>
 <li><p><strong>print_summary</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – print summary for the selected nodes.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>leaves_summary</strong> – dictionary of metrics for each selected node of the Model Performance Predictor.</p>
+<dd class="field-even"><p>dictionary of metrics for each selected node of the Model Performance Predictor.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
@@ -307,13 +334,16 @@ either ‘all_error’ to plot all leaves of class ‘Wrong prediction’ or ‘
 <dl class="method">
 <dt id="mea.error_analyzer.ErrorAnalyzer.fit">
 <code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em>, <em class="sig-param">max_nr_rows=100000</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/error_analyzer.html#ErrorAnalyzer.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.error_analyzer.ErrorAnalyzer.fit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Trains the Model Performance Predictor, a Decision Tree to discriminate between samples that are correctly
+<dd><p>Fit the Model Performance Predictor.</p>
+<p>Trains the Model Performance Predictor, a Decision Tree to discriminate between samples that are correctly
 predicted or wrongly predicted (errors) by a primary model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>ndarray</em><em> or </em><em>dataframe</em>) – feature data from a test set to evaluate the primary predictor and train a Model Performance Predictor.</p></li>
-<li><p><strong>y</strong> (<em>ndarray</em><em> or </em><em>dataframe</em>) – target data from a test set to evaluate the primary predictor and train a Model Performance Predictor.</p></li>
+<li><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.1.4)"><em>pandas.DataFrame</em></a>) – feature data from a test set to evaluate the primary predictor and train a Model
+Performance Predictor.</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.1.4)"><em>pandas.DataFrame</em></a>) – target data from a test set to evaluate the primary predictor and train a Model
+Performance Predictor.</p></li>
 <li><p><strong>max_nr_rows</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – maximum number of rows to process.</p></li>
 </ul>
 </dd>
@@ -327,7 +357,7 @@ predicted or wrongly predicted (errors) by a primary model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>leaf_selector</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><em>array_like</em><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – the desired leaf nodes to visualize. When int it represents the
+<li><p><strong>leaf_selector</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – the desired leaf nodes to visualize. When int it represents the
 number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid values are
 either ‘all_error’ to plot all leaves of class ‘Wrong prediction’ or ‘all’ to plot all leaf nodes.</p></li>
 <li><p><strong>rank_by</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – ranking criterium for the leaf nodes. It can be either ‘purity’ to rank by the leaf
@@ -336,10 +366,10 @@ node purity (ratio of wrongly predicted samples over the total for an error node
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>sorted_leaf_indices</strong> – list of selected leaf nodes indices.</p>
+<dd class="field-even"><p>list of selected leaf nodes indices.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>array_like</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a> or <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -347,18 +377,19 @@ node purity (ratio of wrongly predicted samples over the total for an error node
 <dl class="method">
 <dt id="mea.error_analyzer.ErrorAnalyzer.inverse_transform_features">
 <code class="sig-name descname">inverse_transform_features</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/error_analyzer.html#ErrorAnalyzer.inverse_transform_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.error_analyzer.ErrorAnalyzer.inverse_transform_features" title="Permalink to this definition">¶</a></dt>
-<dd><p>If the predictor comes with a Pipeline preprocessor, map the features indices of the Model
-Performance Predictor Decision Tree back to their indices in the original s unpreprocessed space of features.
+<dd><p>Undo preprocessing of feature values.</p>
+<p>If the predictor comes with a Pipeline preprocessor, map the features indices of the Model
+Performance Predictor Decision Tree back to their indices in the original unpreprocessed space of features.
 Otherwise simply return the feature indices of the decision tree. The feature indices of a decision tree
 indicate what features are used to split the training set at each node.
-See &lt;<a class="reference external" href="https://scikit-learn.org/stable/auto_examples/tree/plot_unveil_tree_structure.html">https://scikit-learn.org/stable/auto_examples/tree/plot_unveil_tree_structure.html</a>&gt;.</p>
+See <a class="reference external" href="https://scikit-learn.org/stable/auto_examples/tree/plot_unveil_tree_structure.html">https://scikit-learn.org/stable/auto_examples/tree/plot_unveil_tree_structure.html</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>feature_indices</strong> – indices of features of the Model Performance Predictor Decision Tree, possibly
-mapped back to the original unprocessed feature space.</p>
+<dd class="field-odd"><p>indices of features of the Model Performance Predictor Decision Tree, possibly mapped back to the
+original unprocessed feature space.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>array_like</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a> or <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -366,16 +397,17 @@ mapped back to the original unprocessed feature space.</p>
 <dl class="method">
 <dt id="mea.error_analyzer.ErrorAnalyzer.inverse_transform_thresholds">
 <code class="sig-name descname">inverse_transform_thresholds</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/error_analyzer.html#ErrorAnalyzer.inverse_transform_thresholds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.error_analyzer.ErrorAnalyzer.inverse_transform_thresholds" title="Permalink to this definition">¶</a></dt>
-<dd><p>If the predictor comes with a Pipeline preprocessor, undo the preprocessing on the thresholds of the Model
+<dd><p>Undo preprocessing of feature threshold values.</p>
+<p>If the predictor comes with a Pipeline preprocessor, undo the preprocessing on the thresholds of the Model
 Performance Predictor Decision Tree for an easier plot interpretation. Otherwise simply return the thresholds of
 the decision tree. The thresholds of a decision tree are the feature values used to split the training set at
-each node. See &lt;<a class="reference external" href="https://scikit-learn.org/stable/auto_examples/tree/plot_unveil_tree_structure.html">https://scikit-learn.org/stable/auto_examples/tree/plot_unveil_tree_structure.html</a>&gt;.</p>
+each node. See <a class="reference external" href="https://scikit-learn.org/stable/auto_examples/tree/plot_unveil_tree_structure.html">https://scikit-learn.org/stable/auto_examples/tree/plot_unveil_tree_structure.html</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>thresholds</strong> – thresholds of the Model Performance Predictor Decision Tree, possibly with preprocessing undone.</p>
+<dd class="field-odd"><p>thresholds of the Model Performance Predictor Decision Tree, possibly with preprocessing undone.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>ndarray</p>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -383,21 +415,23 @@ each node. See &lt;<a class="reference external" href="https://scikit-learn.org/
 <dl class="method">
 <dt id="mea.error_analyzer.ErrorAnalyzer.mpp_summary">
 <code class="sig-name descname">mpp_summary</code><span class="sig-paren">(</span><em class="sig-param">x_test</em>, <em class="sig-param">y_test</em>, <em class="sig-param">nr_max_rows=100000</em>, <em class="sig-param">output_dict=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/error_analyzer.html#ErrorAnalyzer.mpp_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.error_analyzer.ErrorAnalyzer.mpp_summary" title="Permalink to this definition">¶</a></dt>
-<dd><p>Print ErrorAnalyzer summary metrics regarding the Model Performance Predictor.
-:param x_test: feature data from a test set to evaluate the primary predictor and train a Model Performance Predictor.
-:type x_test: ndarray or dataframe
-:param y_test: target data from a test set to evaluate the primary predictor and train a Model Performance Predictor.
-:type y_test: ndarray or dataframe
-:param nr_max_rows: maximum number of rows to process.
-:type nr_max_rows: int
-:param output_dict: whether to return a dict or a string with metrics.
-:type output_dict: bool</p>
+<dd><p>Print ErrorAnalyzer summary metrics regarding the Model Performance Predictor.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>metrics</strong> – metrics regarding the Model Performance Predictor.</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_test</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.1.4)"><em>pandas.DataFrame</em></a>) – feature data from a test set to evaluate the primary predictor
+and train a Model Performance Predictor.</p></li>
+<li><p><strong>y_test</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.1.4)"><em>pandas.DataFrame</em></a>) – target data from a test set to evaluate the primary predictor and
+train a Model Performance Predictor.</p></li>
+<li><p><strong>nr_max_rows</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – maximum number of rows to process.</p></li>
+<li><p><strong>output_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – whether to return a dict or a string with metrics.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>metrics regarding the Model Performance Predictor.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -406,6 +440,17 @@ each node. See &lt;<a class="reference external" href="https://scikit-learn.org/
 <dt id="mea.error_analyzer.ErrorAnalyzer.predict">
 <code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/error_analyzer.html#ErrorAnalyzer.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.error_analyzer.ErrorAnalyzer.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Predict model performance on samples</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.1.4)"><em>pandas.DataFrame</em></a>) – dataset where to apply the Model Performance Predictor.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>predictions from the Model Performance Predictor (Wrong/Correct primary predictions).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

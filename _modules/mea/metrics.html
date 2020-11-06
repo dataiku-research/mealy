@@ -201,21 +201,16 @@
 
 <div class="viewcode-block" id="mpp_report"><a class="viewcode-back" href="../../gen_modules/mea.metrics.html#mea.metrics.mpp_report">[docs]</a><span class="k">def</span> <span class="nf">mpp_report</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">output_dict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Build a text report showing the main Model Performance Predictor (MPP) metrics.</span>
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    y_true : ndarray</span>
-<span class="sd">        Ground truth values of wrong/correct predictions of the MPP primary model. Expected values in</span>
-<span class="sd">        [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].</span>
-<span class="sd">    y_pred : ndarray</span>
-<span class="sd">        Estimated targets as returned by a Model Performance Predictor. Expected values in</span>
-<span class="sd">        [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].</span>
-<span class="sd">    output_dict : bool</span>
-<span class="sd">        If True, return output as dict (default = False).</span>
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    metrics: dict or str</span>
-<span class="sd">        metrics regarding the Model Performance Predictor.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        y_true (numpy.ndarray): Ground truth values of wrong/correct predictions of the MPP primary model.</span>
+<span class="sd">            Expected values in [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].</span>
+<span class="sd">        y_pred (numpy.ndarray): Estimated targets as returned by a Model Performance Predictor. Expected values in</span>
+<span class="sd">            [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].</span>
+<span class="sd">        output_dict (bool): If True, return output as dict (default = False).</span>
+
+<span class="sd">    Return:</span>
+<span class="sd">        dict or str: metrics regarding the Model Performance Predictor.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">mpp_accuracy_score</span> <span class="o">=</span> <span class="n">compute_mpp_accuracy</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>

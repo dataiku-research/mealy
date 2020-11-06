@@ -196,53 +196,31 @@
 
 
 <div class="viewcode-block" id="ErrorAnalyzer"><a class="viewcode-back" href="../../gen_modules/mea.error_analyzer.html#mea.error_analyzer.ErrorAnalyzer">[docs]</a><span class="k">class</span> <span class="nc">ErrorAnalyzer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    ErrorAnalyzer analyzes the errors of a prediction model on a test set.</span>
+    <span class="sd">&quot;&quot;&quot; ErrorAnalyzer analyzes the errors of a prediction model on a test set.</span>
+
 <span class="sd">    It uses model predictions and ground truth target to compute the model errors on the test set.</span>
 <span class="sd">    It then trains a Decision Tree, called a Model Performance Predictor, on the same test set by using the model error</span>
 <span class="sd">    as target. The nodes of the decision tree are different segments of errors to be studied individually.</span>
+
 <span class="sd">    Args:</span>
+<span class="sd">        predictor (sklearn.base.BaseEstimator or sklearn.pipeline.Pipeline): a sklearn model to analyze. Either an estimator</span>
+<span class="sd">            or a Pipeline containing a ColumnTransformer with the preprocessing steps and an estimator as last step.</span>
+<span class="sd">        feature_names (list): list of feature names, default=None.</span>
+<span class="sd">        seed (int): random seed.</span>
 
-<span class="sd">        predictor: sklearn.BaseEstimator or sklearn.Pipeline</span>
-<span class="sd">            a sklearn model to analyze. Either an estimator or a Pipeline containing a ColumnTransformer with</span>
-<span class="sd">            the preprocessing steps and an estimator as last step.</span>
-
-<span class="sd">        feature_names: list</span>
-<span class="sd">            list of feature names, default=None.</span>
-
-<span class="sd">        seed: int</span>
-<span class="sd">            random seed.</span>
 <span class="sd">    Attributes:</span>
-
-<span class="sd">        error_train_x: ndarray</span>
-<span class="sd">            features used to train the Model performance Predictor.</span>
-
-<span class="sd">        error_train_y: ndarray</span>
-<span class="sd">            target used to train the Model performance Predictor, it is abinary variable</span>
+<span class="sd">        error_train_x (numpy.ndarray): features used to train the Model performance Predictor.</span>
+<span class="sd">        error_train_y (numpy.ndarray): target used to train the Model performance Predictor, it is abinary variable</span>
 <span class="sd">            representing whether the input predictor predicted correctly or incorrectly the samples in error_train_x.</span>
-
-<span class="sd">        model_performance_predictor_features: array_like</span>
-<span class="sd">            feature names used in the Model Performance Predictor.</span>
-
-<span class="sd">        model_performance_predictor: DecisionTree</span>
-<span class="sd">            performance predictor decision tree.</span>
-
-<span class="sd">        train_leaf_ids: ndarray</span>
-<span class="sd">            indices of leaf in the Model Performance Predictor, where each of the training</span>
-<span class="sd">        sample falls.</span>
-
-<span class="sd">        impurity: ndarray</span>
-<span class="sd">            impurity of leaf nodes (used for ranking the nodes).</span>
-
-<span class="sd">        quantized_impurity: ndarray</span>
-<span class="sd">            quantized impurity of leaf nodes (used for ranking the nodes).</span>
-
-<span class="sd">        difference: ndarray</span>
-<span class="sd">            difference of number of correctly and incorrectly predicted samples in leaf nodes (used for ranking the</span>
-<span class="sd">            nodes).</span>
-
-<span class="sd">        leaf_ids: ndarray</span>
-<span class="sd">            list of all leaf nodes indices.</span>
+<span class="sd">        model_performance_predictor_features (list): feature names used in the Model Performance Predictor.</span>
+<span class="sd">        model_performance_predictor (sklearn.tree.DecisionTreeClassifier): performance predictor decision tree.</span>
+<span class="sd">        train_leaf_ids (numpy.ndarray): indices of leaf in the Model Performance Predictor, where each of the training</span>
+<span class="sd">            sample falls.</span>
+<span class="sd">        impurity (numpy.ndarray): impurity of leaf nodes (used for ranking the nodes).</span>
+<span class="sd">        quantized_impurity (numpy.ndarray): quantized impurity of leaf nodes (used for ranking the nodes).</span>
+<span class="sd">        difference (numpy.ndarray): difference of number of correctly and incorrectly predicted samples in leaf nodes</span>
+<span class="sd">            (used for ranking the nodes).</span>
+<span class="sd">        leaf_ids (numpy.ndarray): list of all leaf nodes indices.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -337,20 +315,17 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_leaf_ids</span>
 
 <div class="viewcode-block" id="ErrorAnalyzer.fit"><a class="viewcode-back" href="../../gen_modules/mea.error_analyzer.html#mea.error_analyzer.ErrorAnalyzer.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">max_nr_rows</span><span class="o">=</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">MAX_NUM_ROW</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Fit the Model Performance Predictor.</span>
+
 <span class="sd">        Trains the Model Performance Predictor, a Decision Tree to discriminate between samples that are correctly</span>
 <span class="sd">        predicted or wrongly predicted (errors) by a primary model.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        x: ndarray or dataframe</span>
-<span class="sd">            feature data from a test set to evaluate the primary predictor and train a Model Performance Predictor.</span>
-
-<span class="sd">        y: ndarray or dataframe</span>
-<span class="sd">            target data from a test set to evaluate the primary predictor and train a Model Performance Predictor.</span>
-
-<span class="sd">        max_nr_rows: int</span>
-<span class="sd">            maximum number of rows to process.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            x (numpy.ndarray or pandas.DataFrame): feature data from a test set to evaluate the primary predictor and train a Model</span>
+<span class="sd">                Performance Predictor.</span>
+<span class="sd">            y (numpy.ndarray or pandas.DataFrame): target data from a test set to evaluate the primary predictor and train a Model</span>
+<span class="sd">                Performance Predictor.</span>
+<span class="sd">            max_nr_rows (int): maximum number of rows to process.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Preparing the model performance predictor...&quot;</span><span class="p">)</span>
@@ -401,7 +376,14 @@
         <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">error_y</span>
 
 <div class="viewcode-block" id="ErrorAnalyzer.predict"><a class="viewcode-back" href="../../gen_modules/mea.error_analyzer.html#mea.error_analyzer.ErrorAnalyzer.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Predict model performance on samples &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Predict model performance on samples</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x (numpy.ndarray or pandas.DataFrame): dataset where to apply the Model Performance Predictor.</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            numpy.ndarray: predictions from the Model Performance Predictor (Wrong/Correct primary predictions).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_performance_predictor</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
 
     <span class="nd">@staticmethod</span>
@@ -476,23 +458,16 @@
 <div class="viewcode-block" id="ErrorAnalyzer.get_ranked_leaf_ids"><a class="viewcode-back" href="../../gen_modules/mea.error_analyzer.html#mea.error_analyzer.ErrorAnalyzer.get_ranked_leaf_ids">[docs]</a>    <span class="k">def</span> <span class="nf">get_ranked_leaf_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">leaf_selector</span><span class="p">,</span> <span class="n">rank_by</span><span class="o">=</span><span class="s1">&#39;purity&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Select error nodes and rank them by importance.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
+<span class="sd">        Args:</span>
+<span class="sd">            leaf_selector (int or list or str): the desired leaf nodes to visualize. When int it represents the</span>
+<span class="sd">                number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid values are</span>
+<span class="sd">                either &#39;all_error&#39; to plot all leaves of class &#39;Wrong prediction&#39; or &#39;all&#39; to plot all leaf nodes.</span>
+<span class="sd">            rank_by (str): ranking criterium for the leaf nodes. It can be either &#39;purity&#39; to rank by the leaf</span>
+<span class="sd">                node purity (ratio of wrongly predicted samples over the total for an error node) or &#39;class_difference&#39;</span>
+<span class="sd">                (difference of number of wrongly and correctly predicted samples in a node).</span>
 
-<span class="sd">        leaf_selector : int or array_like or str</span>
-<span class="sd">            the desired leaf nodes to visualize. When int it represents the</span>
-<span class="sd">            number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid values are</span>
-<span class="sd">            either &#39;all_error&#39; to plot all leaves of class &#39;Wrong prediction&#39; or &#39;all&#39; to plot all leaf nodes.</span>
-
-<span class="sd">        rank_by: str</span>
-<span class="sd">            ranking criterium for the leaf nodes. It can be either &#39;purity&#39; to rank by the leaf</span>
-<span class="sd">            node purity (ratio of wrongly predicted samples over the total for an error node) or &#39;class_difference&#39;</span>
-<span class="sd">            (difference of number of wrongly and correctly predicted samples in a node).</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        sorted_leaf_indices: array_like</span>
-<span class="sd">            list of selected leaf nodes indices.</span>
+<span class="sd">        Return:</span>
+<span class="sd">            list or numpy.ndarray: list of selected leaf nodes indices.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">apply_leaf_selector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_leaf_selector</span><span class="p">(</span><span class="n">leaf_selector</span><span class="p">)</span>
@@ -510,7 +485,7 @@
 
     <span class="k">def</span> <span class="nf">_get_leaf_selector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">leaf_selector</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Return a function that select rows of provided arrays. Arrays must be of shape (1, number of leaves)</span>
+<span class="sd">        Return a function that select rows of provided arrays. Arrays must be of shape (1, number of leaves)</span>
 <span class="sd">            Args:</span>
 <span class="sd">                leaf_selector: int, str, or array-like</span>
 <span class="sd">                How to select the rows of the array</span>
@@ -587,17 +562,18 @@
         <span class="k">return</span> <span class="n">path_to_node</span>
 
 <div class="viewcode-block" id="ErrorAnalyzer.inverse_transform_features"><a class="viewcode-back" href="../../gen_modules/mea.error_analyzer.html#mea.error_analyzer.ErrorAnalyzer.inverse_transform_features">[docs]</a>    <span class="k">def</span> <span class="nf">inverse_transform_features</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; If the predictor comes with a Pipeline preprocessor, map the features indices of the Model</span>
-<span class="sd">        Performance Predictor Decision Tree back to their indices in the original s unpreprocessed space of features.</span>
+        <span class="sd">&quot;&quot;&quot; Undo preprocessing of feature values.</span>
+
+<span class="sd">        If the predictor comes with a Pipeline preprocessor, map the features indices of the Model</span>
+<span class="sd">        Performance Predictor Decision Tree back to their indices in the original unpreprocessed space of features.</span>
 <span class="sd">        Otherwise simply return the feature indices of the decision tree. The feature indices of a decision tree</span>
 <span class="sd">        indicate what features are used to split the training set at each node.</span>
-<span class="sd">        See &lt;https://scikit-learn.org/stable/auto_examples/tree/plot_unveil_tree_structure.html&gt;.</span>
+<span class="sd">        See https://scikit-learn.org/stable/auto_examples/tree/plot_unveil_tree_structure.html.</span>
 
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        feature_indices: array_like</span>
-<span class="sd">            indices of features of the Model Performance Predictor Decision Tree, possibly</span>
-<span class="sd">            mapped back to the original unprocessed feature space.</span>
+<span class="sd">        Return:</span>
+<span class="sd">            list or numpy.ndarray:</span>
+<span class="sd">                indices of features of the Model Performance Predictor Decision Tree, possibly mapped back to the</span>
+<span class="sd">                original unprocessed feature space.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -617,15 +593,16 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_clf_features</span></div>
 
 <div class="viewcode-block" id="ErrorAnalyzer.inverse_transform_thresholds"><a class="viewcode-back" href="../../gen_modules/mea.error_analyzer.html#mea.error_analyzer.ErrorAnalyzer.inverse_transform_thresholds">[docs]</a>    <span class="k">def</span> <span class="nf">inverse_transform_thresholds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; If the predictor comes with a Pipeline preprocessor, undo the preprocessing on the thresholds of the Model</span>
+        <span class="sd">&quot;&quot;&quot;  Undo preprocessing of feature threshold values.</span>
+
+<span class="sd">        If the predictor comes with a Pipeline preprocessor, undo the preprocessing on the thresholds of the Model</span>
 <span class="sd">        Performance Predictor Decision Tree for an easier plot interpretation. Otherwise simply return the thresholds of</span>
 <span class="sd">        the decision tree. The thresholds of a decision tree are the feature values used to split the training set at</span>
-<span class="sd">        each node. See &lt;https://scikit-learn.org/stable/auto_examples/tree/plot_unveil_tree_structure.html&gt;.</span>
+<span class="sd">        each node. See https://scikit-learn.org/stable/auto_examples/tree/plot_unveil_tree_structure.html.</span>
 
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        thresholds: ndarray</span>
-<span class="sd">            thresholds of the Model Performance Predictor Decision Tree, possibly with preprocessing undone.</span>
+<span class="sd">        Return:</span>
+<span class="sd">            numpy.ndarray:</span>
+<span class="sd">                thresholds of the Model Performance Predictor Decision Tree, possibly with preprocessing undone.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -660,26 +637,17 @@
 
     <span class="c1"># TODO: rewrite this method using the ranking arrays</span>
 <div class="viewcode-block" id="ErrorAnalyzer.error_node_summary"><a class="viewcode-back" href="../../gen_modules/mea.error_analyzer.html#mea.error_analyzer.ErrorAnalyzer.error_node_summary">[docs]</a>    <span class="k">def</span> <span class="nf">error_node_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">leaf_selector</span><span class="o">=</span><span class="s1">&#39;all_errors&#39;</span><span class="p">,</span> <span class="n">add_path_to_leaves</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">print_summary</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Return summary information regarding input nodes</span>
+        <span class="sd">&quot;&quot;&quot; Return summary information regarding input nodes.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
+<span class="sd">        Args:</span>
+<span class="sd">            leaf_selector (int or list or str): the desired leaf nodes to visualize. When int it represents the</span>
+<span class="sd">                number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid values</span>
+<span class="sd">                are either &#39;all_error&#39; to plot all leaves of class &#39;Wrong prediction&#39; or &#39;all&#39; to plot all leaf nodes.</span>
+<span class="sd">            add_path_to_leaves (bool): add information of the feature path across the tree till the selected node.</span>
+<span class="sd">            print_summary (bool): print summary for the selected nodes.</span>
 
-<span class="sd">        leaf_selector : int or array_like or str</span>
-<span class="sd">            the desired leaf nodes to visualize. When int it represents the</span>
-<span class="sd">            number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid values are</span>
-<span class="sd">            either &#39;all_error&#39; to plot all leaves of class &#39;Wrong prediction&#39; or &#39;all&#39; to plot all leaf nodes.</span>
-
-<span class="sd">        add_path_to_leaves: bool</span>
-<span class="sd">            add information of the feature path across the tree till the selected node.</span>
-
-<span class="sd">        print_summary: bool</span>
-<span class="sd">            print summary for the selected nodes.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        leaves_summary: dict</span>
-<span class="sd">            dictionary of metrics for each selected node of the Model Performance Predictor.</span>
+<span class="sd">        Return:</span>
+<span class="sd">            dict: dictionary of metrics for each selected node of the Model Performance Predictor.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">leaf_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ranked_leaf_ids</span><span class="p">(</span><span class="n">leaf_selector</span><span class="o">=</span><span class="n">leaf_selector</span><span class="p">)</span>
@@ -727,24 +695,17 @@
 
 <div class="viewcode-block" id="ErrorAnalyzer.mpp_summary"><a class="viewcode-back" href="../../gen_modules/mea.error_analyzer.html#mea.error_analyzer.ErrorAnalyzer.mpp_summary">[docs]</a>    <span class="k">def</span> <span class="nf">mpp_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">nr_max_rows</span><span class="o">=</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">MAX_NUM_ROW</span><span class="p">,</span> <span class="n">output_dict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Print ErrorAnalyzer summary metrics regarding the Model Performance Predictor.</span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        x_test: ndarray or dataframe</span>
-<span class="sd">            feature data from a test set to evaluate the primary predictor and train a Model Performance Predictor.</span>
 
-<span class="sd">        y_test:  ndarray or dataframe</span>
-<span class="sd">            target data from a test set to evaluate the primary predictor and train a Model Performance Predictor.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            x_test (numpy.ndarray or pandas.DataFrame): feature data from a test set to evaluate the primary predictor</span>
+<span class="sd">                and train a Model Performance Predictor.</span>
+<span class="sd">            y_test (numpy.ndarray or pandas.DataFrame): target data from a test set to evaluate the primary predictor and</span>
+<span class="sd">                train a Model Performance Predictor.</span>
+<span class="sd">            nr_max_rows (int): maximum number of rows to process.</span>
+<span class="sd">            output_dict (bool): whether to return a dict or a string with metrics.</span>
 
-<span class="sd">        nr_max_rows: int</span>
-<span class="sd">            maximum number of rows to process.</span>
-
-<span class="sd">        output_dict: bool</span>
-<span class="sd">            whether to return a dict or a string with metrics.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        metrics: dict or str</span>
-<span class="sd">            metrics regarding the Model Performance Predictor.</span>
+<span class="sd">        Return:</span>
+<span class="sd">            dict or str: metrics regarding the Model Performance Predictor.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">prep_x</span><span class="p">,</span> <span class="n">prep_y</span> <span class="o">=</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span>

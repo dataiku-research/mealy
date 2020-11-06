@@ -250,9 +250,9 @@
 <div class="viewcode-block" id="ErrorVisualizer"><a class="viewcode-back" href="../../gen_modules/mea.error_visualizer.html#mea.error_visualizer.ErrorVisualizer">[docs]</a><span class="k">class</span> <span class="nc">ErrorVisualizer</span><span class="p">(</span><span class="n">_BaseErrorVisualizer</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    ErrorVisualizer provides visual utilities to analyze the Model Performance Predictor in ErrorAnalyzer</span>
+
 <span class="sd">    Args:</span>
-<span class="sd">        error_analyzer: mea.ErrorAnalyzer</span>
-<span class="sd">            fitted ErrorAnalyzer representing the performance of a primary model.</span>
+<span class="sd">        error_analyzer (ErrorAnalyzer): fitted ErrorAnalyzer representing the performance of a primary model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_analyzer</span><span class="p">):</span>
@@ -282,15 +282,12 @@
 
 <div class="viewcode-block" id="ErrorVisualizer.plot_error_tree"><a class="viewcode-back" href="../../gen_modules/mea.error_visualizer.html#mea.error_visualizer.ErrorVisualizer.plot_error_tree">[docs]</a>    <span class="k">def</span> <span class="nf">plot_error_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Plot the graph of the decision tree.</span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        size : tuple</span>
-<span class="sd">            size of the output plot.</span>
 
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        gvz_graph: graphviz.Source</span>
-<span class="sd">            graph of the Model Performance Predictor decision tree.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            size (tuple): size of the output plot.</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            graphviz.Source: graph of the Model Performance Predictor decision tree.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">digraph_tree</span> <span class="o">=</span> <span class="n">export_graphviz</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="p">,</span>
@@ -345,37 +342,32 @@
                                              <span class="n">show_global</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_class</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rank_leaves_by</span><span class="o">=</span><span class="s2">&quot;purity&quot;</span><span class="p">,</span> <span class="n">nr_bins</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
                                              <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">)):</span>
         <span class="sd">&quot;&quot;&quot;Return plot of error node feature distribution and compare to global baseline.</span>
+
 <span class="sd">        The top-k features are sorted by importance in the Model Performance Predictor.</span>
 <span class="sd">        The most important are more correlated with the errors. When no specific node is selected,</span>
 <span class="sd">        the leaf nodes are ranked by an importance criterium and presented in relevance order.</span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
 
-<span class="sd">        leaf_selector : int or array_like or str</span>
-<span class="sd">            the desired leaf nodes to visualize. When int it represents the</span>
-<span class="sd">            number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid values are</span>
-<span class="sd">            either &#39;all_error&#39; to plot all leaves of class &#39;Wrong prediction&#39; or &#39;all&#39; to plot all leaf nodes.</span>
+<span class="sd">        Args:</span>
 
-<span class="sd">        top_k_features : int</span>
-<span class="sd">            number of features to plot per node.</span>
+<span class="sd">            leaf_selector (int or list or str): the desired leaf nodes to visualize. When int it represents the</span>
+<span class="sd">                number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid values</span>
+<span class="sd">                are either &#39;all_error&#39; to plot all leaves of class &#39;Wrong prediction&#39; or &#39;all&#39; to plot all leaf nodes.</span>
 
-<span class="sd">        show_global : bool</span>
-<span class="sd">            plot the feature distribution of samples in a node vs. samples in the whole data</span>
-<span class="sd">            (global baseline).</span>
+<span class="sd">            top_k_features (int): number of features to plot per node.</span>
 
-<span class="sd">        show_class : bool</span>
-<span class="sd">            show the proportion of Wrongly and Correctly predicted samples in the feature distributions.</span>
+<span class="sd">            show_global (bool): plot the feature distribution of samples in a node vs. samples in the whole data</span>
+<span class="sd">                (global baseline).</span>
 
-<span class="sd">        rank_leaves_by : str</span>
-<span class="sd">            ranking criterium for the leaf nodes. It can be either &#39;purity&#39; to rank by the leaf</span>
-<span class="sd">            node purity (ratio of wrongly predicted samples over the total for an error node) or &#39;class_difference&#39;</span>
-<span class="sd">            (difference of number of wrongly and correctly predicted samples in a node).</span>
+<span class="sd">            show_class (bool): show the proportion of Wrongly and Correctly predicted samples in the feature</span>
+<span class="sd">                distributions.</span>
 
-<span class="sd">        nr_bins : int</span>
-<span class="sd">            number of bins in the feature distribution plots.</span>
+<span class="sd">            rank_leaves_by (str): ranking criterium for the leaf nodes. It can be either &#39;purity&#39; to rank by the leaf</span>
+<span class="sd">                node purity (ratio of wrongly predicted samples over the total for an error node) or &#39;class_difference&#39;</span>
+<span class="sd">                (difference of number of wrongly and correctly predicted samples in a node).</span>
 
-<span class="sd">        figsize: tuple</span>
-<span class="sd">            size of the plots.</span>
+<span class="sd">            nr_bins (int): number of bins in the feature distribution plots.</span>
+
+<span class="sd">            figsize (tuple): size of the plots.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 

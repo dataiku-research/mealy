@@ -207,21 +207,19 @@
 <div class="sphx-glr-clear"></div><dl class="function">
 <dt id="mea.metrics.mpp_report">
 <code class="sig-prename descclassname">mea.metrics.</code><code class="sig-name descname">mpp_report</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">output_dict=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/metrics.html#mpp_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.metrics.mpp_report" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build a text report showing the main Model Performance Predictor (MPP) metrics.
-:param y_true: Ground truth values of wrong/correct predictions of the MPP primary model. Expected values in</p>
-<blockquote>
-<div><p>[ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].</p>
-</div></blockquote>
+<dd><p>Build a text report showing the main Model Performance Predictor (MPP) metrics.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>y_pred</strong> (<em>ndarray</em>) – Estimated targets as returned by a Model Performance Predictor. Expected values in
+<li><p><strong>y_true</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – Ground truth values of wrong/correct predictions of the MPP primary model.
+Expected values in [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].</p></li>
+<li><p><strong>y_pred</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – Estimated targets as returned by a Model Performance Predictor. Expected values in
 [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].</p></li>
 <li><p><strong>output_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – If True, return output as dict (default = False).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>metrics</strong> – metrics regarding the Model Performance Predictor.</p>
+<dd class="field-even"><p>metrics regarding the Model Performance Predictor.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>

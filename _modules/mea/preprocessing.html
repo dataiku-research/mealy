@@ -186,15 +186,18 @@
 
 <div class="viewcode-block" id="FeatureNameTransformer"><a class="viewcode-back" href="../../gen_modules/mea.preprocessing.html#mea.preprocessing.FeatureNameTransformer">[docs]</a><span class="k">class</span> <span class="nc">FeatureNameTransformer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Transformer of feature names and indices.</span>
+
 <span class="sd">        A FeatureNameTransformer parses an input Pipeline preprocessor and generate</span>
 <span class="sd">        a mapping between the input unprocessed feature names/indices and the output</span>
 <span class="sd">        preprocessed feature names/indices.</span>
+
 <span class="sd">        Args:</span>
-<span class="sd">            ct_preprocessor: sklearn Pipeline containing a ColumnTransformer with the preprocessing steps</span>
-<span class="sd">            orig_feats: list of original unpreprocessed feature names, default=None.</span>
+<span class="sd">            ct_preprocessor (sklearn.compose.ColumnTransformer): preprocessor</span>
+<span class="sd">            orig_feats (list): list of original unpreprocessed feature names, default=None.</span>
+
 <span class="sd">        Attributes:</span>
-<span class="sd">            original_feature_names : list of original unpreprocessed feature names.</span>
-<span class="sd">            preprocessed_feature_names: list of preprocessed feature names</span>
+<span class="sd">            original_feature_names (list): list of original unpreprocessed feature names.</span>
+<span class="sd">            preprocessed_feature_names (list): list of preprocessed feature names</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ct_preprocessor</span><span class="p">,</span> <span class="n">orig_feats</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -259,20 +262,18 @@
                 <span class="n">len_preproc</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tr_feature_names</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FeatureNameTransformer.transform"><a class="viewcode-back" href="../../gen_modules/mea.preprocessing.html#mea.preprocessing.FeatureNameTransformer.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Transform the unprocessed feature name at given index or with given name</span>
-<span class="sd">        into the output preprocessed feature names or indices.</span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        index : int</span>
-<span class="sd">            feature index.</span>
-<span class="sd">        name : str</span>
-<span class="sd">            feature name.</span>
+        <span class="sd">&quot;&quot;&quot; Apply preprocessing to feature name.</span>
 
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        indices: array_like</span>
-<span class="sd">            list of indices (resp. names) of the preprocessed features corresponding to the input feature index</span>
-<span class="sd">            (resp.name). If both index and name are provided, the index is retained and output indices are returned.</span>
+<span class="sd">        Transform the unprocessed feature name at given index or with given name</span>
+<span class="sd">        into the output preprocessed feature names or indices.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            index (int): feature index.</span>
+<span class="sd">            name (str): feature name.</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            list: list of indices (resp. names) of the preprocessed features corresponding to the input feature index</span>
+<span class="sd">                (resp.name). If both index and name are provided, the index is retained and output indices are returned.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original2preprocessed</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
@@ -284,20 +285,19 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;One of the input index or name should be specified.&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="FeatureNameTransformer.inverse_transform"><a class="viewcode-back" href="../../gen_modules/mea.preprocessing.html#mea.preprocessing.FeatureNameTransformer.inverse_transform">[docs]</a>    <span class="k">def</span> <span class="nf">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Transform the preprocessed feature name at given index or with given name</span>
-<span class="sd">        back into the original unprocessed feature name or index.</span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        index : int</span>
-<span class="sd">            feature index.</span>
-<span class="sd">        name : str</span>
-<span class="sd">            feature name.</span>
+        <span class="sd">&quot;&quot;&quot;Undo preprocessing of feature name.</span>
 
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        feature: int or str</span>
-<span class="sd">            index (resp. name) of the unprocessed feature corresponding to the input preprocessed feature index</span>
-<span class="sd">            (resp.name). If both index and name are provided, the index is retained and an output index is returned.</span>
+<span class="sd">        Transform the preprocessed feature name at given index or with given name</span>
+<span class="sd">        back into the original unprocessed feature name or index.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            index (int): feature index.</span>
+<span class="sd">            name (str): feature name.</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            int or str: index (resp. name) of the unprocessed feature corresponding to the input preprocessed feature</span>
+<span class="sd">                index (resp.name). If both index and name are provided, the index is retained and an output index is</span>
+<span class="sd">                returned.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed2original</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
@@ -310,18 +310,14 @@
 
 <div class="viewcode-block" id="FeatureNameTransformer.is_categorical"><a class="viewcode-back" href="../../gen_modules/mea.preprocessing.html#mea.preprocessing.FeatureNameTransformer.is_categorical">[docs]</a>    <span class="k">def</span> <span class="nf">is_categorical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check whether an unprocessed feature at a given index or with a given name is categorical.</span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        index : int</span>
-<span class="sd">            feature index.</span>
-<span class="sd">        name : str</span>
-<span class="sd">            feature name.</span>
 
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        is_cat: bool</span>
-<span class="sd">            True if the input feature is categorical, else False. If both index and name are provided, the index is</span>
-<span class="sd">            retained.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            index (int): feature index.</span>
+<span class="sd">            name (str): feature name.</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            bool: True if the input feature is categorical, else False. If both index and name are provided, the index</span>
+<span class="sd">                is retained.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_feature_names</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
@@ -334,18 +330,18 @@
 
 <div class="viewcode-block" id="PipelinePreprocessor"><a class="viewcode-back" href="../../gen_modules/mea.preprocessing.html#mea.preprocessing.PipelinePreprocessor">[docs]</a><span class="k">class</span> <span class="nc">PipelinePreprocessor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Transformer of feature values from the original values to preprocessed ones.</span>
+
 <span class="sd">        A PipelinePreprocessor parses an input Pipeline preprocessor and generate</span>
 <span class="sd">        a mapping between the input unprocessed feature values and the output</span>
 <span class="sd">        preprocessed feature values.</span>
-<span class="sd">        Args:</span>
-<span class="sd">            ct_preprocessor: sklearn.Pipeline</span>
-<span class="sd">                pipeline containing a ColumnTransformer with the preprocessing steps</span>
 
-<span class="sd">            orig_feats: array_like</span>
-<span class="sd">                list of original unpreprocessed feature names, default=None.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            ct_preprocessor (sklearn.compose.ColumnTransformer): preprocessing steps</span>
+<span class="sd">            orig_feats (list): list of original unpreprocessed feature names, default=None.</span>
+
 <span class="sd">        Attributes:</span>
-<span class="sd">            fn_transformer : mea.FeatureNameTransformer</span>
-<span class="sd">                transformer managing the mapping between original and preprocessed feature names.</span>
+<span class="sd">            fn_transformer (FeatureNameTransformer): transformer managing the mapping between original and</span>
+<span class="sd">                preprocessed feature names.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ct_preprocessor</span><span class="p">,</span> <span class="n">orig_feats</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -355,29 +351,23 @@
 
 <div class="viewcode-block" id="PipelinePreprocessor.transform"><a class="viewcode-back" href="../../gen_modules/mea.preprocessing.html#mea.preprocessing.PipelinePreprocessor.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Transform the input feature values according to the preprocessing pipeline.</span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        x : ndarray or dataframe</span>
-<span class="sd">            input feature values.</span>
 
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        x_transformed: ndarray</span>
-<span class="sd">            transformed feature values</span>
+<span class="sd">        Args:</span>
+<span class="sd">            x (numpy.ndarray or pandas.DataFrame): input feature values.</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            numpy.ndarray: transformed feature values</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ct_preprocessor</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="PipelinePreprocessor.inverse_transform"><a class="viewcode-back" href="../../gen_modules/mea.preprocessing.html#mea.preprocessing.PipelinePreprocessor.inverse_transform">[docs]</a>    <span class="k">def</span> <span class="nf">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preprocessed_x</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Invert the preprocessing pipeline and inverse transform feature values.</span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        preprocessed_x : ndarray</span>
-<span class="sd">            preprocessed feature values.</span>
 
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        undo_prep_test_x: ndarray</span>
-<span class="sd">            feature values without preprocessing</span>
+<span class="sd">        Args:</span>
+<span class="sd">            preprocessed_x (numpy.ndarray): preprocessed feature values.</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            numpy.ndarray: feature values without preprocessing</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
