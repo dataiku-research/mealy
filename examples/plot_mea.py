@@ -21,11 +21,18 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 
 import numpy as np
+import random
+
+import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
 
 from mea.error_analyzer import ErrorAnalyzer
 from mea.error_visualizer import ErrorVisualizer
 
-np.random.seed(100)
+
+default_seed = 10
+np.random.seed(default_seed)
+random.seed(default_seed)
 
 ##############################################################################
 # Load Boston houses dataset
@@ -61,7 +68,17 @@ print(error_analyzer.mpp_summary(X_test, y_test, output_dict=False))
 # Plot the Model Performance Predictor Decision Tree
 
 error_visualizer = ErrorVisualizer(error_analyzer)
-error_visualizer.plot_error_tree(size=(5, 5))
+tree_src = error_visualizer.plot_error_tree()
+
+# the output of ``plot_error_tree`` is rendered automatically in a python notebook
+# the following is for rendering in this sphynx gallery
+tree_src.format = 'png'
+tree_src.render('tree')
+tree_img = mpimg.imread('tree.png')
+
+plt.figure(figsize=(20, 20))
+plt.imshow(tree_img)
+plt.axis('off')
 
 ##############################################################################
 # Print the details regarding the decision tree nodes containing the majority of errors
