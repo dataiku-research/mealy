@@ -9,7 +9,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.base import BaseEstimator
 from mea.kneed import KneeLocator
-from mea.dku_error_analysis_utils import check_enough_data, ErrorAnalyzerConstants
+from mea.error_analysis_utils import check_enough_data, ErrorAnalyzerConstants
 from mea.metrics import mpp_report
 from mea.preprocessing import PipelinePreprocessor
 
