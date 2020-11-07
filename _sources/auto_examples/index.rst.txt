@@ -29,6 +29,26 @@ Those examples show basic usage of mea.
    :hidden:
 
    /auto_examples/plot_mea
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Here we train a RandomForestClassifier to predict whether a person gains more or less than 50k ...">
+
+.. only:: html
+
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_mea_pipeline_thumb.png
+
+     :ref:`sphx_glr_auto_examples_plot_mea_pipeline.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_mea_pipeline
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>

@@ -1,0 +1,395 @@
+.. note::
+    :class: sphx-glr-download-link-note
+
+    Click :ref:`here <sphx_glr_download_auto_examples_plot_mea_pipeline.py>` to download the full example code
+.. rst-class:: sphx-glr-example-title
+
+.. _sphx_glr_auto_examples_plot_mea_pipeline.py:
+
+
+Model Error Analysis with scikit-learn Pipeline for the Adult income dataset
+============================================================================
+
+Here we train a RandomForestClassifier to predict whether a person gains
+more or less than 50k per year. This is our primary model.
+Before training the primary model we preprocess the categorical and numeric
+features of the dataset by means of a scikit-learn Pipeline.
+Then we build a secondary model, called Model Performance Predictor (MPP),
+to predict on what samples the primary model returns wrong or correct predictions.
+The MPP is a DecisionTree returning a binary outcome success/failure. The leaf nodes
+yielding failure outcome gather the samples mis-predicted by the primary
+model. Plotting the feature distributions of these samples and comparing
+to the whole data highlights the subpopulations where the model works poorly.
+
+Those are the necessary imports and initializations.
+
+
+.. code-block:: python3
+
+
+    from sklearn.model_selection import train_test_split
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.compose import ColumnTransformer
+    from sklearn.preprocessing import StandardScaler, OneHotEncoder
+    from sklearn.impute import SimpleImputer
+    from sklearn.pipeline import Pipeline
+
+    import pandas as pd
+    import numpy as np
+    import random
+
+    import matplotlib.image as mpimg
+    import matplotlib.pyplot as plt
+
+    from mea.error_analyzer import ErrorAnalyzer
+    from mea.error_visualizer import ErrorVisualizer
+
+
+    default_seed = 10
+    np.random.seed(default_seed)
+    random.seed(default_seed)
+
+
+
+
+
+
+
+
+Load Adult income dataset.
+
+
+.. code-block:: python3
+
+
+    adult_income_url = 'https://www.openml.org/data/get_csv/54002/adult-census.arff'
+
+    df = pd.read_csv(adult_income_url)
+
+    target = 'class'
+
+    X = df.dropna().drop(target, axis=1)
+    y = df.dropna()[target]
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+    numeric_features = df.select_dtypes(include=['int64', 'float64']).columns.tolist()
+    categorical_features = df.select_dtypes(include=['object']).drop([target], axis=1).columns.tolist()
+
+    feature_names = numeric_features + categorical_features
+
+    print('Categorical features of the adult dataset:')
+    print(categorical_features)
+    print('Numeric features of the adult dataset:')
+    print(numeric_features)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Categorical features of the adult dataset:
+    ['workclass', 'education:', 'marital-status:', 'occupation:', 'relationship:', 'race:', 'sex:', 'native-country:']
+    Numeric features of the adult dataset:
+    ['ID', 'age', 'fnlwgt:', 'education-num:', 'capital-gain:', 'capital-loss:', 'hours-per-week:']
+
+
+
+
+Build the preprocessing Pipeline.
+
+
+.. code-block:: python3
+
+
+    numeric_transformer = Pipeline(steps=[
+        ('imputer', SimpleImputer(strategy='median')),
+        ('scaler', StandardScaler())])
+    categorical_transformer = Pipeline(steps=[
+        ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
+        ('onehot', OneHotEncoder(handle_unknown='ignore'))])
+
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ('num', numeric_transformer, numeric_features),
+            ('cat', categorical_transformer, categorical_features)])
+
+    model = Pipeline(steps=[('preprocessor', preprocessor),
+                            ('classifier', RandomForestClassifier())])
+
+
+
+
+
+
+
+
+Train preprocessing Pipeline and RandomForestClassifier.
+
+
+.. code-block:: python3
+
+
+    model.fit(X_train, y_train)
+
+    acc_score = model.score(X_test, y_test)
+    print("Acc = %.2f" % acc_score)
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Acc = 0.85
+
+
+
+
+Fit a Model Performance Predictor on the model performances.
+
+
+.. code-block:: python3
+
+
+    error_analyzer = ErrorAnalyzer(model, feature_names=feature_names)
+    error_analyzer.fit(X_test, y_test)
+
+
+
+
+
+
+
+
+Print metrics regarding the Model Performance Predictor.
+
+
+.. code-block:: python3
+
+
+    print(error_analyzer.mpp_summary(X_test, y_test, output_dict=False))
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    The MPP was trained with accuracy 85.29%.
+    The Decision Tree estimated the primary models accuracy to 99.77%.
+    The true accuracy of the primary model is 85.15.%
+    The Fidelity of the MPP is 85.38%.
+    Warning: the built MPP might not be representative of the primary model performances.
+    The MPP predicted model accuracy is considered too different from the true model accuracy.
+
+
+
+
+
+Plot the Model Performance Predictor Decision Tree.
+
+
+.. code-block:: python3
+
+
+    error_visualizer = ErrorVisualizer(error_analyzer)
+    tree_src = error_visualizer.plot_error_tree()
+
+    # the output of ``plot_error_tree`` is rendered automatically in a python notebook
+    # the following is for rendering in this sphynx gallery
+    tree_src.format = 'png'
+    tree_src.render('tree')
+    tree_img = mpimg.imread('tree.png')
+
+    plt.figure(figsize=(20, 20))
+    plt.imshow(tree_img)
+    plt.axis('off')
+
+
+
+
+.. image:: /auto_examples/images/sphx_glr_plot_mea_pipeline_001.png
+    :class: sphx-glr-single-img
+
+
+
+
+
+Print the details regarding the decision tree nodes containing the majority of errors.
+
+
+.. code-block:: python3
+
+
+    error_analyzer.error_node_summary(leaf_selector="all_errors", add_path_to_leaves=True, print_summary=True);
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    LEAF 6:
+         Correct predictions: 0 | Wrong predictions: 2 | Local error (purity): 1.00 | Global error: 0.00
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: <= 12.50
+               hours-per-week: <= 45.50
+                  marital-status: != Never-married
+                     relationship: == Wife
+    LEAF 50:
+         Correct predictions: 0 | Wrong predictions: 2 | Local error (purity): 1.00 | Global error: 0.00
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: > 4760.50
+               occupation: == Farming-fishing
+                  capital-gain: > 21045.50
+    LEAF 21:
+         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.00
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: > 12.50
+               age <= 27.50
+                  ID > 1.08
+                     ID <= 1.11
+    LEAF 46:
+         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.00
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: > 4760.50
+               occupation: != Farming-fishing
+                  ID <= -0.71
+                     ID > -0.74
+    LEAF 16:
+         Correct predictions: 3 | Wrong predictions: 6 | Local error (purity): 0.67 | Global error: 0.01
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: <= 12.50
+               hours-per-week: > 45.50
+                  fnlwgt: > 340894.50
+                     workclass == Self-emp-not-inc
+
+
+
+
+Plot the feature distributions of samples in ``LEAF 16`` containing the majority of errors.
+Rank features by correlation to error.
+
+
+.. code-block:: python3
+
+
+    error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=16, top_k_features=3)
+
+
+
+
+.. rst-class:: sphx-glr-horizontal
+
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_pipeline_002.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_pipeline_003.png
+            :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mea_pipeline_004.png
+            :class: sphx-glr-multi-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    Leaf 16 (Wrong prediction: 0.667, Correct prediction: 0.333)
+
+
+
+
+Discussion
+----------
+
+Model Performance Predictor Metrics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We are dealing with a binary classification task.
+Here the primary predictions of "income less or more than 50k" have been categorized
+in two classes: 'Correct prediction' and 'Wrong prediction' according to the difference
+from the true class. The accuracy is then the number of Correct predictions over the total.
+The MPP is representative of the behavior of the primary model as the true primary
+accuracy and the one estimated by the MPP are close.
+
+Model Failures
+^^^^^^^^^^^^^^
+
+Let's focus on the nodes of the MPP DecisionTree, in particular the leaf nodes
+of class 'Wrong prediction'. These leaves contain the majority of errors, each
+leaf clustering a subpopulation of errors with different feature values. The largest
+and purest failure nodes are highlighted when printing the error node summary, and
+also when plotting the feature distributions in the node (``leaf_selector="all_errors"``).
+From the feature distributions, sorted by correlation with the error, we can see that
+the majority of problems occur for divorced people with low capital gain.
+In the next iteration of model design, the primary model needs to be improved for these
+subpopulations.
+
+
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  22.955 seconds)
+
+**Estimated memory usage:**  500 MB
+
+
+.. _sphx_glr_download_auto_examples_plot_mea_pipeline.py:
+
+
+.. only :: html
+
+ .. container:: sphx-glr-footer
+    :class: sphx-glr-footer-example
+
+
+
+  .. container:: sphx-glr-download
+
+     :download:`Download Python source code: plot_mea_pipeline.py <plot_mea_pipeline.py>`
+
+
+
+  .. container:: sphx-glr-download
+
+     :download:`Download Jupyter notebook: plot_mea_pipeline.ipynb <plot_mea_pipeline.ipynb>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_
