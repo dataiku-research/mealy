@@ -150,10 +150,25 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                     else:
                         lte_split_without_feature = lte_split[0].split('\\n')[0]
                         lte_split_with_new_feature = lte_split_without_feature + '\\n' + split_feature
-                        lte_modified = ' != '.join([lte_split_with_new_feature, descaled_value])
+                        lte_modified = ' != '.join([lte_split_with_new_feature, str(descaled_value)])
                     new_label = '\\nentropy'.join([lte_modified, entropy_split[1]])
 
                     node.set_label(new_label)
+
+                alpha = 0.0
+                node_class = ErrorAnalyzerConstants.CORRECT_PREDICTION
+                if 'value = [' in node_label:
+                    values = [float(ii) for ii in node_label.split('value = [')[1].split(']')[0].split(',')]
+                    node_arg_class = np.argmax(values)
+                    node_class = self._error_clf.classes_[node_arg_class]
+                    # transparency as the entropy value
+                    alpha = values[node_arg_class]
+                class_color = ErrorAnalyzerConstants.ERROR_TREE_COLORS[node_class].strip('#')
+                class_color_rgb = tuple(int(class_color[i:i + 2], 16) for i in (0, 2, 4))
+                # compute the color as alpha against white
+                color_rgb = [int(round(alpha * c + (1 - alpha) * 255, 0)) for c in class_color_rgb]
+                color = '#{:02x}{:02x}{:02x}'.format(color_rgb[0], color_rgb[1], color_rgb[2])
+                node.set_fillcolor(color)
 
         if size is not None:
             pydot_graph.set_size('"%d,%d!"' % (size[0], size[1]))
@@ -244,8 +259,9 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                 else:
 
                     bins = np.unique(feature_column)[:nr_bins]
-                    histogram_func = lambda f_samples: np.bincount(np.searchsorted(bins, f_samples),
-                                                                   minlength=len(bins))[:nr_bins]
+                    histogram_func = lambda f_samples: \
+                        np.bincount(np.searchsorted(bins, f_samples),
+                                    minlength=len(bins))[:nr_bins].astype(float)/len(f_samples)
 
                 if show_global:
                     if show_class:
