@@ -208,7 +208,11 @@ class ErrorAnalyzer(object):
         Return:
             numpy.ndarray: predictions from the Model Performance Predictor (Wrong/Correct primary predictions).
         """
-        return self.model_performance_predictor.predict(x)
+        if self.pipeline_preprocessor is None:
+            prep_x = x
+        else:
+            prep_x = self.pipeline_preprocessor.transform(x)
+        return self.model_performance_predictor.predict(prep_x)
 
     @staticmethod
     def _get_epsilon(difference, mode='rec'):
