@@ -251,10 +251,10 @@ to the whole data highlights the subpopulations where the model works poorly.</p
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>The MPP was trained with accuracy 98.43%.
-The Decision Tree estimated the primary models accuracy to 86.61%.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>The MPP was trained with accuracy 93.70%.
+The Decision Tree estimated the primary models accuracy to 85.04%.
 The true accuracy of the primary model is 85.04.%
-The Fidelity of the MPP is 98.43%.
+The Fidelity of the MPP is 100.00%.
 The MPP is considered representative of the primary model performances.
 </pre></div>
 </div>
@@ -279,56 +279,30 @@ The MPP is considered representative of the primary model performances.
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>LEAF 12:
-     Correct predictions: 0 | Wrong predictions: 10 | Local error (purity): 1.00 | Global error: 0.53
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>LEAF 17:
+     Correct predictions: 0 | Wrong predictions: 9 | Local error (purity): 1.00 | Global error: 0.47
      Path to leaf:
      AGE &gt; 82.15
-        LSTAT &lt;= 8.96
-           RM &lt;= 8.21
-LEAF 14:
-     Correct predictions: 0 | Wrong predictions: 2 | Local error (purity): 1.00 | Global error: 0.11
+        RM &gt; 6.55
+           RM &lt;= 7.76
+LEAF 11:
+     Correct predictions: 2 | Wrong predictions: 3 | Local error (purity): 0.60 | Global error: 0.16
      Path to leaf:
      AGE &gt; 82.15
-        LSTAT &lt;= 8.96
-           RM &gt; 8.21
-              AGE &lt;= 89.20
-LEAF 3:
-     Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.05
-     Path to leaf:
-     AGE &lt;= 82.15
-        LSTAT &lt;= 25.53
-           TAX &lt;= 204.50
-LEAF 9:
-     Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.05
-     Path to leaf:
-     AGE &lt;= 82.15
-        LSTAT &gt; 25.53
-LEAF 17:
-     Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.05
+        RM &lt;= 6.55
+           LSTAT &lt;= 14.03
+              RM &lt;= 6.05
+LEAF 18:
+     Correct predictions: 2 | Wrong predictions: 3 | Local error (purity): 0.60 | Global error: 0.16
      Path to leaf:
      AGE &gt; 82.15
-        LSTAT &gt; 8.96
-           DIS &lt;= 1.32
-LEAF 19:
-     Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.05
-     Path to leaf:
-     AGE &gt; 82.15
-        LSTAT &gt; 8.96
-           DIS &gt; 1.32
-              TAX &lt;= 213.00
-LEAF 21:
-     Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.05
-     Path to leaf:
-     AGE &gt; 82.15
-        LSTAT &gt; 8.96
-           DIS &gt; 1.32
-              TAX &gt; 213.00
-                 RM &lt;= 4.12
+        RM &gt; 6.55
+           RM &gt; 7.76
 </pre></div>
 </div>
-<p>Plot the feature distributions of samples in <code class="docutils literal notranslate"><span class="pre">LEAF</span> <span class="pre">12</span></code> containing the majority of errors.
+<p>Plot the feature distributions of samples in <code class="docutils literal notranslate"><span class="pre">LEAF</span> <span class="pre">17</span></code> containing the majority of errors.
 Rank features by correlation to error.</p>
-<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">error_visualizer</span><span class="o">.</span><span class="n">plot_feature_distributions_on_leaves</span><span class="p">(</span><span class="n">leaf_selector</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">top_k_features</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">error_visualizer</span><span class="o">.</span><span class="n">plot_feature_distributions_on_leaves</span><span class="p">(</span><span class="n">leaf_selector</span><span class="o">=</span><span class="mi">17</span><span class="p">,</span> <span class="n">top_k_features</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
@@ -340,7 +314,7 @@ Rank features by correlation to error.</p>
 </li>
 </ul>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Leaf 12 (Wrong prediction: 1.000, Correct prediction: 0.000)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Leaf 17 (Wrong prediction: 1.000, Correct prediction: 0.000)
 </pre></div>
 </div>
 <div class="section" id="discussion">
@@ -365,11 +339,11 @@ leaf clustering a subpopulation of errors with different feature values. The lar
 and purest failure nodes are highlighted when printing the error node summary, and
 also when plotting the feature distributions in the node (<code class="docutils literal notranslate"><span class="pre">leaf_selector=&quot;all_errors&quot;</span></code>).
 From the feature distributions, sorted by correlation with the error, we can see that
-the majority of problems occur for extreme values of features <code class="docutils literal notranslate"><span class="pre">LSTAT</span></code> and <code class="docutils literal notranslate"><span class="pre">AGE</span></code>.
+the majority of problems occur for high values of features <code class="docutils literal notranslate"><span class="pre">RM</span></code> and <code class="docutils literal notranslate"><span class="pre">AGE</span></code>.
 In the next iteration of model design, the primary model needs to be improved for these
 subpopulations.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  3.865 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  197 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  3.754 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  190 MB</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-mea-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/b9c7db120083279d70637f728d144247/plot_mea.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_mea.py</span></code></a></p>

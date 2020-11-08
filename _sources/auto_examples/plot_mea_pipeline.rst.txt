@@ -189,10 +189,10 @@ Print metrics regarding the Model Performance Predictor.
 
  .. code-block:: none
 
-    The MPP was trained with accuracy 85.29%.
-    The Decision Tree estimated the primary models accuracy to 99.77%.
+    The MPP was trained with accuracy 85.67%.
+    The Decision Tree estimated the primary models accuracy to 95.33%.
     The true accuracy of the primary model is 85.15.%
-    The Fidelity of the MPP is 85.38%.
+    The Fidelity of the MPP is 89.82%.
     Warning: the built MPP might not be representative of the primary model performances.
     The MPP predicted model accuracy is considered too different from the true model accuracy.
 
@@ -247,57 +247,103 @@ Print the details regarding the decision tree nodes containing the majority of e
 
  .. code-block:: none
 
-    LEAF 6:
-         Correct predictions: 0 | Wrong predictions: 2 | Local error (purity): 1.00 | Global error: 0.00
-         Path to leaf:
-         marital-status: != Married-civ-spouse
-            education-num: <= 12.50
-               hours-per-week: <= 45.50
-                  marital-status: != Never-married
-                     relationship: == Wife
-    LEAF 50:
-         Correct predictions: 0 | Wrong predictions: 2 | Local error (purity): 1.00 | Global error: 0.00
+    LEAF 130:
+         Correct predictions: 25 | Wrong predictions: 38 | Local error (purity): 0.60 | Global error: 0.04
          Path to leaf:
          marital-status: == Married-civ-spouse
-            capital-gain: > 4760.50
-               occupation: == Farming-fishing
-                  capital-gain: > 21045.50
-    LEAF 21:
-         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.00
-         Path to leaf:
-         marital-status: != Married-civ-spouse
-            education-num: > 12.50
-               age <= 27.50
-                  ID > 1.08
-                     ID <= 1.11
-    LEAF 46:
-         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.00
+            capital-gain: <= 4760.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           education-num: <= 13.50
+                              hours-per-week: > 32.50
+                                 ID <= 1.62
+                                    occupation: != Machine-op-inspct
+                                       ID <= 1.41
+                                          occupation: == Prof-specialty
+                                             age <= 39.50
+    LEAF 136:
+         Correct predictions: 22 | Wrong predictions: 32 | Local error (purity): 0.59 | Global error: 0.03
          Path to leaf:
          marital-status: == Married-civ-spouse
-            capital-gain: > 4760.50
-               occupation: != Farming-fishing
-                  ID <= -0.71
-                     ID > -0.74
-    LEAF 16:
-         Correct predictions: 3 | Wrong predictions: 6 | Local error (purity): 0.67 | Global error: 0.01
+            capital-gain: <= 4760.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           education-num: <= 13.50
+                              hours-per-week: > 32.50
+                                 ID > 1.62
+    LEAF 104:
+         Correct predictions: 30 | Wrong predictions: 35 | Local error (purity): 0.54 | Global error: 0.04
          Path to leaf:
-         marital-status: != Married-civ-spouse
-            education-num: <= 12.50
-               hours-per-week: > 45.50
-                  fnlwgt: > 340894.50
-                     workclass == Self-emp-not-inc
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 4760.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           education-num: <= 13.50
+                              hours-per-week: > 32.50
+                                 ID <= 1.62
+                                    occupation: != Machine-op-inspct
+                                       ID <= 1.41
+                                          occupation: != Prof-specialty
+                                             workclass != Self-emp-inc
+                                                ID <= 1.17
+                                                   ID <= 0.07
+                                                      ID <= -0.09
+                                                         ID <= -0.97
+                                                            ID > -1.37
+                                                               age <= 44.50
+    LEAF 115:
+         Correct predictions: 25 | Wrong predictions: 28 | Local error (purity): 0.53 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 4760.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           education-num: <= 13.50
+                              hours-per-week: > 32.50
+                                 ID <= 1.62
+                                    occupation: != Machine-op-inspct
+                                       ID <= 1.41
+                                          occupation: != Prof-specialty
+                                             workclass != Self-emp-inc
+                                                ID <= 1.17
+                                                   ID <= 0.07
+                                                      ID > -0.09
+    LEAF 128:
+         Correct predictions: 33 | Wrong predictions: 36 | Local error (purity): 0.52 | Global error: 0.04
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 4760.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           education-num: <= 13.50
+                              hours-per-week: > 32.50
+                                 ID <= 1.62
+                                    occupation: != Machine-op-inspct
+                                       ID <= 1.41
+                                          occupation: != Prof-specialty
+                                             workclass == Self-emp-inc
 
 
 
 
-Plot the feature distributions of samples in ``LEAF 16`` containing the majority of errors.
+Plot the feature distributions of samples in ``LEAF 130`` containing the majority of errors.
 Rank features by correlation to error.
 
 
 .. code-block:: python3
 
 
-    error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=16, top_k_features=3)
+    error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=130, top_k_features=3)
 
 
 
@@ -327,7 +373,7 @@ Rank features by correlation to error.
 
  .. code-block:: none
 
-    Leaf 16 (Wrong prediction: 0.667, Correct prediction: 0.333)
+    Leaf 130 (Wrong prediction: 0.603, Correct prediction: 0.397)
 
 
 
@@ -354,7 +400,7 @@ leaf clustering a subpopulation of errors with different feature values. The lar
 and purest failure nodes are highlighted when printing the error node summary, and
 also when plotting the feature distributions in the node (``leaf_selector="all_errors"``).
 From the feature distributions, sorted by correlation with the error, we can see that
-the majority of problems occur for divorced people with low capital gain.
+the majority of problems occur for young married people with high education.
 In the next iteration of model design, the primary model needs to be improved for these
 subpopulations.
 
@@ -362,9 +408,9 @@ subpopulations.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  23.072 seconds)
+   **Total running time of the script:** ( 0 minutes  25.033 seconds)
 
-**Estimated memory usage:**  436 MB
+**Estimated memory usage:**  897 MB
 
 
 .. _sphx_glr_download_auto_examples_plot_mea_pipeline.py:

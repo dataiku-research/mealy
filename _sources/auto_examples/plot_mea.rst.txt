@@ -131,10 +131,10 @@ Print metrics regarding the Model Performance Predictor.
 
  .. code-block:: none
 
-    The MPP was trained with accuracy 98.43%.
-    The Decision Tree estimated the primary models accuracy to 86.61%.
+    The MPP was trained with accuracy 93.70%.
+    The Decision Tree estimated the primary models accuracy to 85.04%.
     The true accuracy of the primary model is 85.04.%
-    The Fidelity of the MPP is 98.43%.
+    The Fidelity of the MPP is 100.00%.
     The MPP is considered representative of the primary model performances.
 
 
@@ -188,63 +188,37 @@ Print the details regarding the decision tree nodes containing the majority of e
 
  .. code-block:: none
 
-    LEAF 12:
-         Correct predictions: 0 | Wrong predictions: 10 | Local error (purity): 1.00 | Global error: 0.53
-         Path to leaf:
-         AGE > 82.15
-            LSTAT <= 8.96
-               RM <= 8.21
-    LEAF 14:
-         Correct predictions: 0 | Wrong predictions: 2 | Local error (purity): 1.00 | Global error: 0.11
-         Path to leaf:
-         AGE > 82.15
-            LSTAT <= 8.96
-               RM > 8.21
-                  AGE <= 89.20
-    LEAF 3:
-         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.05
-         Path to leaf:
-         AGE <= 82.15
-            LSTAT <= 25.53
-               TAX <= 204.50
-    LEAF 9:
-         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.05
-         Path to leaf:
-         AGE <= 82.15
-            LSTAT > 25.53
     LEAF 17:
-         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.05
+         Correct predictions: 0 | Wrong predictions: 9 | Local error (purity): 1.00 | Global error: 0.47
          Path to leaf:
          AGE > 82.15
-            LSTAT > 8.96
-               DIS <= 1.32
-    LEAF 19:
-         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.05
+            RM > 6.55
+               RM <= 7.76
+    LEAF 11:
+         Correct predictions: 2 | Wrong predictions: 3 | Local error (purity): 0.60 | Global error: 0.16
          Path to leaf:
          AGE > 82.15
-            LSTAT > 8.96
-               DIS > 1.32
-                  TAX <= 213.00
-    LEAF 21:
-         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.05
+            RM <= 6.55
+               LSTAT <= 14.03
+                  RM <= 6.05
+    LEAF 18:
+         Correct predictions: 2 | Wrong predictions: 3 | Local error (purity): 0.60 | Global error: 0.16
          Path to leaf:
          AGE > 82.15
-            LSTAT > 8.96
-               DIS > 1.32
-                  TAX > 213.00
-                     RM <= 4.12
+            RM > 6.55
+               RM > 7.76
 
 
 
 
-Plot the feature distributions of samples in ``LEAF 12`` containing the majority of errors.
+Plot the feature distributions of samples in ``LEAF 17`` containing the majority of errors.
 Rank features by correlation to error.
 
 
 .. code-block:: python3
 
 
-    error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=12, top_k_features=3)
+    error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=17, top_k_features=3)
 
 
 
@@ -274,7 +248,7 @@ Rank features by correlation to error.
 
  .. code-block:: none
 
-    Leaf 12 (Wrong prediction: 1.000, Correct prediction: 0.000)
+    Leaf 17 (Wrong prediction: 1.000, Correct prediction: 0.000)
 
 
 
@@ -304,7 +278,7 @@ leaf clustering a subpopulation of errors with different feature values. The lar
 and purest failure nodes are highlighted when printing the error node summary, and
 also when plotting the feature distributions in the node (``leaf_selector="all_errors"``).
 From the feature distributions, sorted by correlation with the error, we can see that
-the majority of problems occur for extreme values of features ``LSTAT`` and ``AGE``.
+the majority of problems occur for high values of features ``RM`` and ``AGE``.
 In the next iteration of model design, the primary model needs to be improved for these
 subpopulations.
 
@@ -312,9 +286,9 @@ subpopulations.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.865 seconds)
+   **Total running time of the script:** ( 0 minutes  3.754 seconds)
 
-**Estimated memory usage:**  197 MB
+**Estimated memory usage:**  190 MB
 
 
 .. _sphx_glr_download_auto_examples_plot_mea.py:

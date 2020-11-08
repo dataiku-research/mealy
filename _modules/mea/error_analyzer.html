@@ -321,10 +321,10 @@
 <span class="sd">        predicted or wrongly predicted (errors) by a primary model.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            x (numpy.ndarray or pandas.DataFrame): feature data from a test set to evaluate the primary predictor and train a Model</span>
-<span class="sd">                Performance Predictor.</span>
-<span class="sd">            y (numpy.ndarray or pandas.DataFrame): target data from a test set to evaluate the primary predictor and train a Model</span>
-<span class="sd">                Performance Predictor.</span>
+<span class="sd">            x (numpy.ndarray or pandas.DataFrame): feature data from a test set to evaluate the primary predictor and</span>
+<span class="sd">                train a Model Performance Predictor.</span>
+<span class="sd">            y (numpy.ndarray or pandas.DataFrame): target data from a test set to evaluate the primary predictor and</span>
+<span class="sd">                train a Model Performance Predictor.</span>
 <span class="sd">            max_nr_rows (int): maximum number of rows to process.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -344,13 +344,13 @@
         <span class="c1"># entropy/mutual information is used to split nodes in Microsoft Pandora system</span>
         <span class="n">criterion</span> <span class="o">=</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">CRITERION</span>
 
-        <span class="n">dt_clf</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">criterion</span><span class="o">=</span><span class="n">criterion</span><span class="p">,</span> <span class="n">min_samples_leaf</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_seed</span><span class="p">)</span>
-        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;max_depth&#39;</span><span class="p">:</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">MAX_DEPTH_GRID</span><span class="p">}</span>
+        <span class="n">dt_clf</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">criterion</span><span class="o">=</span><span class="n">criterion</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_seed</span><span class="p">)</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;min_samples_leaf&#39;</span><span class="p">:</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">MIN_SAMPLES_LEAF_GRID</span><span class="p">}</span>
         <span class="n">gs_clf</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">dt_clf</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
         <span class="n">gs_clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_train_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_train_y</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span> <span class="o">=</span> <span class="n">gs_clf</span><span class="o">.</span><span class="n">best_estimator_</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Grid search selected max_depth = </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">gs_clf</span><span class="o">.</span><span class="n">best_params_</span><span class="p">[</span><span class="s1">&#39;max_depth&#39;</span><span class="p">]))</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Grid search selected max_depth = </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">gs_clf</span><span class="o">.</span><span class="n">best_params_</span><span class="p">[</span><span class="s1">&#39;min_samples_leaf&#39;</span><span class="p">]))</span></div>
 
     <span class="k">def</span> <span class="nf">_compute_primary_model_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">max_nr_rows</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

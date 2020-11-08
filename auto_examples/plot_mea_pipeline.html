@@ -294,10 +294,10 @@ Numeric features of the adult dataset:
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>The MPP was trained with accuracy 85.29%.
-The Decision Tree estimated the primary models accuracy to 99.77%.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>The MPP was trained with accuracy 85.67%.
+The Decision Tree estimated the primary models accuracy to 95.33%.
 The true accuracy of the primary model is 85.15.%
-The Fidelity of the MPP is 85.38%.
+The Fidelity of the MPP is 89.82%.
 Warning: the built MPP might not be representative of the primary model performances.
 The MPP predicted model accuracy is considered too different from the true model accuracy.
 </pre></div>
@@ -323,50 +323,96 @@ The MPP predicted model accuracy is considered too different from the true model
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>LEAF 6:
-     Correct predictions: 0 | Wrong predictions: 2 | Local error (purity): 1.00 | Global error: 0.00
-     Path to leaf:
-     marital-status: != Married-civ-spouse
-        education-num: &lt;= 12.50
-           hours-per-week: &lt;= 45.50
-              marital-status: != Never-married
-                 relationship: == Wife
-LEAF 50:
-     Correct predictions: 0 | Wrong predictions: 2 | Local error (purity): 1.00 | Global error: 0.00
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>LEAF 130:
+     Correct predictions: 25 | Wrong predictions: 38 | Local error (purity): 0.60 | Global error: 0.04
      Path to leaf:
      marital-status: == Married-civ-spouse
-        capital-gain: &gt; 4760.50
-           occupation: == Farming-fishing
-              capital-gain: &gt; 21045.50
-LEAF 21:
-     Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.00
-     Path to leaf:
-     marital-status: != Married-civ-spouse
-        education-num: &gt; 12.50
-           age &lt;= 27.50
-              ID &gt; 1.08
-                 ID &lt;= 1.11
-LEAF 46:
-     Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.00
+        capital-gain: &lt;= 4760.50
+           education-num: &gt; 8.50
+              capital-loss: &lt;= 1836.50
+                 age &gt; 29.50
+                    age &lt;= 66.50
+                       education-num: &lt;= 13.50
+                          hours-per-week: &gt; 32.50
+                             ID &lt;= 1.62
+                                occupation: != Machine-op-inspct
+                                   ID &lt;= 1.41
+                                      occupation: == Prof-specialty
+                                         age &lt;= 39.50
+LEAF 136:
+     Correct predictions: 22 | Wrong predictions: 32 | Local error (purity): 0.59 | Global error: 0.03
      Path to leaf:
      marital-status: == Married-civ-spouse
-        capital-gain: &gt; 4760.50
-           occupation: != Farming-fishing
-              ID &lt;= -0.71
-                 ID &gt; -0.74
-LEAF 16:
-     Correct predictions: 3 | Wrong predictions: 6 | Local error (purity): 0.67 | Global error: 0.01
+        capital-gain: &lt;= 4760.50
+           education-num: &gt; 8.50
+              capital-loss: &lt;= 1836.50
+                 age &gt; 29.50
+                    age &lt;= 66.50
+                       education-num: &lt;= 13.50
+                          hours-per-week: &gt; 32.50
+                             ID &gt; 1.62
+LEAF 104:
+     Correct predictions: 30 | Wrong predictions: 35 | Local error (purity): 0.54 | Global error: 0.04
      Path to leaf:
-     marital-status: != Married-civ-spouse
-        education-num: &lt;= 12.50
-           hours-per-week: &gt; 45.50
-              fnlwgt: &gt; 340894.50
-                 workclass == Self-emp-not-inc
+     marital-status: == Married-civ-spouse
+        capital-gain: &lt;= 4760.50
+           education-num: &gt; 8.50
+              capital-loss: &lt;= 1836.50
+                 age &gt; 29.50
+                    age &lt;= 66.50
+                       education-num: &lt;= 13.50
+                          hours-per-week: &gt; 32.50
+                             ID &lt;= 1.62
+                                occupation: != Machine-op-inspct
+                                   ID &lt;= 1.41
+                                      occupation: != Prof-specialty
+                                         workclass != Self-emp-inc
+                                            ID &lt;= 1.17
+                                               ID &lt;= 0.07
+                                                  ID &lt;= -0.09
+                                                     ID &lt;= -0.97
+                                                        ID &gt; -1.37
+                                                           age &lt;= 44.50
+LEAF 115:
+     Correct predictions: 25 | Wrong predictions: 28 | Local error (purity): 0.53 | Global error: 0.03
+     Path to leaf:
+     marital-status: == Married-civ-spouse
+        capital-gain: &lt;= 4760.50
+           education-num: &gt; 8.50
+              capital-loss: &lt;= 1836.50
+                 age &gt; 29.50
+                    age &lt;= 66.50
+                       education-num: &lt;= 13.50
+                          hours-per-week: &gt; 32.50
+                             ID &lt;= 1.62
+                                occupation: != Machine-op-inspct
+                                   ID &lt;= 1.41
+                                      occupation: != Prof-specialty
+                                         workclass != Self-emp-inc
+                                            ID &lt;= 1.17
+                                               ID &lt;= 0.07
+                                                  ID &gt; -0.09
+LEAF 128:
+     Correct predictions: 33 | Wrong predictions: 36 | Local error (purity): 0.52 | Global error: 0.04
+     Path to leaf:
+     marital-status: == Married-civ-spouse
+        capital-gain: &lt;= 4760.50
+           education-num: &gt; 8.50
+              capital-loss: &lt;= 1836.50
+                 age &gt; 29.50
+                    age &lt;= 66.50
+                       education-num: &lt;= 13.50
+                          hours-per-week: &gt; 32.50
+                             ID &lt;= 1.62
+                                occupation: != Machine-op-inspct
+                                   ID &lt;= 1.41
+                                      occupation: != Prof-specialty
+                                         workclass == Self-emp-inc
 </pre></div>
 </div>
-<p>Plot the feature distributions of samples in <code class="docutils literal notranslate"><span class="pre">LEAF</span> <span class="pre">16</span></code> containing the majority of errors.
+<p>Plot the feature distributions of samples in <code class="docutils literal notranslate"><span class="pre">LEAF</span> <span class="pre">130</span></code> containing the majority of errors.
 Rank features by correlation to error.</p>
-<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">error_visualizer</span><span class="o">.</span><span class="n">plot_feature_distributions_on_leaves</span><span class="p">(</span><span class="n">leaf_selector</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">top_k_features</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">error_visualizer</span><span class="o">.</span><span class="n">plot_feature_distributions_on_leaves</span><span class="p">(</span><span class="n">leaf_selector</span><span class="o">=</span><span class="mi">130</span><span class="p">,</span> <span class="n">top_k_features</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
@@ -378,7 +424,7 @@ Rank features by correlation to error.</p>
 </li>
 </ul>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Leaf 16 (Wrong prediction: 0.667, Correct prediction: 0.333)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Leaf 130 (Wrong prediction: 0.603, Correct prediction: 0.397)
 </pre></div>
 </div>
 <div class="section" id="discussion">
@@ -400,11 +446,11 @@ leaf clustering a subpopulation of errors with different feature values. The lar
 and purest failure nodes are highlighted when printing the error node summary, and
 also when plotting the feature distributions in the node (<code class="docutils literal notranslate"><span class="pre">leaf_selector=&quot;all_errors&quot;</span></code>).
 From the feature distributions, sorted by correlation with the error, we can see that
-the majority of problems occur for divorced people with low capital gain.
+the majority of problems occur for young married people with high education.
 In the next iteration of model design, the primary model needs to be improved for these
 subpopulations.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  23.072 seconds)</p>
-<p><strong>Estimated memory usage:</strong>  436 MB</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  25.033 seconds)</p>
+<p><strong>Estimated memory usage:</strong>  897 MB</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-mea-pipeline-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/48a296b5854b6a1be0e2ae6f4a4fe848/plot_mea_pipeline.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_mea_pipeline.py</span></code></a></p>
