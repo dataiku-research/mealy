@@ -123,10 +123,10 @@ plt.axis('off')
 error_analyzer.error_node_summary(leaf_selector="all_errors", add_path_to_leaves=True, print_summary=True);
 
 ##############################################################################
-# Plot the feature distributions of samples in ``LEAF 16`` containing the majority of errors.
+# Plot the feature distributions of samples in ``LEAF 130`` containing the majority of errors.
 # Rank features by correlation to error.
 
-error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=16, top_k_features=3)
+error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=130, top_k_features=3)
 
 ##############################################################################
 # Discussion
@@ -151,7 +151,7 @@ error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=16, top_k_fe
 # and purest failure nodes are highlighted when printing the error node summary, and
 # also when plotting the feature distributions in the node (``leaf_selector="all_errors"``).
 # From the feature distributions, sorted by correlation with the error, we can see that
-# the majority of problems occur for divorced people with low capital gain.
+# the majority of problems occur for young married people with high education.
 # In the next iteration of model design, the primary model needs to be improved for these
 # subpopulations.
 #

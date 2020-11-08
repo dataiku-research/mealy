@@ -145,10 +145,10 @@ class ErrorAnalyzer(object):
         predicted or wrongly predicted (errors) by a primary model.
 
         Args:
-            x (numpy.ndarray or pandas.DataFrame): feature data from a test set to evaluate the primary predictor and train a Model
-                Performance Predictor.
-            y (numpy.ndarray or pandas.DataFrame): target data from a test set to evaluate the primary predictor and train a Model
-                Performance Predictor.
+            x (numpy.ndarray or pandas.DataFrame): feature data from a test set to evaluate the primary predictor and
+                train a Model Performance Predictor.
+            y (numpy.ndarray or pandas.DataFrame): target data from a test set to evaluate the primary predictor and
+                train a Model Performance Predictor.
             max_nr_rows (int): maximum number of rows to process.
 
         """
@@ -168,13 +168,13 @@ class ErrorAnalyzer(object):
         # entropy/mutual information is used to split nodes in Microsoft Pandora system
         criterion = ErrorAnalyzerConstants.CRITERION
 
-        dt_clf = tree.DecisionTreeClassifier(criterion=criterion, min_samples_leaf=1, random_state=self._seed)
-        parameters = {'max_depth': ErrorAnalyzerConstants.MAX_DEPTH_GRID}
+        dt_clf = tree.DecisionTreeClassifier(criterion=criterion, random_state=self._seed)
+        parameters = {'min_samples_leaf': ErrorAnalyzerConstants.MIN_SAMPLES_LEAF_GRID}
         gs_clf = GridSearchCV(dt_clf, parameters, cv=5)
         gs_clf.fit(self._error_train_x, self._error_train_y)
         self._error_clf = gs_clf.best_estimator_
 
-        logger.info('Grid search selected max_depth = {}'.format(gs_clf.best_params_['max_depth']))
+        logger.info('Grid search selected max_depth = {}'.format(gs_clf.best_params_['min_samples_leaf']))
 
     def _compute_primary_model_error(self, x, y, max_nr_rows):
         """
