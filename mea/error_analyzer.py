@@ -174,7 +174,11 @@ class ErrorAnalyzer(object):
 
     def predict(self, x):
         """ Predict model performance on samples """
-        return self.model_performance_predictor.predict(x)
+        if self.pipeline_preprocessor is None:
+            prep_x = x
+        else:
+            prep_x = self.pipeline_preprocessor.transform(x)
+        return self.model_performance_predictor.predict(prep_x)
 
     @staticmethod
     def _get_epsilon(difference, mode='rec'):
