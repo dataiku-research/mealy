@@ -45,7 +45,7 @@ class FeatureNameTransformer(object):
         len_preproc = 0
         for i, (tr_type, tr, tr_feature_names) in enumerate(ct_preprocessor.transformers_):
 
-            orig_feats_ids = np.where(np.in1d(orig_feats, tr_feature_names))[0]
+            orig_feats_ids = np.where(np.in1d(self.original_feature_names, tr_feature_names))[0]
             if isinstance(tr, Pipeline):
                 single_tr = tr.steps[-1][1]
             else:
