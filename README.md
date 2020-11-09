@@ -5,6 +5,7 @@
 mea is a Python package to perform Model Error Analysis of scikit-learn models leveraging a Model Performance Predictor.
 
 The project is currently maintained by [Dataiku's](https://www.dataiku.com/) research team.
+This is an alpha version.
 
 ## Getting started
 

@@ -45,7 +45,7 @@ class ErrorAnalyzerConstants(object):
     """
     WRONG_PREDICTION = "Wrong prediction"
     CORRECT_PREDICTION = "Correct prediction"
-    PARAMETERS_GRID = {'max_depth': [5, 10, None], 'min_samples_leaf': [10, 20],'min_samples_split' : [2, 10, 40]}
+    PARAMETERS_GRID = {'max_depth': [5, 10, 20], 'min_samples_leaf': [10, 20]}
     TEST_SIZE = 0.2
 
     MIN_NUM_ROWS = 100  # heuristic choice

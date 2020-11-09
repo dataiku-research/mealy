@@ -143,8 +143,8 @@ error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=leaf_id, top
 # Here the primary predictions of "income less or more than 50k" have been categorized
 # in two classes: 'Correct prediction' and 'Wrong prediction' according to the difference
 # from the true class. The accuracy is then the number of Correct predictions over the total.
-# The MPP is representative of the behavior of the primary model as the true primary
-# accuracy and the one estimated by the MPP are close.
+# The MPP might not be representative of the behavior of the primary model as the true primary
+# accuracy and the one estimated by the MPP are not close.
 #
 # Model Failures
 # ^^^^^^^^^^^^^^
