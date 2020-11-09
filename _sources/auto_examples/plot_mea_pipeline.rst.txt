@@ -21,6 +21,8 @@ yielding failure outcome gather the samples mis-predicted by the primary
 model. Plotting the feature distributions of these samples and comparing
 to the whole data highlights the subpopulations where the model works poorly.
 
+When using a python notebook, set ``%matplotlib inline`` to enable display.
+
 Those are the necessary imports and initializations.
 
 
@@ -189,10 +191,10 @@ Print metrics regarding the Model Performance Predictor.
 
  .. code-block:: none
 
-    The MPP was trained with accuracy 85.67%.
-    The Decision Tree estimated the primary models accuracy to 95.33%.
+    The MPP was trained with accuracy 79.99%.
+    The Decision Tree estimated the primary models accuracy to 66.74%.
     The true accuracy of the primary model is 85.15.%
-    The Fidelity of the MPP is 89.82%.
+    The Fidelity of the MPP is 81.59%.
     Warning: the built MPP might not be representative of the primary model performances.
     The MPP predicted model accuracy is considered too different from the true model accuracy.
 
@@ -247,103 +249,3405 @@ Print the details regarding the decision tree nodes containing the majority of e
 
  .. code-block:: none
 
-    LEAF 130:
-         Correct predictions: 25 | Wrong predictions: 38 | Local error (purity): 0.60 | Global error: 0.04
+    LEAF 366:
+         Correct predictions: 1 | Wrong predictions: 53 | Local error (purity): 0.97 | Global error: 0.06
          Path to leaf:
          marital-status: == Married-civ-spouse
-            capital-gain: <= 4760.50
+            capital-gain: <= 5095.50
                education-num: > 8.50
                   capital-loss: <= 1836.50
                      age > 29.50
                         age <= 66.50
-                           education-num: <= 13.50
-                              hours-per-week: > 32.50
-                                 ID <= 1.62
-                                    occupation: != Machine-op-inspct
-                                       ID <= 1.41
-                                          occupation: == Prof-specialty
-                                             age <= 39.50
-    LEAF 136:
-         Correct predictions: 22 | Wrong predictions: 32 | Local error (purity): 0.59 | Global error: 0.03
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: > 181160.50
+                                                               workclass != Local-gov
+                                                                  age > 44.50
+                                                                     workclass != Federal-gov
+                                                                        ID <= 0.87
+                                                                           ID <= 0.04
+                                                                              education: != HS-grad
+    LEAF 400:
+         Correct predictions: 1 | Wrong predictions: 53 | Local error (purity): 0.97 | Global error: 0.06
          Path to leaf:
          marital-status: == Married-civ-spouse
-            capital-gain: <= 4760.50
+            capital-gain: <= 5095.50
                education-num: > 8.50
                   capital-loss: <= 1836.50
                      age > 29.50
                         age <= 66.50
-                           education-num: <= 13.50
-                              hours-per-week: > 32.50
-                                 ID > 1.62
-    LEAF 104:
-         Correct predictions: 30 | Wrong predictions: 35 | Local error (purity): 0.54 | Global error: 0.04
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID <= -0.97
+                                                         age > 31.50
+                                                            race: == White
+                                                               ID > -1.36
+                                                                  age <= 45.50
+                                                                     fnlwgt: <= 226471.50
+                                                                        ID <= -1.07
+    LEAF 525:
+         Correct predictions: 1 | Wrong predictions: 53 | Local error (purity): 0.97 | Global error: 0.06
          Path to leaf:
          marital-status: == Married-civ-spouse
-            capital-gain: <= 4760.50
+            capital-gain: <= 5095.50
                education-num: > 8.50
                   capital-loss: <= 1836.50
                      age > 29.50
                         age <= 66.50
-                           education-num: <= 13.50
-                              hours-per-week: > 32.50
-                                 ID <= 1.62
-                                    occupation: != Machine-op-inspct
-                                       ID <= 1.41
-                                          occupation: != Prof-specialty
-                                             workclass != Self-emp-inc
-                                                ID <= 1.17
-                                                   ID <= 0.07
-                                                      ID <= -0.09
-                                                         ID <= -0.97
-                                                            ID > -1.37
-                                                               age <= 44.50
-    LEAF 115:
-         Correct predictions: 25 | Wrong predictions: 28 | Local error (purity): 0.53 | Global error: 0.03
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: == Prof-specialty
+                                                native-country: == United-States
+                                                   age <= 39.50
+                                                      ID > -1.09
+                                                         workclass != Private
+    LEAF 548:
+         Correct predictions: 1 | Wrong predictions: 43 | Local error (purity): 0.96 | Global error: 0.05
          Path to leaf:
          marital-status: == Married-civ-spouse
-            capital-gain: <= 4760.50
+            capital-gain: <= 5095.50
                education-num: > 8.50
                   capital-loss: <= 1836.50
                      age > 29.50
                         age <= 66.50
-                           education-num: <= 13.50
-                              hours-per-week: > 32.50
-                                 ID <= 1.62
-                                    occupation: != Machine-op-inspct
-                                       ID <= 1.41
-                                          occupation: != Prof-specialty
-                                             workclass != Self-emp-inc
-                                                ID <= 1.17
-                                                   ID <= 0.07
-                                                      ID > -0.09
-    LEAF 128:
-         Correct predictions: 33 | Wrong predictions: 36 | Local error (purity): 0.52 | Global error: 0.04
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID > 1.69
+    LEAF 463:
+         Correct predictions: 2 | Wrong predictions: 43 | Local error (purity): 0.95 | Global error: 0.05
          Path to leaf:
          marital-status: == Married-civ-spouse
-            capital-gain: <= 4760.50
+            capital-gain: <= 5095.50
                education-num: > 8.50
                   capital-loss: <= 1836.50
                      age > 29.50
                         age <= 66.50
-                           education-num: <= 13.50
-                              hours-per-week: > 32.50
-                                 ID <= 1.62
-                                    occupation: != Machine-op-inspct
-                                       ID <= 1.41
-                                          occupation: != Prof-specialty
-                                             workclass == Self-emp-inc
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: <= 193530.50
+                                                                     occupation: != Handlers-cleaners
+                                                                        age <= 42.50
+                                                                           hours-per-week: > 49.00
+                                                                              education-num: <= 11.50
+                                                                                 age > 36.50
+    LEAF 540:
+         Correct predictions: 2 | Wrong predictions: 43 | Local error (purity): 0.95 | Global error: 0.05
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: > 2994.00
+    LEAF 467:
+         Correct predictions: 2 | Wrong predictions: 43 | Local error (purity): 0.94 | Global error: 0.05
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: <= 193530.50
+                                                                     occupation: != Handlers-cleaners
+                                                                        age > 42.50
+                                                                           hours-per-week: <= 58.50
+                                                                              age <= 43.50
+    LEAF 338:
+         Correct predictions: 0 | Wrong predictions: 40 | Local error (purity): 0.99 | Global error: 0.04
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: <= 181160.50
+                                                               education: != Some-college
+                                                                  hours-per-week: > 51.00
+                                                                     fnlwgt: <= 110978.00
+    LEAF 527:
+         Correct predictions: 2 | Wrong predictions: 40 | Local error (purity): 0.93 | Global error: 0.04
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: == Prof-specialty
+                                                native-country: == United-States
+                                                   age <= 39.50
+                                                      ID > -1.09
+                                                         workclass == Private
+                                                            education: != Bachelors
+    LEAF 282:
+         Correct predictions: 1 | Wrong predictions: 37 | Local error (purity): 0.95 | Global error: 0.04
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID <= -1.72
+    LEAF 473:
+         Correct predictions: 2 | Wrong predictions: 37 | Local error (purity): 0.93 | Global error: 0.04
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: <= 193530.50
+                                                                     occupation: != Handlers-cleaners
+                                                                        age > 42.50
+                                                                           hours-per-week: <= 58.50
+                                                                              age > 43.50
+                                                                                 fnlwgt: <= 114097.00
+                                                                                    fnlwgt: <= 104700.00
+                                                                                       age <= 54.50
+                                                                                          fnlwgt: > 67407.50
+    LEAF 369:
+         Correct predictions: 0 | Wrong predictions: 33 | Local error (purity): 1.00 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: > 181160.50
+                                                               workclass != Local-gov
+                                                                  age > 44.50
+                                                                     workclass != Federal-gov
+                                                                        ID > 0.87
+    LEAF 580:
+         Correct predictions: 3 | Wrong predictions: 37 | Local error (purity): 0.91 | Global error: 0.04
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: > 13.50
+                                 age > 56.50
+                                    hours-per-week: <= 42.50
+    LEAF 271:
+         Correct predictions: 1 | Wrong predictions: 33 | Local error (purity): 0.95 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age <= 29.50
+                        education-num: > 9.50
+                           hours-per-week: <= 44.50
+                              ID > -0.81
+                                 fnlwgt: > 177711.50
+                                    workclass == Private
+                                       fnlwgt: <= 226537.50
+    LEAF 359:
+         Correct predictions: 3 | Wrong predictions: 33 | Local error (purity): 0.91 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: > 181160.50
+                                                               workclass != Local-gov
+                                                                  age <= 44.50
+                                                                     hours-per-week: <= 57.50
+                                                                        hours-per-week: <= 47.00
+                                                                           ID > -0.06
+                                                                              age > 37.50
+    LEAF 324:
+         Correct predictions: 0 | Wrong predictions: 30 | Local error (purity): 0.98 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: <= 181160.50
+                                                               education: != Some-college
+                                                                  hours-per-week: <= 51.00
+                                                                     fnlwgt: <= 170714.50
+                                                                        occupation: != Sales
+                                                                           occupation: != Craft-repair
+                                                                              occupation: != Transport-moving
+                                                                                 ID <= 1.12
+                                                                                    fnlwgt: <= 48320.50
+    LEAF 328:
+         Correct predictions: 0 | Wrong predictions: 30 | Local error (purity): 0.98 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: <= 181160.50
+                                                               education: != Some-college
+                                                                  hours-per-week: <= 51.00
+                                                                     fnlwgt: <= 170714.50
+                                                                        occupation: != Sales
+                                                                           occupation: != Craft-repair
+                                                                              occupation: != Transport-moving
+                                                                                 ID <= 1.12
+                                                                                    fnlwgt: > 48320.50
+                                                                                       fnlwgt: > 116192.00
+                                                                                          fnlwgt: <= 134580.00
+    LEAF 384:
+         Correct predictions: 0 | Wrong predictions: 30 | Local error (purity): 0.98 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID <= -0.97
+                                                         age <= 31.50
+    LEAF 180:
+         Correct predictions: 1 | Wrong predictions: 30 | Local error (purity): 0.96 | Global error: 0.03
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: > 12.50
+               age > 27.50
+                  capital-gain: <= 4826.00
+                     age > 45.50
+                        age <= 64.50
+                           workclass == Private
+                              occupation: == Exec-managerial
+                                 fnlwgt: <= 185882.00
+    LEAF 360:
+         Correct predictions: 1 | Wrong predictions: 30 | Local error (purity): 0.96 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: > 181160.50
+                                                               workclass != Local-gov
+                                                                  age <= 44.50
+                                                                     hours-per-week: <= 57.50
+                                                                        hours-per-week: > 47.00
+    LEAF 556:
+         Correct predictions: 1 | Wrong predictions: 30 | Local error (purity): 0.96 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: > 13.50
+                                 age <= 56.50
+                                    ID <= 1.36
+                                       age <= 35.50
+                                          education: == Masters
+                                             ID > -0.06
+    LEAF 487:
+         Correct predictions: 1 | Wrong predictions: 30 | Local error (purity): 0.95 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: <= 193530.50
+                                                                     occupation: != Handlers-cleaners
+                                                                        age > 42.50
+                                                                           hours-per-week: <= 58.50
+                                                                              age > 43.50
+                                                                                 fnlwgt: > 114097.00
+                                                                                    fnlwgt: > 129154.50
+                                                                                       education: != Bachelors
+                                                                                          fnlwgt: > 145496.50
+                                                                                             age > 55.50
+    LEAF 395:
+         Correct predictions: 2 | Wrong predictions: 30 | Local error (purity): 0.93 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID <= -0.97
+                                                         age > 31.50
+                                                            race: == White
+                                                               ID <= -1.36
+                                                                  occupation: != Sales
+                                                                     age > 38.50
+                                                                        education: == HS-grad
+    LEAF 502:
+         Correct predictions: 2 | Wrong predictions: 30 | Local error (purity): 0.91 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: > 201782.00
+                                                                  age <= 41.50
+                                                                     hours-per-week: <= 47.50
+                                                                        education-num: <= 10.50
+                                                                           fnlwgt: <= 309305.50
+                                                                              fnlwgt: > 267852.50
+    LEAF 566:
+         Correct predictions: 2 | Wrong predictions: 30 | Local error (purity): 0.91 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: > 13.50
+                                 age <= 56.50
+                                    ID <= 1.36
+                                       age > 35.50
+                                          occupation: != Exec-managerial
+                                             age > 40.50
+                                                age <= 47.50
+                                                   education: != Prof-school
+                                                      hours-per-week: > 40.50
+    LEAF 157:
+         Correct predictions: 1 | Wrong predictions: 26 | Local error (purity): 0.96 | Global error: 0.03
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: > 12.50
+               age > 27.50
+                  capital-gain: <= 4826.00
+                     age <= 45.50
+                        hours-per-week: > 49.00
+                           workclass != Local-gov
+                              ID > -0.21
+                                 fnlwgt: <= 229486.00
+                                    fnlwgt: > 147503.00
+    LEAF 276:
+         Correct predictions: 1 | Wrong predictions: 26 | Local error (purity): 0.96 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age <= 29.50
+                        education-num: > 9.50
+                           hours-per-week: > 44.50
+                              hours-per-week: <= 49.00
+                                 ID > 0.04
+    LEAF 341:
+         Correct predictions: 1 | Wrong predictions: 26 | Local error (purity): 0.96 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: <= 181160.50
+                                                               education: != Some-college
+                                                                  hours-per-week: > 51.00
+                                                                     fnlwgt: > 110978.00
+                                                                        fnlwgt: > 145795.50
+    LEAF 475:
+         Correct predictions: 1 | Wrong predictions: 26 | Local error (purity): 0.96 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: <= 193530.50
+                                                                     occupation: != Handlers-cleaners
+                                                                        age > 42.50
+                                                                           hours-per-week: <= 58.50
+                                                                              age > 43.50
+                                                                                 fnlwgt: <= 114097.00
+                                                                                    fnlwgt: > 104700.00
+    LEAF 536:
+         Correct predictions: 1 | Wrong predictions: 26 | Local error (purity): 0.96 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: == Prof-specialty
+                                                native-country: == United-States
+                                                   age > 39.50
+                                                      age > 41.50
+                                                         fnlwgt: <= 202942.50
+                                                            fnlwgt: > 164963.00
+    LEAF 504:
+         Correct predictions: 1 | Wrong predictions: 26 | Local error (purity): 0.94 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: > 201782.00
+                                                                  age <= 41.50
+                                                                     hours-per-week: <= 47.50
+                                                                        education-num: > 10.50
+    LEAF 142:
+         Correct predictions: 2 | Wrong predictions: 26 | Local error (purity): 0.92 | Global error: 0.03
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: > 12.50
+               age > 27.50
+                  capital-gain: <= 4826.00
+                     age <= 45.50
+                        hours-per-week: <= 49.00
+                           ID > 0.39
+                              fnlwgt: > 126019.50
+                                 fnlwgt: <= 214052.50
+                                    ID <= 0.75
+    LEAF 299:
+         Correct predictions: 2 | Wrong predictions: 26 | Local error (purity): 0.92 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: <= 31.00
+                                       ID > -1.30
+                                          relationship: == Wife
+                                             education-num: > 9.50
+                                                age <= 37.00
+    LEAF 493:
+         Correct predictions: 1 | Wrong predictions: 23 | Local error (purity): 0.93 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: > 193530.50
+                                                                     ID > 0.47
+    LEAF 535:
+         Correct predictions: 2 | Wrong predictions: 23 | Local error (purity): 0.91 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: == Prof-specialty
+                                                native-country: == United-States
+                                                   age > 39.50
+                                                      age > 41.50
+                                                         fnlwgt: <= 202942.50
+                                                            fnlwgt: <= 164963.00
+                                                               ID > 0.60
+    LEAF 407:
+         Correct predictions: 2 | Wrong predictions: 23 | Local error (purity): 0.89 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID <= -0.97
+                                                         age > 31.50
+                                                            race: == White
+                                                               ID > -1.36
+                                                                  age > 45.50
+                                                                     occupation: == Craft-repair
+    LEAF 156:
+         Correct predictions: 2 | Wrong predictions: 20 | Local error (purity): 0.90 | Global error: 0.02
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: > 12.50
+               age > 27.50
+                  capital-gain: <= 4826.00
+                     age <= 45.50
+                        hours-per-week: > 49.00
+                           workclass != Local-gov
+                              ID > -0.21
+                                 fnlwgt: <= 229486.00
+                                    fnlwgt: <= 147503.00
+    LEAF 246:
+         Correct predictions: 2 | Wrong predictions: 20 | Local error (purity): 0.90 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age <= 29.50
+                        education-num: <= 9.50
+                           ID > -0.95
+                              hours-per-week: > 39.00
+                                 race: == White
+                                    fnlwgt: <= 177486.50
+                                       ID <= 1.33
+                                          ID > -0.04
+    LEAF 307:
+         Correct predictions: 2 | Wrong predictions: 20 | Local error (purity): 0.90 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID <= -1.61
+                                                   ID <= -1.69
+                                                      age <= 42.50
+    LEAF 367:
+         Correct predictions: 2 | Wrong predictions: 20 | Local error (purity): 0.90 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: > 181160.50
+                                                               workclass != Local-gov
+                                                                  age > 44.50
+                                                                     workclass != Federal-gov
+                                                                        ID <= 0.87
+                                                                           ID <= 0.04
+                                                                              education: == HS-grad
+    LEAF 375:
+         Correct predictions: 2 | Wrong predictions: 20 | Local error (purity): 0.90 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: > 181160.50
+                                                               workclass == Local-gov
+                                                                  ID > 0.55
+    LEAF 448:
+         Correct predictions: 2 | Wrong predictions: 20 | Local error (purity): 0.90 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: <= 193530.50
+                                                                     occupation: != Handlers-cleaners
+                                                                        age <= 42.50
+                                                                           hours-per-week: <= 49.00
+                                                                              occupation: != Sales
+                                                                                 native-country: == United-States
+                                                                                    education: != HS-grad
+                                                                                       fnlwgt: <= 60993.50
+    LEAF 462:
+         Correct predictions: 2 | Wrong predictions: 20 | Local error (purity): 0.90 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: <= 193530.50
+                                                                     occupation: != Handlers-cleaners
+                                                                        age <= 42.50
+                                                                           hours-per-week: > 49.00
+                                                                              education-num: <= 11.50
+                                                                                 age <= 36.50
+    LEAF 492:
+         Correct predictions: 2 | Wrong predictions: 20 | Local error (purity): 0.90 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: > 193530.50
+                                                                     ID <= 0.47
+    LEAF 515:
+         Correct predictions: 2 | Wrong predictions: 20 | Local error (purity): 0.90 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: > 201782.00
+                                                                  age > 41.50
+                                                                     education-num: <= 11.50
+                                                                        fnlwgt: > 225647.00
+                                                                           ID > 0.93
+    LEAF 178:
+         Correct predictions: 4 | Wrong predictions: 33 | Local error (purity): 0.88 | Global error: 0.03
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: > 12.50
+               age > 27.50
+                  capital-gain: <= 4826.00
+                     age > 45.50
+                        age <= 64.50
+                           workclass == Private
+                              occupation: != Exec-managerial
+                                 age > 49.50
+                                    relationship: == Not-in-family
+                                       fnlwgt: > 155197.00
+    LEAF 413:
+         Correct predictions: 4 | Wrong predictions: 30 | Local error (purity): 0.87 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age <= 33.50
+                                                            occupation: != Machine-op-inspct
+                                                               fnlwgt: > 94618.00
+                                                                  ID <= -0.40
+    LEAF 483:
+         Correct predictions: 4 | Wrong predictions: 30 | Local error (purity): 0.87 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: <= 193530.50
+                                                                     occupation: != Handlers-cleaners
+                                                                        age > 42.50
+                                                                           hours-per-week: <= 58.50
+                                                                              age > 43.50
+                                                                                 fnlwgt: > 114097.00
+                                                                                    fnlwgt: > 129154.50
+                                                                                       education: != Bachelors
+                                                                                          fnlwgt: > 145496.50
+                                                                                             age <= 55.50
+                                                                                                ID <= 0.23
+    LEAF 111:
+         Correct predictions: 5 | Wrong predictions: 30 | Local error (purity): 0.85 | Global error: 0.03
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: <= 12.50
+               hours-per-week: > 45.50
+                  relationship: != Own-child
+                     fnlwgt: > 340894.50
+                        sex: == Male
+    LEAF 278:
+         Correct predictions: 5 | Wrong predictions: 30 | Local error (purity): 0.85 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age <= 29.50
+                        education-num: > 9.50
+                           hours-per-week: > 44.50
+                              hours-per-week: > 49.00
+                                 fnlwgt: <= 170604.00
+    LEAF 602:
+         Correct predictions: 5 | Wrong predictions: 30 | Local error (purity): 0.84 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: > 1836.50
+                     capital-loss: > 2054.00
+                        fnlwgt: <= 182045.00
+    LEAF 209:
+         Correct predictions: 3 | Wrong predictions: 26 | Local error (purity): 0.88 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: <= 8.50
+                  hours-per-week: > 27.50
+                     fnlwgt: <= 188742.00
+                        age <= 61.50
+                           age > 36.50
+                              fnlwgt: > 152628.50
+                                 age <= 45.50
+    LEAF 539:
+         Correct predictions: 4 | Wrong predictions: 26 | Local error (purity): 0.85 | Global error: 0.03
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: == Prof-specialty
+                                                native-country: == United-States
+                                                   age > 39.50
+                                                      age > 41.50
+                                                         fnlwgt: > 202942.50
+                                                            fnlwgt: > 253110.00
+    LEAF 102:
+         Correct predictions: 3 | Wrong predictions: 23 | Local error (purity): 0.87 | Global error: 0.02
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: <= 12.50
+               hours-per-week: > 45.50
+                  relationship: != Own-child
+                     fnlwgt: <= 340894.50
+                        fnlwgt: <= 249840.50
+                           education-num: > 7.50
+                              workclass == Private
+                                 age > 37.50
+                                    ID <= -0.54
+                                       education: == Some-college
+    LEAF 433:
+         Correct predictions: 3 | Wrong predictions: 23 | Local error (purity): 0.87 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID <= -0.76
+                                                               relationship: == Husband
+                                                                  age <= 43.50
+                                                                     ID <= -0.84
+    LEAF 164:
+         Correct predictions: 4 | Wrong predictions: 23 | Local error (purity): 0.85 | Global error: 0.02
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: > 12.50
+               age > 27.50
+                  capital-gain: <= 4826.00
+                     age > 45.50
+                        age <= 64.50
+                           workclass != Private
+                              sex: != Female
+                                 age <= 53.00
+    LEAF 459:
+         Correct predictions: 4 | Wrong predictions: 23 | Local error (purity): 0.85 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: <= 193530.50
+                                                                     occupation: != Handlers-cleaners
+                                                                        age <= 42.50
+                                                                           hours-per-week: <= 49.00
+                                                                              occupation: == Sales
+    LEAF 373:
+         Correct predictions: 5 | Wrong predictions: 23 | Local error (purity): 0.82 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: > 181160.50
+                                                               workclass == Local-gov
+                                                                  ID <= 0.55
+                                                                     ID <= -0.11
+    LEAF 547:
+         Correct predictions: 5 | Wrong predictions: 23 | Local error (purity): 0.82 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: > 3120.00
+                                          age > 34.50
+                                             fnlwgt: > 163788.50
+    LEAF 472:
+         Correct predictions: 5 | Wrong predictions: 23 | Local error (purity): 0.80 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: <= 193530.50
+                                                                     occupation: != Handlers-cleaners
+                                                                        age > 42.50
+                                                                           hours-per-week: <= 58.50
+                                                                              age > 43.50
+                                                                                 fnlwgt: <= 114097.00
+                                                                                    fnlwgt: <= 104700.00
+                                                                                       age <= 54.50
+                                                                                          fnlwgt: <= 67407.50
+    LEAF 329:
+         Correct predictions: 2 | Wrong predictions: 20 | Local error (purity): 0.87 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: <= 181160.50
+                                                               education: != Some-college
+                                                                  hours-per-week: <= 51.00
+                                                                     fnlwgt: <= 170714.50
+                                                                        occupation: != Sales
+                                                                           occupation: != Craft-repair
+                                                                              occupation: != Transport-moving
+                                                                                 ID <= 1.12
+                                                                                    fnlwgt: > 48320.50
+                                                                                       fnlwgt: > 116192.00
+                                                                                          fnlwgt: > 134580.00
+    LEAF 349:
+         Correct predictions: 2 | Wrong predictions: 20 | Local error (purity): 0.87 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: <= 181160.50
+                                                               education: == Some-college
+                                                                  fnlwgt: > 95860.00
+                                                                     age <= 52.50
+                                                                        hours-per-week: > 42.50
+    LEAF 294:
+         Correct predictions: 6 | Wrong predictions: 23 | Local error (purity): 0.78 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: <= 31.00
+                                       ID > -1.30
+                                          relationship: != Wife
+                                             fnlwgt: <= 246375.00
+                                                ID > 0.36
+    LEAF 523:
+         Correct predictions: 4 | Wrong predictions: 20 | Local error (purity): 0.83 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: == Prof-specialty
+                                                native-country: == United-States
+                                                   age <= 39.50
+                                                      ID <= -1.09
+    LEAF 358:
+         Correct predictions: 4 | Wrong predictions: 20 | Local error (purity): 0.81 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: > 181160.50
+                                                               workclass != Local-gov
+                                                                  age <= 44.50
+                                                                     hours-per-week: <= 57.50
+                                                                        hours-per-week: <= 47.00
+                                                                           ID > -0.06
+                                                                              age <= 37.50
+    LEAF 514:
+         Correct predictions: 4 | Wrong predictions: 20 | Local error (purity): 0.81 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: > 201782.00
+                                                                  age > 41.50
+                                                                     education-num: <= 11.50
+                                                                        fnlwgt: > 225647.00
+                                                                           ID <= 0.93
+                                                                              fnlwgt: > 314659.50
+    LEAF 145:
+         Correct predictions: 5 | Wrong predictions: 20 | Local error (purity): 0.79 | Global error: 0.02
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: > 12.50
+               age > 27.50
+                  capital-gain: <= 4826.00
+                     age <= 45.50
+                        hours-per-week: <= 49.00
+                           ID > 0.39
+                              fnlwgt: > 126019.50
+                                 fnlwgt: <= 214052.50
+                                    ID > 0.75
+                                       age > 37.50
+    LEAF 224:
+         Correct predictions: 2 | Wrong predictions: 16 | Local error (purity): 0.85 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: <= 8.50
+                  hours-per-week: > 27.50
+                     fnlwgt: > 188742.00
+                        ID <= 0.23
+                           ID > -0.87
+                              ID <= -0.34
+                                 ID > -0.58
+    LEAF 275:
+         Correct predictions: 2 | Wrong predictions: 16 | Local error (purity): 0.85 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age <= 29.50
+                        education-num: > 9.50
+                           hours-per-week: > 44.50
+                              hours-per-week: <= 49.00
+                                 ID <= 0.04
+    LEAF 379:
+         Correct predictions: 2 | Wrong predictions: 16 | Local error (purity): 0.85 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: == Farming-fishing
+                                                            fnlwgt: > 106422.00
+                                                               fnlwgt: <= 178998.50
+    LEAF 181:
+         Correct predictions: 3 | Wrong predictions: 16 | Local error (purity): 0.83 | Global error: 0.02
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: > 12.50
+               age > 27.50
+                  capital-gain: <= 4826.00
+                     age > 45.50
+                        age <= 64.50
+                           workclass == Private
+                              occupation: == Exec-managerial
+                                 fnlwgt: > 185882.00
+    LEAF 426:
+         Correct predictions: 3 | Wrong predictions: 16 | Local error (purity): 0.83 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age <= 33.50
+                                                            occupation: != Machine-op-inspct
+                                                               fnlwgt: > 94618.00
+                                                                  ID > -0.40
+                                                                     ID > -0.16
+                                                                        relationship: == Wife
+    LEAF 453:
+         Correct predictions: 3 | Wrong predictions: 16 | Local error (purity): 0.83 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: <= 193530.50
+                                                                     occupation: != Handlers-cleaners
+                                                                        age <= 42.50
+                                                                           hours-per-week: <= 49.00
+                                                                              occupation: != Sales
+                                                                                 native-country: == United-States
+                                                                                    education: != HS-grad
+                                                                                       fnlwgt: > 60993.50
+                                                                                          ID > 0.46
+    LEAF 528:
+         Correct predictions: 3 | Wrong predictions: 16 | Local error (purity): 0.83 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: == Prof-specialty
+                                                native-country: == United-States
+                                                   age <= 39.50
+                                                      ID > -1.09
+                                                         workclass == Private
+                                                            education: == Bachelors
+    LEAF 205:
+         Correct predictions: 4 | Wrong predictions: 16 | Local error (purity): 0.80 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: <= 8.50
+                  hours-per-week: > 27.50
+                     fnlwgt: <= 188742.00
+                        age <= 61.50
+                           age > 36.50
+                              fnlwgt: <= 152628.50
+                                 hours-per-week: <= 52.50
+                                    education-num: > 5.50
+                                       age <= 52.50
+    LEAF 401:
+         Correct predictions: 4 | Wrong predictions: 16 | Local error (purity): 0.80 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID <= -0.97
+                                                         age > 31.50
+                                                            race: == White
+                                                               ID > -1.36
+                                                                  age <= 45.50
+                                                                     fnlwgt: <= 226471.50
+                                                                        ID > -1.07
+    LEAF 486:
+         Correct predictions: 4 | Wrong predictions: 16 | Local error (purity): 0.80 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: <= 193530.50
+                                                                     occupation: != Handlers-cleaners
+                                                                        age > 42.50
+                                                                           hours-per-week: <= 58.50
+                                                                              age > 43.50
+                                                                                 fnlwgt: > 114097.00
+                                                                                    fnlwgt: > 129154.50
+                                                                                       education: != Bachelors
+                                                                                          fnlwgt: > 145496.50
+                                                                                             age <= 55.50
+                                                                                                ID > 0.23
+                                                                                                   ID > 1.10
+    LEAF 501:
+         Correct predictions: 4 | Wrong predictions: 16 | Local error (purity): 0.80 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: > 201782.00
+                                                                  age <= 41.50
+                                                                     hours-per-week: <= 47.50
+                                                                        education-num: <= 10.50
+                                                                           fnlwgt: <= 309305.50
+                                                                              fnlwgt: <= 267852.50
+                                                                                 ID > 0.06
+    LEAF 590:
+         Correct predictions: 4 | Wrong predictions: 16 | Local error (purity): 0.80 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age > 66.50
+                           occupation: == Exec-managerial
+    LEAF 153:
+         Correct predictions: 4 | Wrong predictions: 16 | Local error (purity): 0.78 | Global error: 0.02
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: > 12.50
+               age > 27.50
+                  capital-gain: <= 4826.00
+                     age <= 45.50
+                        hours-per-week: > 49.00
+                           workclass != Local-gov
+                              ID <= -0.21
+                                 education: == Bachelors
+    LEAF 405:
+         Correct predictions: 4 | Wrong predictions: 16 | Local error (purity): 0.78 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID <= -0.97
+                                                         age > 31.50
+                                                            race: == White
+                                                               ID > -1.36
+                                                                  age > 45.50
+                                                                     occupation: != Craft-repair
+                                                                        fnlwgt: <= 145196.00
+    LEAF 17:
+         Correct predictions: 3 | Wrong predictions: 13 | Local error (purity): 0.79 | Global error: 0.01
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: <= 12.50
+               hours-per-week: <= 45.50
+                  marital-status: != Never-married
+                     fnlwgt: <= 144966.50
+                        race: == White
+                           marital-status: != Divorced
+                              hours-per-week: > 19.00
+                                 marital-status: != Separated
+                                    sex: == Female
+                                       education-num: > 8.50
+                                          ID > 0.20
+    LEAF 266:
+         Correct predictions: 3 | Wrong predictions: 13 | Local error (purity): 0.79 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age <= 29.50
+                        education-num: > 9.50
+                           hours-per-week: <= 44.50
+                              ID > -0.81
+                                 fnlwgt: <= 177711.50
+                                    fnlwgt: <= 119002.50
+                                       ID > 0.74
+    LEAF 300:
+         Correct predictions: 3 | Wrong predictions: 13 | Local error (purity): 0.79 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: <= 31.00
+                                       ID > -1.30
+                                          relationship: == Wife
+                                             education-num: > 9.50
+                                                age > 37.00
+    LEAF 393:
+         Correct predictions: 3 | Wrong predictions: 13 | Local error (purity): 0.79 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID <= -0.97
+                                                         age > 31.50
+                                                            race: == White
+                                                               ID <= -1.36
+                                                                  occupation: != Sales
+                                                                     age > 38.50
+                                                                        education: != HS-grad
+                                                                           age <= 45.00
+    LEAF 93:
+         Correct predictions: 7 | Wrong predictions: 23 | Local error (purity): 0.77 | Global error: 0.02
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: <= 12.50
+               hours-per-week: > 45.50
+                  relationship: != Own-child
+                     fnlwgt: <= 340894.50
+                        fnlwgt: <= 249840.50
+                           education-num: > 7.50
+                              workclass != Private
+                                 ID > -0.26
+                                    age <= 37.00
+    LEAF 326:
+         Correct predictions: 5 | Wrong predictions: 16 | Local error (purity): 0.76 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: <= 181160.50
+                                                               education: != Some-college
+                                                                  hours-per-week: <= 51.00
+                                                                     fnlwgt: <= 170714.50
+                                                                        occupation: != Sales
+                                                                           occupation: != Craft-repair
+                                                                              occupation: != Transport-moving
+                                                                                 ID <= 1.12
+                                                                                    fnlwgt: > 48320.50
+                                                                                       fnlwgt: <= 116192.00
+    LEAF 402:
+         Correct predictions: 5 | Wrong predictions: 16 | Local error (purity): 0.76 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID <= -0.97
+                                                         age > 31.50
+                                                            race: == White
+                                                               ID > -1.36
+                                                                  age <= 45.50
+                                                                     fnlwgt: > 226471.50
+    LEAF 55:
+         Correct predictions: 6 | Wrong predictions: 16 | Local error (purity): 0.72 | Global error: 0.02
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: <= 12.50
+               hours-per-week: <= 45.50
+                  marital-status: != Never-married
+                     fnlwgt: > 144966.50
+                        fnlwgt: > 185547.50
+                           fnlwgt: > 188228.00
+                              fnlwgt: > 307878.00
+                                 ID > -0.81
+                                    race: != Black
+                                       education-num: > 9.50
+    LEAF 458:
+         Correct predictions: 6 | Wrong predictions: 16 | Local error (purity): 0.72 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: <= 193530.50
+                                                                     occupation: != Handlers-cleaners
+                                                                        age <= 42.50
+                                                                           hours-per-week: <= 49.00
+                                                                              occupation: != Sales
+                                                                                 native-country: == United-States
+                                                                                    education: == HS-grad
+                                                                                       fnlwgt: > 109088.00
+                                                                                          age > 38.50
+    LEAF 555:
+         Correct predictions: 6 | Wrong predictions: 16 | Local error (purity): 0.72 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: > 13.50
+                                 age <= 56.50
+                                    ID <= 1.36
+                                       age <= 35.50
+                                          education: == Masters
+                                             ID <= -0.06
+    LEAF 480:
+         Correct predictions: 7 | Wrong predictions: 16 | Local error (purity): 0.70 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: <= 193530.50
+                                                                     occupation: != Handlers-cleaners
+                                                                        age > 42.50
+                                                                           hours-per-week: <= 58.50
+                                                                              age > 43.50
+                                                                                 fnlwgt: > 114097.00
+                                                                                    fnlwgt: > 129154.50
+                                                                                       education: != Bachelors
+                                                                                          fnlwgt: <= 145496.50
+    LEAF 370:
+         Correct predictions: 4 | Wrong predictions: 13 | Local error (purity): 0.77 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: > 181160.50
+                                                               workclass != Local-gov
+                                                                  age > 44.50
+                                                                     workclass == Federal-gov
+    LEAF 425:
+         Correct predictions: 4 | Wrong predictions: 13 | Local error (purity): 0.77 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age <= 33.50
+                                                            occupation: != Machine-op-inspct
+                                                               fnlwgt: > 94618.00
+                                                                  ID > -0.40
+                                                                     ID > -0.16
+                                                                        relationship: != Wife
+                                                                           fnlwgt: > 286905.00
+    LEAF 581:
+         Correct predictions: 4 | Wrong predictions: 13 | Local error (purity): 0.77 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: > 13.50
+                                 age > 56.50
+                                    hours-per-week: > 42.50
+    LEAF 12:
+         Correct predictions: 7 | Wrong predictions: 16 | Local error (purity): 0.69 | Global error: 0.02
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: <= 12.50
+               hours-per-week: <= 45.50
+                  marital-status: != Never-married
+                     fnlwgt: <= 144966.50
+                        race: == White
+                           marital-status: != Divorced
+                              hours-per-week: > 19.00
+                                 marital-status: != Separated
+                                    sex: != Female
+    LEAF 332:
+         Correct predictions: 7 | Wrong predictions: 16 | Local error (purity): 0.69 | Global error: 0.02
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: <= 181160.50
+                                                               education: != Some-college
+                                                                  hours-per-week: <= 51.00
+                                                                     fnlwgt: <= 170714.50
+                                                                        occupation: != Sales
+                                                                           occupation: == Craft-repair
+    LEAF 170:
+         Correct predictions: 4 | Wrong predictions: 13 | Local error (purity): 0.74 | Global error: 0.01
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: > 12.50
+               age > 27.50
+                  capital-gain: <= 4826.00
+                     age > 45.50
+                        age <= 64.50
+                           workclass != Private
+                              sex: == Female
+                                 age > 53.50
+                                    age > 56.50
+    LEAF 212:
+         Correct predictions: 4 | Wrong predictions: 13 | Local error (purity): 0.74 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: <= 8.50
+                  hours-per-week: > 27.50
+                     fnlwgt: <= 188742.00
+                        age <= 61.50
+                           age > 36.50
+                              fnlwgt: > 152628.50
+                                 age > 45.50
+                                    ID > 0.49
+    LEAF 272:
+         Correct predictions: 5 | Wrong predictions: 13 | Local error (purity): 0.72 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age <= 29.50
+                        education-num: > 9.50
+                           hours-per-week: <= 44.50
+                              ID > -0.81
+                                 fnlwgt: > 177711.50
+                                    workclass == Private
+                                       fnlwgt: > 226537.50
+    LEAF 572:
+         Correct predictions: 5 | Wrong predictions: 13 | Local error (purity): 0.72 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: > 13.50
+                                 age <= 56.50
+                                    ID <= 1.36
+                                       age > 35.50
+                                          occupation: != Exec-managerial
+                                             age > 40.50
+                                                age > 47.50
+                                                   ID > 0.04
+    LEAF 91:
+         Correct predictions: 4 | Wrong predictions: 10 | Local error (purity): 0.71 | Global error: 0.01
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: <= 12.50
+               hours-per-week: > 45.50
+                  relationship: != Own-child
+                     fnlwgt: <= 340894.50
+                        fnlwgt: <= 249840.50
+                           education-num: > 7.50
+                              workclass != Private
+                                 ID <= -0.26
+                                    fnlwgt: > 173996.00
+    LEAF 135:
+         Correct predictions: 4 | Wrong predictions: 10 | Local error (purity): 0.71 | Global error: 0.01
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: > 12.50
+               age > 27.50
+                  capital-gain: <= 4826.00
+                     age <= 45.50
+                        hours-per-week: <= 49.00
+                           ID <= 0.39
+                              hours-per-week: > 41.00
+                                 ID > -0.69
+    LEAF 197:
+         Correct predictions: 4 | Wrong predictions: 10 | Local error (purity): 0.71 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: <= 8.50
+                  hours-per-week: > 27.50
+                     fnlwgt: <= 188742.00
+                        age <= 61.50
+                           age <= 36.50
+                              education: == 10th
+    LEAF 330:
+         Correct predictions: 4 | Wrong predictions: 10 | Local error (purity): 0.71 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: <= 181160.50
+                                                               education: != Some-college
+                                                                  hours-per-week: <= 51.00
+                                                                     fnlwgt: <= 170714.50
+                                                                        occupation: != Sales
+                                                                           occupation: != Craft-repair
+                                                                              occupation: != Transport-moving
+                                                                                 ID > 1.12
+    LEAF 335:
+         Correct predictions: 4 | Wrong predictions: 10 | Local error (purity): 0.71 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: <= 181160.50
+                                                               education: != Some-college
+                                                                  hours-per-week: <= 51.00
+                                                                     fnlwgt: > 170714.50
+                                                                        ID <= 0.49
+    LEAF 348:
+         Correct predictions: 4 | Wrong predictions: 10 | Local error (purity): 0.71 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: <= 181160.50
+                                                               education: == Some-college
+                                                                  fnlwgt: > 95860.00
+                                                                     age <= 52.50
+                                                                        hours-per-week: <= 42.50
+    LEAF 368:
+         Correct predictions: 4 | Wrong predictions: 10 | Local error (purity): 0.71 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: > 181160.50
+                                                               workclass != Local-gov
+                                                                  age > 44.50
+                                                                     workclass != Federal-gov
+                                                                        ID <= 0.87
+                                                                           ID > 0.04
+    LEAF 420:
+         Correct predictions: 4 | Wrong predictions: 10 | Local error (purity): 0.71 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age <= 33.50
+                                                            occupation: != Machine-op-inspct
+                                                               fnlwgt: > 94618.00
+                                                                  ID > -0.40
+                                                                     ID > -0.16
+                                                                        relationship: != Wife
+                                                                           fnlwgt: <= 286905.00
+                                                                              education: != HS-grad
+                                                                                 fnlwgt: <= 187535.00
+    LEAF 565:
+         Correct predictions: 4 | Wrong predictions: 10 | Local error (purity): 0.71 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: > 13.50
+                                 age <= 56.50
+                                    ID <= 1.36
+                                       age > 35.50
+                                          occupation: != Exec-managerial
+                                             age > 40.50
+                                                age <= 47.50
+                                                   education: != Prof-school
+                                                      hours-per-week: <= 40.50
+    LEAF 589:
+         Correct predictions: 4 | Wrong predictions: 10 | Local error (purity): 0.71 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age > 66.50
+                           occupation: != Exec-managerial
+                              age > 75.50
+    LEAF 331:
+         Correct predictions: 4 | Wrong predictions: 10 | Local error (purity): 0.68 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: <= 181160.50
+                                                               education: != Some-college
+                                                                  hours-per-week: <= 51.00
+                                                                     fnlwgt: <= 170714.50
+                                                                        occupation: != Sales
+                                                                           occupation: != Craft-repair
+                                                                              occupation: == Transport-moving
+    LEAF 340:
+         Correct predictions: 4 | Wrong predictions: 10 | Local error (purity): 0.68 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: <= 181160.50
+                                                               education: != Some-college
+                                                                  hours-per-week: > 51.00
+                                                                     fnlwgt: > 110978.00
+                                                                        fnlwgt: <= 145795.50
+    LEAF 474:
+         Correct predictions: 4 | Wrong predictions: 10 | Local error (purity): 0.68 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: <= 193530.50
+                                                                     occupation: != Handlers-cleaners
+                                                                        age > 42.50
+                                                                           hours-per-week: <= 58.50
+                                                                              age > 43.50
+                                                                                 fnlwgt: <= 114097.00
+                                                                                    fnlwgt: <= 104700.00
+                                                                                       age > 54.50
+    LEAF 588:
+         Correct predictions: 4 | Wrong predictions: 10 | Local error (purity): 0.68 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age > 66.50
+                           occupation: != Exec-managerial
+                              age <= 75.50
+                                 fnlwgt: > 182489.50
+                                    workclass == Private
+    LEAF 598:
+         Correct predictions: 4 | Wrong predictions: 10 | Local error (purity): 0.68 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: > 1836.50
+                     capital-loss: <= 2054.00
+                        education-num: <= 11.50
+                           ID > 0.40
+                              hours-per-week: <= 46.50
+    LEAF 297:
+         Correct predictions: 8 | Wrong predictions: 13 | Local error (purity): 0.62 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: <= 31.00
+                                       ID > -1.30
+                                          relationship: == Wife
+                                             education-num: <= 9.50
+    LEAF 32:
+         Correct predictions: 5 | Wrong predictions: 10 | Local error (purity): 0.66 | Global error: 0.01
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: <= 12.50
+               hours-per-week: <= 45.50
+                  marital-status: != Never-married
+                     fnlwgt: <= 144966.50
+                        race: == White
+                           marital-status: == Divorced
+                              fnlwgt: <= 105594.00
+                                 age > 50.50
+                                    education: == HS-grad
+    LEAF 177:
+         Correct predictions: 5 | Wrong predictions: 10 | Local error (purity): 0.66 | Global error: 0.01
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: > 12.50
+               age > 27.50
+                  capital-gain: <= 4826.00
+                     age > 45.50
+                        age <= 64.50
+                           workclass == Private
+                              occupation: != Exec-managerial
+                                 age > 49.50
+                                    relationship: == Not-in-family
+                                       fnlwgt: <= 155197.00
+    LEAF 485:
+         Correct predictions: 5 | Wrong predictions: 10 | Local error (purity): 0.66 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: <= 193530.50
+                                                                     occupation: != Handlers-cleaners
+                                                                        age > 42.50
+                                                                           hours-per-week: <= 58.50
+                                                                              age > 43.50
+                                                                                 fnlwgt: > 114097.00
+                                                                                    fnlwgt: > 129154.50
+                                                                                       education: != Bachelors
+                                                                                          fnlwgt: > 145496.50
+                                                                                             age <= 55.50
+                                                                                                ID > 0.23
+                                                                                                   ID <= 1.10
+    LEAF 534:
+         Correct predictions: 5 | Wrong predictions: 10 | Local error (purity): 0.66 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: == Prof-specialty
+                                                native-country: == United-States
+                                                   age > 39.50
+                                                      age > 41.50
+                                                         fnlwgt: <= 202942.50
+                                                            fnlwgt: <= 164963.00
+                                                               ID <= 0.60
+    LEAF 505:
+         Correct predictions: 8 | Wrong predictions: 13 | Local error (purity): 0.60 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: > 201782.00
+                                                                  age <= 41.50
+                                                                     hours-per-week: > 47.50
+    LEAF 165:
+         Correct predictions: 5 | Wrong predictions: 10 | Local error (purity): 0.63 | Global error: 0.01
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: > 12.50
+               age > 27.50
+                  capital-gain: <= 4826.00
+                     age > 45.50
+                        age <= 64.50
+                           workclass != Private
+                              sex: != Female
+                                 age > 53.00
+    LEAF 293:
+         Correct predictions: 5 | Wrong predictions: 10 | Local error (purity): 0.63 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: <= 31.00
+                                       ID > -1.30
+                                          relationship: != Wife
+                                             fnlwgt: <= 246375.00
+                                                ID <= 0.36
+                                                   fnlwgt: > 149112.00
+    LEAF 464:
+         Correct predictions: 5 | Wrong predictions: 10 | Local error (purity): 0.63 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: <= 193530.50
+                                                                     occupation: != Handlers-cleaners
+                                                                        age <= 42.50
+                                                                           hours-per-week: > 49.00
+                                                                              education-num: > 11.50
+    LEAF 488:
+         Correct predictions: 5 | Wrong predictions: 10 | Local error (purity): 0.63 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: <= 193530.50
+                                                                     occupation: != Handlers-cleaners
+                                                                        age > 42.50
+                                                                           hours-per-week: <= 58.50
+                                                                              age > 43.50
+                                                                                 fnlwgt: > 114097.00
+                                                                                    fnlwgt: > 129154.50
+                                                                                       education: == Bachelors
+    LEAF 609:
+         Correct predictions: 5 | Wrong predictions: 10 | Local error (purity): 0.63 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: > 5095.50
+               age > 60.50
+                  age <= 64.50
+    LEAF 45:
+         Correct predictions: 6 | Wrong predictions: 10 | Local error (purity): 0.61 | Global error: 0.01
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: <= 12.50
+               hours-per-week: <= 45.50
+                  marital-status: != Never-married
+                     fnlwgt: > 144966.50
+                        fnlwgt: > 185547.50
+                           fnlwgt: > 188228.00
+                              fnlwgt: <= 307878.00
+                                 occupation: == Craft-repair
+                                    education: == HS-grad
+    LEAF 37:
+         Correct predictions: 7 | Wrong predictions: 10 | Local error (purity): 0.59 | Global error: 0.01
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: <= 12.50
+               hours-per-week: <= 45.50
+                  marital-status: != Never-married
+                     fnlwgt: > 144966.50
+                        fnlwgt: > 185547.50
+                           fnlwgt: <= 188228.00
+    LEAF 509:
+         Correct predictions: 7 | Wrong predictions: 10 | Local error (purity): 0.59 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: > 201782.00
+                                                                  age > 41.50
+                                                                     education-num: <= 11.50
+                                                                        fnlwgt: <= 225647.00
+                                                                           fnlwgt: <= 212212.50
+    LEAF 513:
+         Correct predictions: 7 | Wrong predictions: 10 | Local error (purity): 0.59 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: > 201782.00
+                                                                  age > 41.50
+                                                                     education-num: <= 11.50
+                                                                        fnlwgt: > 225647.00
+                                                                           ID <= 0.93
+                                                                              fnlwgt: <= 314659.50
+    LEAF 245:
+         Correct predictions: 7 | Wrong predictions: 10 | Local error (purity): 0.57 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age <= 29.50
+                        education-num: <= 9.50
+                           ID > -0.95
+                              hours-per-week: > 39.00
+                                 race: == White
+                                    fnlwgt: <= 177486.50
+                                       ID <= 1.33
+                                          ID <= -0.04
+    LEAF 51:
+         Correct predictions: 4 | Wrong predictions: 6 | Local error (purity): 0.59 | Global error: 0.01
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: <= 12.50
+               hours-per-week: <= 45.50
+                  marital-status: != Never-married
+                     fnlwgt: > 144966.50
+                        fnlwgt: > 185547.50
+                           fnlwgt: > 188228.00
+                              fnlwgt: > 307878.00
+                                 ID > -0.81
+                                    race: != Black
+                                       education-num: <= 9.50
+                                          ID <= -0.47
+    LEAF 78:
+         Correct predictions: 4 | Wrong predictions: 6 | Local error (purity): 0.59 | Global error: 0.01
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: <= 12.50
+               hours-per-week: <= 45.50
+                  marital-status: == Never-married
+                     age > 22.50
+                        occupation: != Protective-serv
+                           occupation: == Craft-repair
+                              ID > 1.03
+                                 fnlwgt: > 194255.50
+    LEAF 81:
+         Correct predictions: 4 | Wrong predictions: 6 | Local error (purity): 0.59 | Global error: 0.01
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: <= 12.50
+               hours-per-week: <= 45.50
+                  marital-status: == Never-married
+                     age > 22.50
+                        occupation: == Protective-serv
+                           ID > 0.13
+    LEAF 169:
+         Correct predictions: 4 | Wrong predictions: 6 | Local error (purity): 0.59 | Global error: 0.01
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: > 12.50
+               age > 27.50
+                  capital-gain: <= 4826.00
+                     age > 45.50
+                        age <= 64.50
+                           workclass != Private
+                              sex: == Female
+                                 age > 53.50
+                                    age <= 56.50
+    LEAF 202:
+         Correct predictions: 4 | Wrong predictions: 6 | Local error (purity): 0.59 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: <= 8.50
+                  hours-per-week: > 27.50
+                     fnlwgt: <= 188742.00
+                        age <= 61.50
+                           age > 36.50
+                              fnlwgt: <= 152628.50
+                                 hours-per-week: <= 52.50
+                                    education-num: <= 5.50
+                                       ID <= -0.44
+    LEAF 227:
+         Correct predictions: 4 | Wrong predictions: 6 | Local error (purity): 0.59 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: <= 8.50
+                  hours-per-week: > 27.50
+                     fnlwgt: > 188742.00
+                        ID <= 0.23
+                           ID > -0.87
+                              ID > -0.34
+                                 ID > 0.01
+    LEAF 249:
+         Correct predictions: 4 | Wrong predictions: 6 | Local error (purity): 0.59 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age <= 29.50
+                        education-num: <= 9.50
+                           ID > -0.95
+                              hours-per-week: > 39.00
+                                 race: == White
+                                    fnlwgt: > 177486.50
+                                       ID <= -0.24
+    LEAF 356:
+         Correct predictions: 4 | Wrong predictions: 6 | Local error (purity): 0.59 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: > 181160.50
+                                                               workclass != Local-gov
+                                                                  age <= 44.50
+                                                                     hours-per-week: <= 57.50
+                                                                        hours-per-week: <= 47.00
+                                                                           ID <= -0.06
+    LEAF 436:
+         Correct predictions: 4 | Wrong predictions: 6 | Local error (purity): 0.59 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID <= -0.76
+                                                               relationship: == Husband
+                                                                  age > 43.50
+                                                                     ID <= -0.91
+    LEAF 451:
+         Correct predictions: 4 | Wrong predictions: 6 | Local error (purity): 0.59 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: <= 193530.50
+                                                                     occupation: != Handlers-cleaners
+                                                                        age <= 42.50
+                                                                           hours-per-week: <= 49.00
+                                                                              occupation: != Sales
+                                                                                 native-country: == United-States
+                                                                                    education: != HS-grad
+                                                                                       fnlwgt: > 60993.50
+                                                                                          ID <= 0.46
+                                                                                             fnlwgt: <= 136867.50
+    LEAF 545:
+         Correct predictions: 4 | Wrong predictions: 6 | Local error (purity): 0.59 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: > 3120.00
+                                          age > 34.50
+                                             fnlwgt: <= 163788.50
+                                                age <= 46.00
+    LEAF 570:
+         Correct predictions: 4 | Wrong predictions: 6 | Local error (purity): 0.59 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: > 13.50
+                                 age <= 56.50
+                                    ID <= 1.36
+                                       age > 35.50
+                                          occupation: != Exec-managerial
+                                             age > 40.50
+                                                age > 47.50
+                                                   ID <= 0.04
+                                                      ID <= -0.69
+    LEAF 577:
+         Correct predictions: 4 | Wrong predictions: 6 | Local error (purity): 0.59 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: > 13.50
+                                 age <= 56.50
+                                    ID <= 1.36
+                                       age > 35.50
+                                          occupation: == Exec-managerial
+                                             fnlwgt: > 203945.00
+    LEAF 107:
+         Correct predictions: 5 | Wrong predictions: 6 | Local error (purity): 0.56 | Global error: 0.01
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: <= 12.50
+               hours-per-week: > 45.50
+                  relationship: != Own-child
+                     fnlwgt: <= 340894.50
+                        fnlwgt: <= 249840.50
+                           education-num: > 7.50
+                              workclass == Private
+                                 age > 37.50
+                                    ID > -0.54
+                                       age > 53.50
+    LEAF 175:
+         Correct predictions: 5 | Wrong predictions: 6 | Local error (purity): 0.56 | Global error: 0.01
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: > 12.50
+               age > 27.50
+                  capital-gain: <= 4826.00
+                     age > 45.50
+                        age <= 64.50
+                           workclass == Private
+                              occupation: != Exec-managerial
+                                 age > 49.50
+                                    relationship: != Not-in-family
+    LEAF 308:
+         Correct predictions: 5 | Wrong predictions: 6 | Local error (purity): 0.56 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID <= -1.61
+                                                   ID <= -1.69
+                                                      age > 42.50
+    LEAF 333:
+         Correct predictions: 5 | Wrong predictions: 6 | Local error (purity): 0.56 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: != Farming-fishing
+                                                            fnlwgt: <= 181160.50
+                                                               education: != Some-college
+                                                                  hours-per-week: <= 51.00
+                                                                     fnlwgt: <= 170714.50
+                                                                        occupation: == Sales
+    LEAF 380:
+         Correct predictions: 5 | Wrong predictions: 6 | Local error (purity): 0.56 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass != Private
+                                                      fnlwgt: <= 383121.50
+                                                         occupation: == Farming-fishing
+                                                            fnlwgt: > 106422.00
+                                                               fnlwgt: > 178998.50
+    LEAF 394:
+         Correct predictions: 5 | Wrong predictions: 6 | Local error (purity): 0.56 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID <= -0.97
+                                                         age > 31.50
+                                                            race: == White
+                                                               ID <= -1.36
+                                                                  occupation: != Sales
+                                                                     age > 38.50
+                                                                        education: != HS-grad
+                                                                           age > 45.00
+    LEAF 434:
+         Correct predictions: 5 | Wrong predictions: 6 | Local error (purity): 0.56 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID <= -0.76
+                                                               relationship: == Husband
+                                                                  age <= 43.50
+                                                                     ID > -0.84
+    LEAF 553:
+         Correct predictions: 5 | Wrong predictions: 6 | Local error (purity): 0.56 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: > 13.50
+                                 age <= 56.50
+                                    ID <= 1.36
+                                       age <= 35.50
+                                          education: != Masters
+    LEAF 386:
+         Correct predictions: 8 | Wrong predictions: 10 | Local error (purity): 0.55 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID <= -0.97
+                                                         age > 31.50
+                                                            race: != White
+    LEAF 173:
+         Correct predictions: 8 | Wrong predictions: 10 | Local error (purity): 0.53 | Global error: 0.01
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: > 12.50
+               age > 27.50
+                  capital-gain: <= 4826.00
+                     age > 45.50
+                        age <= 64.50
+                           workclass == Private
+                              occupation: != Exec-managerial
+                                 age <= 49.50
+    LEAF 489:
+         Correct predictions: 8 | Wrong predictions: 10 | Local error (purity): 0.53 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: <= 193530.50
+                                                                     occupation: != Handlers-cleaners
+                                                                        age > 42.50
+                                                                           hours-per-week: > 58.50
+    LEAF 19:
+         Correct predictions: 5 | Wrong predictions: 6 | Local error (purity): 0.53 | Global error: 0.01
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: <= 12.50
+               hours-per-week: <= 45.50
+                  marital-status: != Never-married
+                     fnlwgt: <= 144966.50
+                        race: == White
+                           marital-status: != Divorced
+                              hours-per-week: > 19.00
+                                 marital-status: == Separated
+                                    ID <= -1.02
+    LEAF 94:
+         Correct predictions: 5 | Wrong predictions: 6 | Local error (purity): 0.53 | Global error: 0.01
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: <= 12.50
+               hours-per-week: > 45.50
+                  relationship: != Own-child
+                     fnlwgt: <= 340894.50
+                        fnlwgt: <= 249840.50
+                           education-num: > 7.50
+                              workclass != Private
+                                 ID > -0.26
+                                    age > 37.00
+    LEAF 223:
+         Correct predictions: 5 | Wrong predictions: 6 | Local error (purity): 0.53 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: <= 8.50
+                  hours-per-week: > 27.50
+                     fnlwgt: > 188742.00
+                        ID <= 0.23
+                           ID > -0.87
+                              ID <= -0.34
+                                 ID <= -0.58
+    LEAF 520:
+         Correct predictions: 5 | Wrong predictions: 6 | Local error (purity): 0.53 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: == Prof-specialty
+                                                native-country: != United-States
+    LEAF 530:
+         Correct predictions: 5 | Wrong predictions: 6 | Local error (purity): 0.53 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: == Prof-specialty
+                                                native-country: == United-States
+                                                   age > 39.50
+                                                      age <= 41.50
+    LEAF 129:
+         Correct predictions: 9 | Wrong predictions: 10 | Local error (purity): 0.52 | Global error: 0.01
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: > 12.50
+               age > 27.50
+                  capital-gain: <= 4826.00
+                     age <= 45.50
+                        hours-per-week: <= 49.00
+                           ID <= 0.39
+                              hours-per-week: <= 41.00
+                                 age > 38.50
+                                    ID <= -0.96
+    LEAF 117:
+         Correct predictions: 6 | Wrong predictions: 6 | Local error (purity): 0.51 | Global error: 0.01
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: > 12.50
+               age <= 27.50
+                  ID > 1.08
+                     fnlwgt: <= 183722.50
+    LEAF 148:
+         Correct predictions: 6 | Wrong predictions: 6 | Local error (purity): 0.51 | Global error: 0.01
+         Path to leaf:
+         marital-status: != Married-civ-spouse
+            education-num: > 12.50
+               age > 27.50
+                  capital-gain: <= 4826.00
+                     age <= 45.50
+                        hours-per-week: <= 49.00
+                           ID > 0.39
+                              fnlwgt: > 126019.50
+                                 fnlwgt: > 214052.50
+                                    ID > 0.91
+    LEAF 206:
+         Correct predictions: 6 | Wrong predictions: 6 | Local error (purity): 0.51 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: <= 8.50
+                  hours-per-week: > 27.50
+                     fnlwgt: <= 188742.00
+                        age <= 61.50
+                           age > 36.50
+                              fnlwgt: <= 152628.50
+                                 hours-per-week: <= 52.50
+                                    education-num: > 5.50
+                                       age > 52.50
+    LEAF 254:
+         Correct predictions: 6 | Wrong predictions: 6 | Local error (purity): 0.51 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age <= 29.50
+                        education-num: <= 9.50
+                           ID > -0.95
+                              hours-per-week: > 39.00
+                                 race: == White
+                                    fnlwgt: > 177486.50
+                                       ID > -0.24
+                                          occupation: == Craft-repair
+    LEAF 477:
+         Correct predictions: 6 | Wrong predictions: 6 | Local error (purity): 0.51 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: <= 193530.50
+                                                                     occupation: != Handlers-cleaners
+                                                                        age > 42.50
+                                                                           hours-per-week: <= 58.50
+                                                                              age > 43.50
+                                                                                 fnlwgt: > 114097.00
+                                                                                    fnlwgt: <= 129154.50
+    LEAF 490:
+         Correct predictions: 6 | Wrong predictions: 6 | Local error (purity): 0.51 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: <= 201782.00
+                                                                  fnlwgt: <= 193530.50
+                                                                     occupation: == Handlers-cleaners
+    LEAF 503:
+         Correct predictions: 6 | Wrong predictions: 6 | Local error (purity): 0.51 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: <= 13.50
+                                 ID <= 1.69
+                                    hours-per-week: > 31.00
+                                       capital-gain: <= 3120.00
+                                          capital-gain: <= 2994.00
+                                             occupation: != Prof-specialty
+                                                ID > -1.61
+                                                   workclass == Private
+                                                      ID > -0.97
+                                                         age > 33.50
+                                                            ID > -0.76
+                                                               fnlwgt: > 201782.00
+                                                                  age <= 41.50
+                                                                     hours-per-week: <= 47.50
+                                                                        education-num: <= 10.50
+                                                                           fnlwgt: > 309305.50
+    LEAF 567:
+         Correct predictions: 6 | Wrong predictions: 6 | Local error (purity): 0.51 | Global error: 0.01
+         Path to leaf:
+         marital-status: == Married-civ-spouse
+            capital-gain: <= 5095.50
+               education-num: > 8.50
+                  capital-loss: <= 1836.50
+                     age > 29.50
+                        age <= 66.50
+                           ID > -1.72
+                              education-num: > 13.50
+                                 age <= 56.50
+                                    ID <= 1.36
+                                       age > 35.50
+                                          occupation: != Exec-managerial
+                                             age > 40.50
+                                                age <= 47.50
+                                                   education: == Prof-school
 
 
 
 
-Plot the feature distributions of samples in ``LEAF 130`` containing the majority of errors.
+Plot the feature distributions of samples in the leaf containing the majority of errors.
 Rank features by correlation to error.
 
 
 .. code-block:: python3
 
-
-    error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=130, top_k_features=3)
+    leaf_id = error_analyzer.get_ranked_leaf_ids('all_errors')[0]
+    error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=leaf_id, top_k_features=3)
 
 
 
@@ -373,7 +3677,7 @@ Rank features by correlation to error.
 
  .. code-block:: none
 
-    Leaf 130 (Wrong prediction: 0.603, Correct prediction: 0.397)
+    Leaf 366 (Wrong prediction: 0.968, Correct prediction: 0.032)
 
 
 
@@ -400,7 +3704,7 @@ leaf clustering a subpopulation of errors with different feature values. The lar
 and purest failure nodes are highlighted when printing the error node summary, and
 also when plotting the feature distributions in the node (``leaf_selector="all_errors"``).
 From the feature distributions, sorted by correlation with the error, we can see that
-the majority of problems occur for young married people with high education.
+the majority of problems occur for married people with high education.
 In the next iteration of model design, the primary model needs to be improved for these
 subpopulations.
 
@@ -408,9 +3712,9 @@ subpopulations.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  25.033 seconds)
+   **Total running time of the script:** ( 0 minutes  42.695 seconds)
 
-**Estimated memory usage:**  897 MB
+**Estimated memory usage:**  3045 MB
 
 
 .. _sphx_glr_download_auto_examples_plot_mea_pipeline.py:
