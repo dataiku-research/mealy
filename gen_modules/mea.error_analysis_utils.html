@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mea.metrics &mdash; mea 0.0.1-git documentation</title>
+  <title>mea.error_analysis_utils &mdash; mea 0.0.1-git documentation</title>
   
 
   
@@ -40,8 +40,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="mea.preprocessing" href="mea.preprocessing.html" />
-    <link rel="prev" title="mea.error_visualizer" href="mea.error_visualizer.html" /> 
+    <link rel="prev" title="mea.preprocessing" href="mea.preprocessing.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -126,12 +125,13 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../reference.html">mea’s API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="mea.error_analyzer.html">mea.error_analyzer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mea.error_visualizer.html">mea.error_visualizer</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">mea.metrics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="mea.metrics.html">mea.metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mea.preprocessing.html">mea.preprocessing</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">mea.error_analysis_utils</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#classes">Classes</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="mea.preprocessing.html">mea.preprocessing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mea.error_analysis_utils.html">mea.error_analysis_utils</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/dataiku/mea">Fork mea on Github</a></li>
@@ -173,7 +173,7 @@
       
           <li><a href="../reference.html">mea’s API Reference</a> &raquo;</li>
       
-    <li>mea.metrics</li>
+    <li>mea.error_analysis_utils</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -185,46 +185,53 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-mea.metrics">
-<span id="mea-metrics"></span><h1>mea.metrics<a class="headerlink" href="#module-mea.metrics" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-mea.error_analysis_utils">
+<span id="mea-error-analysis-utils"></span><h1>mea.error_analysis_utils<a class="headerlink" href="#module-mea.error_analysis_utils" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="mea.metrics.compute_confidence_decision">
-<code class="sig-prename descclassname">mea.metrics.</code><code class="sig-name descname">compute_confidence_decision</code><span class="sig-paren">(</span><em class="sig-param">primary_model_true_accuracy</em>, <em class="sig-param">primary_model_predicted_accuracy</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/metrics.html#compute_confidence_decision"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.metrics.compute_confidence_decision" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<div class="sphx-glr-clear"></div><dl class="function">
-<dt id="mea.metrics.compute_mpp_accuracy">
-<code class="sig-prename descclassname">mea.metrics.</code><code class="sig-name descname">compute_mpp_accuracy</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/metrics.html#compute_mpp_accuracy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.metrics.compute_mpp_accuracy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<div class="sphx-glr-clear"></div><dl class="function">
-<dt id="mea.metrics.compute_primary_model_accuracy">
-<code class="sig-prename descclassname">mea.metrics.</code><code class="sig-name descname">compute_primary_model_accuracy</code><span class="sig-paren">(</span><em class="sig-param">y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/metrics.html#compute_primary_model_accuracy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.metrics.compute_primary_model_accuracy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<div class="sphx-glr-clear"></div><dl class="function">
-<dt id="mea.metrics.mpp_report">
-<code class="sig-prename descclassname">mea.metrics.</code><code class="sig-name descname">mpp_report</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">output_dict=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/metrics.html#mpp_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.metrics.mpp_report" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build a text report showing the main Model Performance Predictor (MPP) metrics.</p>
+<dt id="mea.error_analysis_utils.check_enough_data">
+<code class="sig-prename descclassname">mea.error_analysis_utils.</code><code class="sig-name descname">check_enough_data</code><span class="sig-paren">(</span><em class="sig-param">df</em>, <em class="sig-param">min_len</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/error_analysis_utils.html#check_enough_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.error_analysis_utils.check_enough_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check the input dataset is not too small.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>y_true</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – Ground truth values of wrong/correct predictions of the MPP primary model.
-Expected values in [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].</p></li>
-<li><p><strong>y_pred</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – Estimated targets as returned by a Model Performance Predictor. Expected values in
-[ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].</p></li>
-<li><p><strong>output_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – If True, return output as dict (default = False).</p></li>
+<li><p><strong>df</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.1.4)"><em>pandas.DataFrame</em></a>) – input dataset.</p></li>
+<li><p><strong>min_len</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – minimum required length.</p></li>
 </ul>
 </dd>
+</dl>
+</dd></dl>
+
+<div class="sphx-glr-clear"></div><dl class="function">
+<dt id="mea.error_analysis_utils.rank_features_by_error_correlation">
+<code class="sig-prename descclassname">mea.error_analysis_utils.</code><code class="sig-name descname">rank_features_by_error_correlation</code><span class="sig-paren">(</span><em class="sig-param">feature_importances</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/error_analysis_utils.html#rank_features_by_error_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.error_analysis_utils.rank_features_by_error_correlation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rank indices from the most to the least important according to the input weights.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>feature_importances</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – feature importance weights.</p>
+</dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>metrics regarding the Model Performance Predictor.</p>
+<dd class="field-even"><p>list of feature indices sorted from the most to the least important.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
 </dd>
 </dl>
+</dd></dl>
+
+<div class="sphx-glr-clear"></div><dl class="function">
+<dt id="mea.error_analysis_utils.safe_str">
+<code class="sig-prename descclassname">mea.error_analysis_utils.</code><code class="sig-name descname">safe_str</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mea/error_analysis_utils.html#safe_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.error_analysis_utils.safe_str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="sphx-glr-clear"></div></div>
+<div class="section" id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="mea.error_analysis_utils.ErrorAnalyzerConstants">
+<em class="property">class </em><code class="sig-prename descclassname">mea.error_analysis_utils.</code><code class="sig-name descname">ErrorAnalyzerConstants</code><a class="reference internal" href="../_modules/mea/error_analysis_utils.html#ErrorAnalyzerConstants"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mea.error_analysis_utils.ErrorAnalyzerConstants" title="Permalink to this definition">¶</a></dt>
+<dd><p>ErrorAnalyzerConstants stores the values for the configuration parameters of ErrorAnalyzer and ErrorVisualizer.</p>
 </dd></dl>
 
 <div class="sphx-glr-clear"></div></div>
@@ -238,10 +245,8 @@ Expected values in [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConsta
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="mea.preprocessing.html" class="btn btn-neutral float-right" title="mea.preprocessing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-      
-        <a href="mea.error_visualizer.html" class="btn btn-neutral float-left" title="mea.error_visualizer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="mea.preprocessing.html" class="btn btn-neutral float-left" title="mea.preprocessing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

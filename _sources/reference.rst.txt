@@ -22,4 +22,4 @@ every module.
    error_visualizer
    metrics
    preprocessing
-   dku_error_analysis_utils
+   error_analysis_utils
