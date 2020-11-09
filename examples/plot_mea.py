@@ -14,6 +14,10 @@ to the whole data highlights the subpopulations where the model works poorly.
 
 
 ##############################################################################
+# When using a python notebook, set ``%matplotlib inline`` to enable display.
+
+
+##############################################################################
 # Those are the necessary imports and initializations.
 
 from sklearn.datasets import load_boston
@@ -71,7 +75,7 @@ error_visualizer = ErrorVisualizer(error_analyzer)
 tree_src = error_visualizer.plot_error_tree()
 
 # the output of ``plot_error_tree`` is rendered automatically in a python notebook
-# the following is for rendering in this sphynx gallery
+# the following is for rendering in this sphinx gallery
 tree_src.format = 'png'
 tree_src.render('tree')
 tree_img = mpimg.imread('tree.png')
@@ -86,10 +90,10 @@ plt.axis('off')
 error_analyzer.error_node_summary(leaf_selector="all_errors", add_path_to_leaves=True, print_summary=True);
 
 ##############################################################################
-# Plot the feature distributions of samples in ``LEAF 17`` containing the majority of errors.
+# Plot the feature distributions of samples in the leaf containing the majority of errors.
 # Rank features by correlation to error.
-
-error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=17, top_k_features=3)
+leaf_id = error_analyzer.get_ranked_leaf_ids('all_errors')[0]
+error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=leaf_id, top_k_features=3)
 
 ##############################################################################
 # Discussion
@@ -117,7 +121,7 @@ error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=17, top_k_fe
 # and purest failure nodes are highlighted when printing the error node summary, and
 # also when plotting the feature distributions in the node (``leaf_selector="all_errors"``).
 # From the feature distributions, sorted by correlation with the error, we can see that
-# the majority of problems occur for high values of features ``RM`` and ``AGE``.
+# the majority of problems occur for high values of feature ``AGE``.
 # In the next iteration of model design, the primary model needs to be improved for these
 # subpopulations.
 #

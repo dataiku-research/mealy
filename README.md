@@ -95,6 +95,9 @@ while the categorical `features categorical_feature_names` are one-hot encoded.
 The full pre-processing is provided to a `Pipeline` object in the form of a scikit-learn column transformer.
 The last step of the pipeline is the model to analyze.
 
+Among the transfomers available in [`sklearn.preprocessing`](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.preprocessing) 
+`KBinDiscretizer` and `PolynomialFeatures` are currently not supported.
+
 The Model Error Analysis can be performed as:
 
 ```python

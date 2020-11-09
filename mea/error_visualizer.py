@@ -239,7 +239,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
         leaf_nodes = self.get_ranked_leaf_ids(leaf_selector, rank_leaves_by)
         for leaf in leaf_nodes:
             leaf_sample_ids = self._train_leaf_ids == leaf
-            nr_leaf_samples = np.count_nonzero(leaf_sample_ids)
+            nr_leaf_samples = nr_wrong[leaf] + nr_correct[leaf]
             proba_wrong_leaf, proba_correct_leaf = nr_wrong[leaf] / nr_leaf_samples, nr_correct[leaf] / nr_leaf_samples
             print('Leaf {} (Wrong prediction: {:.3f}, Correct prediction: {:.3f})'.format(leaf, proba_wrong_leaf,
                                                                                           proba_correct_leaf))
@@ -272,8 +272,8 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                                 histogram_func(feature_column[~global_error_sample_ids])
                         }
                     else:
-                        root_prediction = ErrorAnalyzerConstants.CORRECT_PREDICTION if nr_correct[0] > nr_wrong[
-                            0] else ErrorAnalyzerConstants.WRONG_PREDICTION
+                        root_prediction = ErrorAnalyzerConstants.CORRECT_PREDICTION if int(nr_correct[0]) >= int(nr_wrong[
+                            0]) else ErrorAnalyzerConstants.WRONG_PREDICTION
                         root_hist_data = {root_prediction: histogram_func(feature_column)}
 
                 leaf_hist_data = {}
