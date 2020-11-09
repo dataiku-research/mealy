@@ -36,6 +36,7 @@ DEPENDENCIES_METADATA = (
         'min_version': '0.14', 'extra_options': ['examples', 'doc']}),
     ('pydotplus', {
         'min_version': '2.0', 'extra_options': ['examples', 'doc']}),
+    ('kneed', {'min_version': '0.6'}),
     ('sphinx-gallery', {
         'min_version': '0.5.0', 'extra_options': ['doc']}),
     ('sphinx', {
