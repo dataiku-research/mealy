@@ -110,7 +110,7 @@ class PipelinePreprocessor(object):
         self.ct_preprocessor = ct_preprocessor
 
     def transform(self, x):
-        return self.ct_preprocessor.transform(x).toarray()
+            return self.ct_preprocessor.transform(x)#.toarray()
 
     def inverse_transform(self, preprocessed_x):
 
