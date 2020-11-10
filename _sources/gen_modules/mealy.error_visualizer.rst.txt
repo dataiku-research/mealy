@@ -1,0 +1,33 @@
+.. Please when editing this file make sure to keep it matching the
+   docs in ../configuration.rst:reference_to_examples
+
+mealy.error_visualizer
+======================
+
+.. automodule:: mealy.error_visualizer
+
+   
+   
+   
+
+   
+   
+
+   Classes
+   -------
+
+   
+   .. autoclass:: ErrorVisualizer
+      :members:
+
+   .. include:: backreferences/mealy.error_visualizer.ErrorVisualizer.examples
+
+   .. raw:: html
+
+	       <div class="sphx-glr-clear"></div>
+   
+   
+
+   
+   
+   

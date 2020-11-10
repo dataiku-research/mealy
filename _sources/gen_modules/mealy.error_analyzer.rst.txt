@@ -1,0 +1,33 @@
+.. Please when editing this file make sure to keep it matching the
+   docs in ../configuration.rst:reference_to_examples
+
+mealy.error_analyzer
+====================
+
+.. automodule:: mealy.error_analyzer
+
+   
+   
+   
+
+   
+   
+
+   Classes
+   -------
+
+   
+   .. autoclass:: ErrorAnalyzer
+      :members:
+
+   .. include:: backreferences/mealy.error_analyzer.ErrorAnalyzer.examples
+
+   .. raw:: html
+
+	       <div class="sphx-glr-clear"></div>
+   
+   
+
+   
+   
+   

@@ -7,7 +7,7 @@
 Examples
 ========
 
-Those examples show basic usage of mea.
+Those examples show basic usage of mealy.
 
 
 .. raw:: html
@@ -16,9 +16,9 @@ Those examples show basic usage of mea.
 
 .. only:: html
 
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_mea_thumb.png
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_mealy_thumb.png
 
-     :ref:`sphx_glr_auto_examples_plot_mea.py`
+     :ref:`sphx_glr_auto_examples_plot_mealy.py`
 
 .. raw:: html
 
@@ -28,7 +28,7 @@ Those examples show basic usage of mea.
 .. toctree::
    :hidden:
 
-   /auto_examples/plot_mea
+   /auto_examples/plot_mealy
 
 .. raw:: html
 
@@ -36,9 +36,9 @@ Those examples show basic usage of mea.
 
 .. only:: html
 
- .. figure:: /auto_examples/images/thumb/sphx_glr_plot_mea_pipeline_thumb.png
+ .. figure:: /auto_examples/images/thumb/sphx_glr_plot_mealy_pipeline_thumb.png
 
-     :ref:`sphx_glr_auto_examples_plot_mea_pipeline.py`
+     :ref:`sphx_glr_auto_examples_plot_mealy_pipeline.py`
 
 .. raw:: html
 
@@ -48,7 +48,7 @@ Those examples show basic usage of mea.
 .. toctree::
    :hidden:
 
-   /auto_examples/plot_mea_pipeline
+   /auto_examples/plot_mealy_pipeline
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>
