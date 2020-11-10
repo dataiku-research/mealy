@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from mea.error_analysis_utils import ErrorAnalyzerConstants
+from mealy.error_analysis_utils import ErrorAnalyzerConstants
 from sklearn.metrics import accuracy_score
 import numpy as np
 

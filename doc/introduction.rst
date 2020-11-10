@@ -42,7 +42,7 @@ for the mis-predicted samples. This information can later be exploited to suppor
 
 The typical workflow in the iterative model design supported by error analysis is illustrated in the figure below.
 
-.. image:: _static/mea_flow.png
+.. image:: _static/mealy_flow.png
   :alt: Model Error Analysis workflow
 
 Metrics

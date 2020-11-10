@@ -1,4 +1,4 @@
 Examples
 ========
 
-Those examples show basic usage of mea.
+Those examples show basic usage of mealy.

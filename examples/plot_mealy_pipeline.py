@@ -36,8 +36,8 @@ import random
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 
-from mea.error_analyzer import ErrorAnalyzer
-from mea.error_visualizer import ErrorVisualizer
+from mealy.error_analyzer import ErrorAnalyzer
+from mealy.error_visualizer import ErrorVisualizer
 
 
 default_seed = 10

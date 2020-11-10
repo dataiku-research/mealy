@@ -1,18 +1,18 @@
 .. _reference:
 
-mea's API Reference
+mealy's API Reference
 ========================
 
-The mea project is automatically documented for
+The mealy project is automatically documented for
 every module.
 
-.. currentmodule:: mea
+.. currentmodule:: mealy
 
-.. automodule:: mea
+.. automodule:: mealy
    :no-members:
    :no-inherited-members:
 
-:py:mod:`mea`:
+:py:mod:`mealy`:
 
 .. autosummary::
    :toctree: gen_modules/

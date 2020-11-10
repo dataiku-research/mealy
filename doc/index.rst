@@ -3,14 +3,14 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to mea's documentation!
+Welcome to mealy's documentation!
 ================================================
 
-mea is a Python package to perform Model Error Analysis of scikit-learn models,
+mealy is a Python package to perform Model Error Analysis of scikit-learn models,
 leveraging a Model Performance Predictor, a Decision Tree predicting the failures
 and successes of a ML model.
 
-The code of the project is on Github: `mea <https://github.com/dataiku/mea>`_
+The code of the project is on Github: `mealy <https://github.com/dataiku/mealy>`_
 
 
 .. _install:
@@ -21,11 +21,11 @@ Installation
 Using Pypi
 ----------
 
-mea can be installed through Pypi using:
+mealy can be installed through Pypi using:
 
 .. code-block:: bash
 
-    $ pip install "mea"
+    $ pip install "mealy"
 
 Installing locally
 ------------------
@@ -35,8 +35,8 @@ Again, the preferred way is to use pip.
 
 .. code-block:: bash
 
-    $ git clone https://github.com/dataiku/mea
-    $ cd mea
+    $ git clone https://github.com/dataiku/mealy
+    $ cd mealy
     $ pip install -e
 
 
@@ -57,7 +57,7 @@ Again, the preferred way is to use pip.
    :caption: API and developer reference
 
    reference
-   Fork mea on Github <https://github.com/dataiku/mea>
+   Fork mealy on Github <https://github.com/dataiku/mealy>
 
 
 Indices and tables

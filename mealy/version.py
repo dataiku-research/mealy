@@ -1,6 +1,6 @@
 # *- encoding: utf-8 -*-
 """
-mea version, required package versions, and utilities for checking
+mealy version, required package versions, and utilities for checking
 """
 # Author: Simona Maggio
 
@@ -76,7 +76,7 @@ def check_modules(extra_option=None, import_module=None, strict=True):
         except ImportError as exc:
             user_friendly_info = (
                 'Module "{0}" could not be found. '
-                'Please install it properly to use mea{1}.'.format(
+                'Please install it properly to use mealy{1}.'.format(
                     package_name, import_module))
             exc.args += (user_friendly_info,)
             exc.msg += '. ' + user_friendly_info
@@ -94,7 +94,7 @@ def check_modules(extra_option=None, import_module=None, strict=True):
         if version_too_old:
             message = (
                 'A {package_name} version of at least {minimum_version} '
-                'is required to use mea{import_module}. '
+                'is required to use mealy{import_module}. '
                 '{module_version} was found. '
                 'Please upgrade {package_name}').format(
                     package_name=package_name,

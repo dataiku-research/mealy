@@ -61,8 +61,8 @@ Let `(X_train, y_train)` be the training data of the model to analyze, and `(X_t
 The Model Error Analysis can be performed as:
 
 ```python
-from mea.error_analyzer import ErrorAnalyzer
-from mea.error_visualizer import ErrorVisualizer
+from mealy.error_analyzer import ErrorAnalyzer
+from mealy.error_visualizer import ErrorVisualizer
 
 # train any scikit-learn model
 model = RandomForestClassifier()
@@ -108,8 +108,8 @@ from sklearn.compose import make_column_transformer
 from sklearn.pipeline import make_pipeline
 from sklearn.impute import SimpleImputer
 
-from mea.error_analyzer import ErrorAnalyzer
-from mea.error_visualizer import ErrorVisualizer
+from mealy.error_analyzer import ErrorAnalyzer
+from mealy.error_visualizer import ErrorVisualizer
 
 transformers = [
     (make_pipeline(SimpleImputer(), StandardScaler()), numerical_feature_names),
