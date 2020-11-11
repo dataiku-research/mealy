@@ -1,22 +1,10 @@
 # -*- coding: utf-8 -*-
-from sklearn.preprocessing import StandardScaler, PowerTransformer, QuantileTransformer, Binarizer, MaxAbsScaler
-from sklearn.preprocessing import MinMaxScaler, Normalizer, RobustScaler, OneHotEncoder, OrdinalEncoder
-from sklearn.impute import SimpleImputer, KNNImputer
 from sklearn.pipeline import Pipeline
 import numpy as np
-
+from mea.error_analysis_utils import  ErrorAnalyzerConstants
 import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='Error Analysis | %(levelname)s - %(message)s')
-
-# use tuple because isinstance() takes only tuple as input type
-VALID_CATEGORICAL_STEPS = (OneHotEncoder, OrdinalEncoder)
-STEPS_THAT_DOES_NOT_CHANGE_OUTPUT_DIMENSION = (StandardScaler, PowerTransformer, QuantileTransformer, MaxAbsScaler,
-                                               Binarizer, Normalizer, MinMaxScaler, RobustScaler, SimpleImputer,
-                                               KNNImputer, OrdinalEncoder)
-STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES = (OneHotEncoder,)
-# for imputers we don't need inverse function
-STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION = (SimpleImputer, KNNImputer)
 
 
 class FeatureNameTransformer(object):
@@ -58,24 +46,24 @@ class FeatureNameTransformer(object):
                 # Now we check if there is a step than changes the output dimension
                 for step in tr.steps:
                     # step is a tuple (step_name, step_function)
-                    if isinstance(step[1], STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES):
+                    if isinstance(step[1], ErrorAnalyzerConstants.STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES):
                         single_tr = step[1]
                         number_of_steps_that_change_dimension += 1
                 if number_of_steps_that_change_dimension > 1:
                     raise ValueError('Each pipeline can only have one step that changes feature dimension, '
                                      'here we got {}'.format(number_of_steps_that_change_dimension))
-                if isinstance(single_tr, STEPS_THAT_DOES_NOT_CHANGE_OUTPUT_DIMENSION):
+                if isinstance(single_tr, ErrorAnalyzerConstants.STEPS_THAT_DOES_NOT_CHANGE_OUTPUT_DIMENSION):
                     self.update_feature_mapping_dict_using_input_names(tr_feature_names, orig_feats_ids)
-                elif isinstance(single_tr, STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES):
+                elif isinstance(single_tr, ErrorAnalyzerConstants.STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES):
                     self.update_feature_mapping_dict_using_output_names(single_tr, tr_feature_names, orig_feats_ids)
                 else:
                     raise ValueError('The package does not support {}, probably because it changes output dimension '
                                      'but does not provide get_feature_names function to keep track of new features '
                                      'generated.'.format(single_tr))
 
-            elif isinstance(tr, STEPS_THAT_DOES_NOT_CHANGE_OUTPUT_DIMENSION):
+            elif isinstance(tr, ErrorAnalyzerConstants.STEPS_THAT_DOES_NOT_CHANGE_OUTPUT_DIMENSION):
                 self.update_feature_mapping_dict_using_input_names(tr_feature_names, orig_feats_ids)
-            elif isinstance(tr, STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES):
+            elif isinstance(tr, ErrorAnalyzerConstants.STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES):
                 self.update_feature_mapping_dict_using_output_names(tr, tr_feature_names, orig_feats_ids)
             elif tr_name == 'remainder' and tr == 'drop':
                 # skip the default drop step of ColumnTransformer
@@ -118,8 +106,8 @@ class FeatureNameTransformer(object):
     def _get_feature_list_from_column_transformer(self, ct_preprocessor):
         all_feature = []
         categorical_features = []
-        for i, (tr_type, tr, tr_feature_names) in enumerate(ct_preprocessor.transformers_):
-            if tr_type == 'remainder' and tr == 'drop':
+        for i, (tr_name, tr, tr_feature_names) in enumerate(ct_preprocessor.transformers_):
+            if tr_name == 'remainder' and tr == 'drop':
                 continue
             else:
                 all_feature.extend(tr_feature_names)
@@ -127,10 +115,10 @@ class FeatureNameTransformer(object):
             # check for categorical features
             if isinstance(tr, Pipeline):
                 for step in tr.steps:
-                    if isinstance(step[1], VALID_CATEGORICAL_STEPS):
+                    if isinstance(step[1], ErrorAnalyzerConstants.VALID_CATEGORICAL_STEPS):
                         categorical_features.extend(tr_feature_names)
                         break
-            elif isinstance(tr, VALID_CATEGORICAL_STEPS):
+            elif isinstance(tr, ErrorAnalyzerConstants.VALID_CATEGORICAL_STEPS):
                 categorical_features.extend(tr_feature_names)
             else:
                 continue
@@ -183,8 +171,8 @@ class PipelinePreprocessor(object):
             inverse_transform_function_available = getattr(single_step, "inverse_transform", None)
             if inverse_transform_function_available:
                 step_input = single_step.inverse_transform(step_output)
-                logger.info("Reversing %s on %s" % (tr_name, ' '.join([f for f in tr_feature_names])))
-            elif isinstance(single_step, STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION):
+                logger.info("Reversing 'step' {} on {}".format(tr_name, ' '.join([f for f in tr_feature_names])))
+            elif isinstance(single_step, ErrorAnalyzerConstants.STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION):
                 logger.info("Apply identity transformation.")
                 step_input = step_output
             else:

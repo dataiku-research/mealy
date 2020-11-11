@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from sklearn.preprocessing import StandardScaler, PowerTransformer, QuantileTransformer, Binarizer, MaxAbsScaler
+from sklearn.preprocessing import MinMaxScaler, Normalizer, RobustScaler, OneHotEncoder, OrdinalEncoder
+from sklearn.impute import SimpleImputer, KNNImputer
 import numpy as np
 
 def check_enough_data(df, min_len):
@@ -45,3 +48,12 @@ class ErrorAnalyzerConstants(object):
     CONFIDENCE_DECISION = 'confidence_decision'
 
     NUMBER_PURITY_LEVELS = 10
+
+    # use tuple because isinstance() takes only tuple as input type
+    VALID_CATEGORICAL_STEPS = (OneHotEncoder, OrdinalEncoder)
+    STEPS_THAT_DOES_NOT_CHANGE_OUTPUT_DIMENSION = (StandardScaler, PowerTransformer, QuantileTransformer, MaxAbsScaler,
+                                                   Binarizer, Normalizer, MinMaxScaler, RobustScaler, SimpleImputer,
+                                                   KNNImputer, OrdinalEncoder)
+    STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES = (OneHotEncoder,)
+    # for imputers we don't need inverse function
+    STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION = (SimpleImputer, KNNImputer)

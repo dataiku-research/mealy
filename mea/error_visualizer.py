@@ -11,7 +11,7 @@ from mea.error_analyzer import ErrorAnalyzer
 
 import logging
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='Error Analysis Plugin | %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='Error Analysis | %(levelname)s - %(message)s')
 
 plt.rc('font', family="sans-serif")
 SMALL_SIZE, MEDIUM_SIZE, BIGGER_SIZE = 8, 10, 12
