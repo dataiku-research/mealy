@@ -177,29 +177,23 @@ class PipelinePreprocessor(object):
     def transform(self, x):
         return self.ct_preprocessor.transform(x)
 
-    def inverse_single_step(self, tr, tr_name, tr_feature_names,
-                            undo_prep_test_x, orig_feats_ids, preprocessed_x, prep_feats_ids):
-
-        inverse_transform_function_available = getattr(tr, "inverse_transform", None)
-        if inverse_transform_function_available:
-            undo_prep_test_x[:, orig_feats_ids] = tr.inverse_transform(preprocessed_x[:, prep_feats_ids])
-            logger.info("Reversing %s on %s" % (tr_name, ' '.join([f for f in tr_feature_names])))
-        elif isinstance(tr, STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION):
-            print("Inverse step {} with identical function.".format(tr))
-            logger.info("Step {} does not support inverse_transform. Skipping.".format(tr))
-            if len(prep_feats_ids) == len(orig_feats_ids):
-                logger.info("Apply identity transformation.")
-                undo_prep_test_x[:, orig_feats_ids] = preprocessed_x[:, prep_feats_ids]
-        else:
-            raise ValueError(
-                'The package does not support {} because it does not provide inverse_transform function.'.format(tr))
-
-        return None
-
     def inverse_transform(self, preprocessed_x):
 
-        orig_feats = self.fn_transformer.original_feature_names
+        def _inverse_single_step(single_step, step_out_x):
+            inverse_transform_function_available = getattr(single_step, "inverse_transform", None)
+            if inverse_transform_function_available:
+                step_in_x = single_step.inverse_transform(step_out_x)
+                logger.info("Reversing %s on %s" % (tr_name, ' '.join([f for f in tr_feature_names])))
+            elif isinstance(single_step, STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION):
+                logger.info("Apply identity transformation.")
+                step_in_x = step_out_x
+            else:
+                raise ValueError(
+                    'The package does not support {} because it does not provide inverse_transform function.'.format(
+                        single_step))
+            return step_in_x
 
+        orig_feats = self.fn_transformer.original_feature_names
         undo_prep_test_x = np.zeros((preprocessed_x.shape[0], len(orig_feats)), dtype='O')
 
         for (tr_name, tr, tr_feature_names) in self.ct_preprocessor.transformers_:
@@ -209,40 +203,18 @@ class PipelinePreprocessor(object):
                 out_ids = self.fn_transformer.transform(i)
                 if isinstance(out_ids, int):
                     prep_feats_ids.append(out_ids)
-                else:
+                else:  # list of ids
                     prep_feats_ids.extend(out_ids)
 
             if isinstance(tr, Pipeline):
                 step_out_x = preprocessed_x[:, prep_feats_ids]
                 for step_name, step in reversed(tr.steps):
-                    inverse_transform_function_available = getattr(step, "inverse_transform", None)
-                    if inverse_transform_function_available:
-                        step_in_x = step.inverse_transform(step_out_x)
-                        logger.info("Reversing %s on %s" % (step_name, ' '.join([f for f in tr_feature_names])))
-                    elif isinstance(step, STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION):
-                        logger.info("Apply identity transformation.")
-                        step_in_x = step_out_x
-                    else:
-                        raise ValueError(
-                            'The package does not support {} because it does not provide inverse_transform '
-                            'function.'.format(step))
-
+                    step_in_x = _inverse_single_step(step, step_out_x)
                     step_out_x = step_in_x
-
                 undo_prep_test_x[:, orig_feats_ids] = step_in_x
             elif tr_name == 'remainder' and tr == 'drop':
                 continue
             else:
-                inverse_transform_function_available = getattr(tr, "inverse_transform", None)
-                if inverse_transform_function_available:
-                    undo_prep_test_x[:, orig_feats_ids] = tr.inverse_transform(preprocessed_x[:, prep_feats_ids])
-                    logger.info("Reversing %s on %s" % (tr_name, ' '.join([f for f in tr_feature_names])))
-                elif isinstance(tr, STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION):
-                    logger.info("Apply identity transformation.")
-                    undo_prep_test_x[:, orig_feats_ids] = preprocessed_x[:, prep_feats_ids]
-                else:
-                    raise ValueError(
-                        'The package does not support {} because it does not provide inverse_transform '
-                        'function.'.format(tr))
+                undo_prep_test_x[:, orig_feats_ids] = _inverse_single_step(tr, preprocessed_x[:, prep_feats_ids])
 
         return undo_prep_test_x
