@@ -382,11 +382,8 @@ class ErrorAnalyzer(object):
         indices = []
         i = 0
 
-        print('FEAT IDS', feats_idx, thresh, dummy_x.shape)
-
         for f, t in zip(feats_idx, thresh):
             dummy_x[i, f] = t
-            print('INVERSE THRESHOLD ', f, t)
             indices.append((i, self.pipeline_preprocessor.fn_transformer.inverse_transform(f)))
             i += 1
 
