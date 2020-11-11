@@ -135,6 +135,9 @@ class ErrorAnalyzer(object):
             prep_x, prep_y = self.pipeline_preprocessor.transform(x), np.array(y)
 
         self._error_train_x, self._error_train_y = self._compute_primary_model_error(prep_x, prep_y, max_nr_rows)
+        possible_outcomes = list(set(self._error_train_y.tolist()))
+        if len(possible_outcomes) == 1:
+            logger.warning('All predictions are {}. To build a proper MPP decision tree we need both correct and incorrect predictions'.format(possible_outcomes[0]))
 
         logger.info("Fitting the model performance predictor...")
 
@@ -148,6 +151,9 @@ class ErrorAnalyzer(object):
 
         logger.info('Grid search selected parameters:')
         logger.info(gs_clf.best_params_)
+
+        if sum(self._error_clf.tree_.feature > 0) == 0:
+            logger.warning("The MPP tree has only 1 node, there will be problem when using this with ErrorVisualizer")
 
     def _compute_primary_model_error(self, x, y, max_nr_rows):
         """
@@ -370,17 +376,21 @@ class ErrorAnalyzer(object):
         feats_idx = self._error_clf.tree_.feature[self._error_clf.tree_.feature > 0]
         thresholds = self._error_clf.tree_.threshold.copy().astype('O')
         thresh = thresholds[self._error_clf.tree_.feature > 0]
-
         n_rows = np.count_nonzero(self._error_clf.tree_.feature[self._error_clf.tree_.feature > 0])
         n_cols = self._error_train_x.shape[1]
         dummy_x = np.zeros((n_rows, n_cols))
 
         indices = []
         i = 0
+
+        print('FEAT IDS', feats_idx, thresh, dummy_x.shape)
+
         for f, t in zip(feats_idx, thresh):
             dummy_x[i, f] = t
+            print('INVERSE THRESHOLD ', f, t)
             indices.append((i, self.pipeline_preprocessor.fn_transformer.inverse_transform(f)))
             i += 1
+
         undo_dummy_x = self.pipeline_preprocessor.inverse_transform(dummy_x)
 
         descaled_thresh = [undo_dummy_x[i, j] for i, j in indices]
