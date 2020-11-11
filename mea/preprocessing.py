@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from sklearn.preprocessing import StandardScaler, PowerTransformer, QuantileTransformer, Binarizer, MaxAbsScaler, MinMaxScaler, Normalizer, RobustScaler, OneHotEncoder, OrdinalEncoder
+from sklearn.preprocessing import StandardScaler, PowerTransformer, QuantileTransformer, Binarizer, MaxAbsScaler
+from sklearn.preprocessing import MinMaxScaler, Normalizer, RobustScaler, OneHotEncoder, OrdinalEncoder
 from sklearn.impute import SimpleImputer, KNNImputer
 from sklearn.pipeline import Pipeline
 import numpy as np
@@ -13,9 +14,10 @@ VALID_CATEGORICAL_STEPS = (OneHotEncoder, OrdinalEncoder)
 STEPS_THAT_DOES_NOT_CHANGE_OUTPUT_DIMENSION = (StandardScaler, PowerTransformer, QuantileTransformer, MaxAbsScaler,
                                                Binarizer, Normalizer, MinMaxScaler, RobustScaler, SimpleImputer,
                                                KNNImputer, OrdinalEncoder)
-STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES = (OneHotEncoder)
+STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES = (OneHotEncoder,)
 # for imputers we don't need inverse function
 STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION = (SimpleImputer, KNNImputer)
+
 
 class FeatureNameTransformer(object):
 
@@ -29,7 +31,8 @@ class FeatureNameTransformer(object):
         self.preprocessed_feature_names = list()
         self.len_preproc = 0
 
-        original_features_from_ct, self.categorical_features = self._get_feature_list_from_column_transformer(ct_preprocessor)
+        original_features_from_ct, self.categorical_features = self._get_feature_list_from_column_transformer(
+            ct_preprocessor)
         if original_features is None:
             self.original_feature_names = original_features_from_ct
         else:
@@ -59,13 +62,16 @@ class FeatureNameTransformer(object):
                         single_tr = step[1]
                         number_of_steps_that_change_dimension += 1
                 if number_of_steps_that_change_dimension > 1:
-                    raise ValueError('Each pipeline can only have one step that changes feature dimension, here we got {}'.format(number_of_steps_that_change_dimension))
+                    raise ValueError('Each pipeline can only have one step that changes feature dimension, '
+                                     'here we got {}'.format(number_of_steps_that_change_dimension))
                 if isinstance(single_tr, STEPS_THAT_DOES_NOT_CHANGE_OUTPUT_DIMENSION):
                     self.update_feature_mapping_dict_using_input_names(tr_feature_names, orig_feats_ids)
                 elif isinstance(single_tr, STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES):
                     self.update_feature_mapping_dict_using_output_names(single_tr, tr_feature_names, orig_feats_ids)
                 else:
-                    raise ValueError('The package does not support {}, probably because it changes output dimension but does not provide get_feature_names function to keep track of new features generated.'.format(single_tr))
+                    raise ValueError('The package does not support {}, probably because it changes output dimension '
+                                     'but does not provide get_feature_names function to keep track of new features '
+                                     'generated.'.format(single_tr))
 
             elif isinstance(tr, STEPS_THAT_DOES_NOT_CHANGE_OUTPUT_DIMENSION):
                 self.update_feature_mapping_dict_using_input_names(tr_feature_names, orig_feats_ids)
@@ -75,7 +81,9 @@ class FeatureNameTransformer(object):
                 # skip the default drop step of ColumnTransformer
                 continue
             else:
-                raise ValueError('The package does not support {}, probably because it changes output dimension but does not provide get_feature_names function to keep track of new features generated.'.format(tr))
+                raise ValueError('The package does not support {}, probably because it changes output dimension but '
+                                 'does not provide get_feature_names function to keep track of new '
+                                 'features generated.'.format(tr))
 
     def update_feature_mapping_dict_using_input_names(self, tr_feature_names, orig_feats_ids):
         self.preprocessed_feature_names.extend(tr_feature_names)
@@ -102,10 +110,10 @@ class FeatureNameTransformer(object):
             self.preprocessed2original.update({self.len_preproc + i: orig_id for i in range(len(part_out_feature_names))})
             self.len_preproc += len(part_out_feature_names)
 
-
     def _compare_original_feature_list(self, feature_list_from_user, feature_list_from_ct):
         if len(feature_list_from_user) != len(feature_list_from_ct):
-            raise ValueError('The list of input original feature does not correspond to the list of features handled by the ct_preprocessor.')
+            raise ValueError('The list of input original feature does not correspond to the list of features handled '
+                             'by the ct_preprocessor.')
 
     def _get_feature_list_from_column_transformer(self, ct_preprocessor):
         all_feature = []
@@ -169,7 +177,8 @@ class PipelinePreprocessor(object):
     def transform(self, x):
         return self.ct_preprocessor.transform(x)
 
-    def inverse_single_step(self, tr, tr_name, tr_feature_names, undo_prep_test_x, orig_feats_ids, preprocessed_x, prep_feats_ids):
+    def inverse_single_step(self, tr, tr_name, tr_feature_names,
+                            undo_prep_test_x, orig_feats_ids, preprocessed_x, prep_feats_ids):
 
         inverse_transform_function_available = getattr(tr, "inverse_transform", None)
         if inverse_transform_function_available:
@@ -193,7 +202,7 @@ class PipelinePreprocessor(object):
 
         undo_prep_test_x = np.zeros((preprocessed_x.shape[0], len(orig_feats)), dtype='O')
 
-        for (tr_name, tr, tr_feature_names) in reversed(self.ct_preprocessor.transformers_):
+        for (tr_name, tr, tr_feature_names) in self.ct_preprocessor.transformers_:
             orig_feats_ids = np.where(np.in1d(orig_feats, tr_feature_names))[0]
             prep_feats_ids = []
             for i in orig_feats_ids:
@@ -204,15 +213,23 @@ class PipelinePreprocessor(object):
                     prep_feats_ids.extend(out_ids)
 
             if isinstance(tr, Pipeline):
-                for step_name, step in tr.steps:
+                step_out_x = preprocessed_x[:, prep_feats_ids]
+                for step_name, step in reversed(tr.steps):
                     inverse_transform_function_available = getattr(step, "inverse_transform", None)
                     if inverse_transform_function_available:
-                        undo_prep_test_x[:, orig_feats_ids] = step.inverse_transform(preprocessed_x[:, prep_feats_ids])
+                        step_in_x = step.inverse_transform(step_out_x)
                         logger.info("Reversing %s on %s" % (step_name, ' '.join([f for f in tr_feature_names])))
                     elif isinstance(step, STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION):
-                        undo_prep_test_x[:, orig_feats_ids] = preprocessed_x[:, prep_feats_ids]
+                        logger.info("Apply identity transformation.")
+                        step_in_x = step_out_x
                     else:
-                        raise ValueError('The package does not support {} because it does not provide inverse_transform function.'.format(step))
+                        raise ValueError(
+                            'The package does not support {} because it does not provide inverse_transform '
+                            'function.'.format(step))
+
+                    step_out_x = step_in_x
+
+                undo_prep_test_x[:, orig_feats_ids] = step_in_x
             elif tr_name == 'remainder' and tr == 'drop':
                 continue
             else:
@@ -224,6 +241,8 @@ class PipelinePreprocessor(object):
                     logger.info("Apply identity transformation.")
                     undo_prep_test_x[:, orig_feats_ids] = preprocessed_x[:, prep_feats_ids]
                 else:
-                    raise ValueError('The package does not support {} because it does not provide inverse_transform function.'.format(tr))
+                    raise ValueError(
+                        'The package does not support {} because it does not provide inverse_transform '
+                        'function.'.format(tr))
 
         return undo_prep_test_x
