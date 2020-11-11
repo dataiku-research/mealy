@@ -9,11 +9,12 @@ from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.base import BaseEstimator
 from kneed import KneeLocator
-from mea.error_analysis_utils import check_enough_data, ErrorAnalyzerConstants
+import logging
+
+from mea.error_analysis_utils import check_enough_data
+from mea.constants import ErrorAnalyzerConstants
 from mea.metrics import mpp_report
 from mea.preprocessing import PipelinePreprocessor
-
-import logging
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='Error Analysis | %(levelname)s - %(message)s')

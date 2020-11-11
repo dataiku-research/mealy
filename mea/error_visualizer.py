@@ -6,7 +6,8 @@ from sklearn.tree import export_graphviz
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
-from mea.error_analysis_utils import ErrorAnalyzerConstants, rank_features_by_error_correlation
+from mea.error_analysis_utils import rank_features_by_error_correlation
+from mea.constants import ErrorAnalyzerConstants
 from mea.error_analyzer import ErrorAnalyzer
 
 import logging
