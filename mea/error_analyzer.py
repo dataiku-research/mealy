@@ -41,7 +41,7 @@ class ErrorAnalyzer(object):
                 raise NotImplementedError("The input preprocessor has to be a ColumnTransformer.")
             self.pipeline_preprocessor = PipelinePreprocessor(ct_preprocessor, feature_names)
 
-            self._features_in_model_performance_predictor = self.pipeline_preprocessor.fn_transformer.preprocessed_feature_names
+            self._features_in_model_performance_predictor = self.pipeline_preprocessor.get_preprocessed_feature_names()
 
         else:
             self._predictor = predictor
@@ -308,7 +308,7 @@ class ErrorAnalyzer(object):
         if self.pipeline_preprocessor is None:
             feature_names = self.model_performance_predictor_features
         else:
-            feature_names = self.pipeline_preprocessor.fn_transformer.original_feature_names
+            feature_names = self.pipeline_preprocessor.get_original_feature_names()
 
         children_left = self.model_performance_predictor.tree_.children_left
         children_right = self.model_performance_predictor.tree_.children_right
@@ -332,7 +332,7 @@ class ErrorAnalyzer(object):
 
             is_categorical = False
             if self.pipeline_preprocessor is not None:
-                is_categorical = self.pipeline_preprocessor.fn_transformer.is_categorical(feat)
+                is_categorical = self.pipeline_preprocessor.is_categorical(feat)
 
             thresh = thresh if is_categorical else ("%.2f" % thresh)
 
@@ -359,7 +359,7 @@ class ErrorAnalyzer(object):
 
         for i, f in enumerate(feats_idx):
             if f > 0:
-                feats_idx[i] = self.pipeline_preprocessor.fn_transformer.inverse_transform(f)
+                feats_idx[i] = self.pipeline_preprocessor.inverse_transform_feature_id(f)
 
         self._error_clf_features = feats_idx
 
@@ -385,7 +385,7 @@ class ErrorAnalyzer(object):
 
         for f, t in zip(feats_idx, thresh):
             dummy_x[i, f] = t
-            indices.append((i, self.pipeline_preprocessor.fn_transformer.inverse_transform(f)))
+            indices.append((i, self.pipeline_preprocessor.inverse_transform_feature_id(f)))
             i += 1
 
         undo_dummy_x = self.pipeline_preprocessor.inverse_transform(dummy_x)

@@ -95,10 +95,10 @@ class ErrorVisualizer(_BaseErrorVisualizer):
 
             self.numerical_feature_names = self.mpp_feature_names
         else:
-            self.original_feature_names = self.pipeline_preprocessor.fn_transformer.original_feature_names
+            self.original_feature_names = self.pipeline_preprocessor.get_original_feature_names()
 
             self.numerical_feature_names = [f for f in self.original_feature_names if
-                                            not self.pipeline_preprocessor.fn_transformer.is_categorical(name=f)]
+                                            not self.pipeline_preprocessor.is_categorical(name=f)]
 
         self._train_leaf_ids = error_analyzer.train_leaf_ids
 
@@ -184,7 +184,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
             min_values, max_values = x.min(axis=0), x.max(axis=0)
             feature_names = self.mpp_feature_names
         else:
-            ranked_feature_ids = [self.pipeline_preprocessor.fn_transformer.inverse_transform(idx) for idx in
+            ranked_feature_ids = [self.pipeline_preprocessor.inverse_transform_feature_id(idx) for idx in
                                   ranked_feature_ids]
             if top_k_features > 0:
                 ranked_feature_ids = ranked_feature_ids[:top_k_features]
@@ -210,7 +210,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
 
                 feature_name = feature_names[feature_idx]
                 feature_is_numerical = True if self.pipeline_preprocessor is None else (
-                    not self.pipeline_preprocessor.fn_transformer.is_categorical(feature_idx))
+                    not self.pipeline_preprocessor.is_categorical(feature_idx))
 
                 feature_column = x[:, i]
 
