@@ -141,13 +141,13 @@ class ErrorAnalyzer(object):
         # entropy/mutual information is used to split nodes in Microsoft Pandora system
         criterion = ErrorAnalyzerConstants.CRITERION
 
-        dt_clf = tree.DecisionTreeClassifier(criterion=criterion, min_samples_leaf=1, random_state=self._seed)
-        parameters = {'max_depth': ErrorAnalyzerConstants.MAX_DEPTH_GRID}
-        gs_clf = GridSearchCV(dt_clf, parameters, cv=5)
+        dt_clf = tree.DecisionTreeClassifier(criterion=criterion, class_weight='balanced', random_state=self._seed)
+        gs_clf = GridSearchCV(dt_clf, param_grid=ErrorAnalyzerConstants.PARAMETERS_GRID, cv=5)
         gs_clf.fit(self._error_train_x, self._error_train_y)
         self._error_clf = gs_clf.best_estimator_
 
-        logger.info('Grid search selected max_depth = {}'.format(gs_clf.best_params_['max_depth']))
+        logger.info('Grid search selected parameters:')
+        logger.info(gs_clf.best_params_)
 
     def _compute_primary_model_error(self, x, y, max_nr_rows):
         """
@@ -445,6 +445,6 @@ class ErrorAnalyzer(object):
         else:
             prep_x, prep_y = self.pipeline_preprocessor.transform(x_test), np.array(y_test)
 
-        x_test, y_true = self._compute_primary_model_error(prep_x, prep_y, nr_max_rows)
+        prep_x, y_true = self._compute_primary_model_error(prep_x, prep_y, nr_max_rows)
         y_pred = self.model_performance_predictor.predict(prep_x)
         return mpp_report(y_true, y_pred, output_dict)
