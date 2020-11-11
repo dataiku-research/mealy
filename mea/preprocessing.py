@@ -179,25 +179,23 @@ class PipelinePreprocessor(object):
 
     def inverse_transform(self, preprocessed_x):
 
-        def _inverse_single_step(single_step, step_out_x):
+        def _inverse_single_step(single_step, step_output):
             inverse_transform_function_available = getattr(single_step, "inverse_transform", None)
             if inverse_transform_function_available:
-                step_in_x = single_step.inverse_transform(step_out_x)
+                step_input = single_step.inverse_transform(step_output)
                 logger.info("Reversing %s on %s" % (tr_name, ' '.join([f for f in tr_feature_names])))
             elif isinstance(single_step, STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION):
                 logger.info("Apply identity transformation.")
-                step_in_x = step_out_x
+                step_input = step_output
             else:
-                raise ValueError(
-                    'The package does not support {} because it does not provide inverse_transform function.'.format(
-                        single_step))
-            return step_in_x
+                raise ValueError('The package does not support {} because it does not provide inverse_transform function.'.format(single_step))
+            return step_input
 
-        orig_feats = self.fn_transformer.original_feature_names
-        undo_prep_test_x = np.zeros((preprocessed_x.shape[0], len(orig_feats)), dtype='O')
+        original_features = self.fn_transformer.original_feature_names
+        undo_prep_test_x = np.zeros((preprocessed_x.shape[0], len(original_features)), dtype='O')
 
         for (tr_name, tr, tr_feature_names) in self.ct_preprocessor.transformers_:
-            orig_feats_ids = np.where(np.in1d(orig_feats, tr_feature_names))[0]
+            orig_feats_ids = np.where(np.in1d(original_features, tr_feature_names))[0]
             prep_feats_ids = []
             for i in orig_feats_ids:
                 out_ids = self.fn_transformer.transform(i)
@@ -206,8 +204,9 @@ class PipelinePreprocessor(object):
                 else:  # list of ids
                     prep_feats_ids.extend(out_ids)
 
+            step_out_x = preprocessed_x[:, prep_feats_ids]
+            step_in_x = None
             if isinstance(tr, Pipeline):
-                step_out_x = preprocessed_x[:, prep_feats_ids]
                 for step_name, step in reversed(tr.steps):
                     step_in_x = _inverse_single_step(step, step_out_x)
                     step_out_x = step_in_x
@@ -215,6 +214,7 @@ class PipelinePreprocessor(object):
             elif tr_name == 'remainder' and tr == 'drop':
                 continue
             else:
-                undo_prep_test_x[:, orig_feats_ids] = _inverse_single_step(tr, preprocessed_x[:, prep_feats_ids])
+                step_in_x = _inverse_single_step(tr, step_out_x)
+                undo_prep_test_x[:, orig_feats_ids] = step_in_x
 
         return undo_prep_test_x
