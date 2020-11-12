@@ -8,12 +8,13 @@ from sklearn.exceptions import NotFittedError
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.base import BaseEstimator
+from sklearn.metrics import make_scorer
 from kneed import KneeLocator
 import logging
 
 from mea.error_analysis_utils import check_enough_data
 from mea.constants import ErrorAnalyzerConstants
-from mea.metrics import mpp_report
+from mea.metrics import mpp_report, fidelity_balanced_accuracy_score
 from mea.preprocessing import PipelinePreprocessor
 
 logger = logging.getLogger(__name__)
@@ -144,8 +145,10 @@ class ErrorAnalyzer(object):
         # entropy/mutual information is used to split nodes in Microsoft Pandora system
         criterion = ErrorAnalyzerConstants.CRITERION
 
-        dt_clf = tree.DecisionTreeClassifier(criterion=criterion, class_weight='balanced', random_state=self._seed)
-        gs_clf = GridSearchCV(dt_clf, param_grid=ErrorAnalyzerConstants.PARAMETERS_GRID, cv=5)
+        dt_clf = tree.DecisionTreeClassifier(criterion=criterion, random_state=self._seed)
+        gs_clf = GridSearchCV(dt_clf, param_grid=ErrorAnalyzerConstants.PARAMETERS_GRID,
+                              cv=5, scoring=make_scorer(fidelity_balanced_accuracy_score))
+
         gs_clf.fit(self._error_train_x, self._error_train_y)
         self._error_clf = gs_clf.best_estimator_
 
@@ -413,8 +416,8 @@ class ErrorAnalyzer(object):
         leaves_summary = []
         for leaf_id in leaf_nodes:
             values = self.model_performance_predictor.tree_.value[leaf_id, :]
-            n_errors = int(round(values[0, error_class_idx], 2))
-            n_corrects = int(round(values[0, correct_class_idx], 2))
+            n_errors = int(np.ceil(values[0, error_class_idx]))
+            n_corrects = int(np.ceil(values[0, correct_class_idx]))
             local_error = float(n_errors) / (n_corrects + n_errors)
             global_error = float(n_errors) / n_total_errors
 
