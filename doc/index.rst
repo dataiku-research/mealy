@@ -6,7 +6,7 @@
 Welcome to Model Error Analysis's documentation!
 ================================================
 
-The code of the project is on Github: `mea <https://github.com/dataiku/mea>`_
+The code of the project is on Github: `mealy <https://github.com/dataiku/mealy>`_
 
 
 .. _install:
@@ -17,11 +17,11 @@ Installation
 Using Pypi
 ----------
 
-mea can be installed through Pypi using:
+mealy can be installed through Pypi using:
 
 .. code-block:: bash
 
-    $ pip install "mea"
+    $ pip install mealy
 
 Installing locally
 ------------------
@@ -31,8 +31,8 @@ Again, the preferred way is to use pip.
 
 .. code-block:: bash
 
-    $ git clone https://github.com/dataiku/mea
-    $ cd mea
+    $ git clone https://github.com/dataiku/mealy
+    $ cd mealy
     $ pip install -e
 
 

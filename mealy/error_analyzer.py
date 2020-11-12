@@ -12,13 +12,13 @@ from sklearn.metrics import make_scorer
 from kneed import KneeLocator
 import logging
 
-from mea.error_analysis_utils import check_enough_data
-from mea.constants import ErrorAnalyzerConstants
-from mea.metrics import mpp_report, fidelity_balanced_accuracy_score
-from mea.preprocessing import PipelinePreprocessor
+from mealy.error_analysis_utils import check_enough_data
+from mealy.constants import ErrorAnalyzerConstants
+from mealy.metrics import mpp_report, fidelity_balanced_accuracy_score
+from mealy.preprocessing import PipelinePreprocessor
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='Error Analysis | %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='mealy | %(levelname)s - %(message)s')
 
 
 class ErrorAnalyzer(object):

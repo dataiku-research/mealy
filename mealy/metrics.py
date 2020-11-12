@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from mea.constants import ErrorAnalyzerConstants
+from mealy.constants import ErrorAnalyzerConstants
 from sklearn.metrics import accuracy_score, balanced_accuracy_score
 import numpy as np
 
