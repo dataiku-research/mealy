@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from sklearn.pipeline import Pipeline
 import numpy as np
+from scipy.sparse import issparse
 import logging
 from mea.error_analysis_utils import check_lists_having_same_elements, get_feature_list_from_column_transformer
 from mea.constants import ErrorAnalyzerConstants
@@ -191,6 +192,13 @@ class PipelinePreprocessor(FeatureNameTransformer):
                     preprocessed_feature_ids.extend(out_ids)
 
             output_of_transformer = preprocessed_x[:, preprocessed_feature_ids]
+
+            is_cat = np.vectorize(self.is_categorical)
+            any_numeric = np.any(~is_cat(original_feature_ids))
+            if issparse(output_of_transformer) and any_numeric:
+                logger.info("Converting to dense matrix to enable inverse_transform.")
+                output_of_transformer = output_of_transformer.todense()
+
             input_of_transformer = None
             if isinstance(transformer, Pipeline):
                 for step_name, step in reversed(transformer.steps):
