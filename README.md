@@ -153,6 +153,8 @@ mea depends on:
 - SciPy >= 0.19
 - scikit-learn >= 0.19 
 - matplotlib >= 2.0 
+- graphviz >= 0.14
+- pydotplus >= 2.0
 
 
 ### Installing with pip
