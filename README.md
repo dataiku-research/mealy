@@ -52,7 +52,7 @@ on a problematic subpopulation, ...
 
 The typical workflow in the iterative model design supported by error analysis is illustrated in the figure below.
 
-![Model Error Analysis Workflow](doc/_static/mealy_flow.png)
+![Model Error Analysis Workflow](https://raw.githubusercontent.com/dataiku/mealy/main/doc/_static/mealy_flow.png?token=ACQTHLPSN7JU6AXC6OJRL4S7W2PXA)
 
 ## Getting started with mealy
 
@@ -158,7 +158,7 @@ mealy depends on:
 - matplotlib >= 2.0 
 - graphviz >= 0.14
 - pydotplus >= 2.0
-- kneed >= 0.6
+- kneed == 0.6
 
 ### Installing with pip
 
