@@ -4,13 +4,13 @@ import graphviz as gv
 import pydotplus
 from sklearn.tree import export_graphviz
 import matplotlib.pyplot as plt
-from mea.error_analysis_utils import rank_features_by_error_correlation
-from mea.constants import ErrorAnalyzerConstants
-from mea.error_analyzer import ErrorAnalyzer
+from mealy.error_analysis_utils import rank_features_by_error_correlation
+from mealy.constants import ErrorAnalyzerConstants
+from mealy.error_analyzer import ErrorAnalyzer
 
 import logging
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='Error Analysis | %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='mealy | %(levelname)s - %(message)s')
 
 plt.rc('font', family="sans-serif")
 SMALL_SIZE, MEDIUM_SIZE, BIGGER_SIZE = 8, 10, 12

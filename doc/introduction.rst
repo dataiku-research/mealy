@@ -8,7 +8,7 @@ After training a ML model, data scientists need to investigate the model failure
 on which the model is performing poorly. This analysis is essential in the iterative process of model design and feature engineering
 and is usually performed manually.
 
-The mea package streamlines the analysis of the samples mostly contributing to model errors and provides the user with
+The mealy package streamlines the analysis of the samples mostly contributing to model errors and provides the user with
 automatic tools to break down the model errors into meaningful groups, easier to analyze, and to highlight the most frequent
 type of errors, as well as the problematic features correlated with the failures.
 
@@ -32,7 +32,7 @@ The leaves of the MPP decision tree break down the test dataset into smaller seg
 model performances. Analyzing the sub-population in the error leaves, and comparing with the global population, provides
 insights about critical features correlated with the model failures.
 
-The mea package leads the user to focus on what are the problematic features and what are the typical values of these features
+The mealy package leads the user to focus on what are the problematic features and what are the typical values of these features
 for the mis-predicted samples. This information can later be exploited to support the strategy selected by the user :
 * improve model design: removing a problematic feature, removing samples likely to be mislabeled, ensemble with a model trained
 on a problematic subpopulation, ...

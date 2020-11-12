@@ -2,13 +2,13 @@
 
 ## Introduction
 
-mea is a Python package to perform Model Error Analysis of scikit-learn models leveraging a Model Performance Predictor.
+mealy is a Python package to perform Model Error Analysis of scikit-learn models leveraging a Model Performance Predictor.
 
 The project is currently maintained by [Dataiku's](https://www.dataiku.com/) research team.
 
 ## Getting started
 
-MEA [documentation](https://dataiku.github.io/mea/) features some examples helping you getting started with Model Error Analysis:
+mealy [documentation](https://dataiku.github.io/mea/) features some examples helping you getting started with Model Error Analysis:
 * [Error Analysis on scikit-learn model](https://dataiku.github.io/mea/auto_examples/sklearn_structured.html) presents a basic error analysis on a regression model for structured data
 * [Error Analysis on pipeline model](https://dataiku.github.io/mea/auto_examples/pipeline_structured.html) presents a basic error analysis on a pipeline regression model for structured data
 * TODO: add examples from text data 
@@ -19,7 +19,7 @@ After training a ML model, data scientists need to investigate the model failure
 on which the model is performing poorly. This analysis is essential in the iterative process of model design and feature engineering 
 and is usually performed manually. 
 
-The mea package streamlines the analysis of the samples mostly contributing to model errors and provides the user with 
+The mealy package streamlines the analysis of the samples mostly contributing to model errors and provides the user with 
 automatic tools to break down the model errors into meaningful groups, easier to analyze, and to highlight the most frequent 
 type of errors, as well as the problematic features correlated with the failures.
 
@@ -43,7 +43,7 @@ The leaves of the MPP decision tree break down the test dataset into smaller seg
 model performances. Analyzing the sub-population in the error leaves, and comparing with the global population, provides 
 insights about critical features correlated with the model failures.
 
-The mea package leads the user to focus on what are the problematic features and what are the typical values of these features 
+The mealy package leads the user to focus on what are the problematic features and what are the typical values of these features 
 for the mis-predicted samples. This information can later be exploited to support the strategy selected by the user :
 * improve model design: removing a problematic feature, removing samples likely to be mislabeled, ensemble with a model trained 
 on a problematic subpopulation, ...
@@ -60,8 +60,8 @@ Let `(X_train, y_train)` be the training data of the model to analyze, and `(X_t
 The Model Error Analysis can be performed as:
 
 ```python
-from mea.error_analyzer import ErrorAnalyzer
-from mea.error_visualizer import ErrorVisualizer
+from mealy.error_analyzer import ErrorAnalyzer
+from mealy.error_visualizer import ErrorVisualizer
 
 # train any scikit-learn model
 model = RandomForestClassifier()
@@ -87,7 +87,7 @@ error_visualizer.plot_feature_distributions_on_leaves(leaf_selector="all_errors"
 ```
 
 
-## Using mea with pipeline to undo feature pre-processing
+## Using mealy with pipeline to undo feature pre-processing
 
 Let `(X_train, y_train)` be the training data of the model to analyze, and `(X_test, y_test)` its test set.
 The numeric features `numerical_feature_names` are for instance pre-processed by a simple imputer and standard scaler, 
@@ -104,8 +104,8 @@ from sklearn.compose import make_column_transformer
 from sklearn.pipeline import make_pipeline
 from sklearn.impute import SimpleImputer
 
-from mea.error_analyzer import ErrorAnalyzer
-from mea.error_visualizer import ErrorVisualizer
+from mealy.error_analyzer import ErrorAnalyzer
+from mealy.error_visualizer import ErrorVisualizer
 
 transformers = [
     (make_pipeline(SimpleImputer(), StandardScaler()), numerical_feature_names),
@@ -147,7 +147,7 @@ error_visualizer.plot_feature_distributions_on_leaves(leaf_selector="all_errors"
 
 ### Dependencies
 
-mea depends on:
+mealy depends on:
 - Python >= 3.5
 - NumPy >= 1.11
 - SciPy >= 0.19
@@ -155,11 +155,11 @@ mea depends on:
 - matplotlib >= 2.0 
 - graphviz >= 0.14
 - pydotplus >= 2.0
-
+- kneed == 0.7.0
 
 ### Installing with pip
 
-The easiest way to install mea is to use `pip`. For a vanilla install, simply type:
+The easiest way to install mealy is to use `pip`. For a vanilla install, simply type:
 
     pip install -U mea
 

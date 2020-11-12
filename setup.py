@@ -10,10 +10,10 @@ descr = """Model Error Analysis python package"""
 
 
 def load_version():
-    """Executes mea/version.py in a globals dictionary and return it.
+    """Executes mealy/version.py in a globals dictionary and return it.
     """
     globals_dict = {}
-    with open(os.path.join('mea', 'version.py')) as fp:
+    with open(os.path.join('mealy', 'version.py')) as fp:
         exec(fp.read(), globals_dict)
     return globals_dict
 
@@ -28,7 +28,7 @@ def is_installing():
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 _VERSION_GLOBALS = load_version()
-DISTNAME = 'mea'
+DISTNAME = 'mealy'
 DESCRIPTION = 'Model Error Analysis python package'
 with open('README.md') as fp:
     LONG_DESCRIPTION = fp.read()

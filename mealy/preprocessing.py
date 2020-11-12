@@ -3,11 +3,11 @@ from sklearn.pipeline import Pipeline
 import numpy as np
 from scipy.sparse import issparse
 import logging
-from mea.error_analysis_utils import check_lists_having_same_elements, get_feature_list_from_column_transformer
-from mea.constants import ErrorAnalyzerConstants
+from mealy.error_analysis_utils import check_lists_having_same_elements, get_feature_list_from_column_transformer
+from mealy.constants import ErrorAnalyzerConstants
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='Error Analysis | %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='mealy | %(levelname)s - %(message)s')
 
 
 class FeatureNameTransformer(object):

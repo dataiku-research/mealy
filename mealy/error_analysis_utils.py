@@ -2,7 +2,7 @@
 from sklearn.pipeline import Pipeline
 import numpy as np
 import collections
-from mea.constants import ErrorAnalyzerConstants
+from mealy.constants import ErrorAnalyzerConstants
 
 
 def get_feature_list_from_column_transformer(ct_preprocessor):
