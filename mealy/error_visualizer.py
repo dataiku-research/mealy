@@ -3,15 +3,14 @@ import numpy as np
 import graphviz as gv
 import pydotplus
 from sklearn.tree import export_graphviz
-import matplotlib
-matplotlib.use('agg')
 import matplotlib.pyplot as plt
-from mealy.error_analysis_utils import ErrorAnalyzerConstants, rank_features_by_error_correlation
+from mealy.error_analysis_utils import rank_features_by_error_correlation
+from mealy.constants import ErrorAnalyzerConstants
 from mealy.error_analyzer import ErrorAnalyzer
 
 import logging
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='Error Analysis Plugin | %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='mealy | %(levelname)s - %(message)s')
 
 plt.rc('font', family="sans-serif")
 SMALL_SIZE, MEDIUM_SIZE, BIGGER_SIZE = 8, 10, 12
@@ -97,10 +96,10 @@ class ErrorVisualizer(_BaseErrorVisualizer):
 
             self.numerical_feature_names = self.mpp_feature_names
         else:
-            self.original_feature_names = self.pipeline_preprocessor.fn_transformer.original_feature_names
+            self.original_feature_names = self.pipeline_preprocessor.get_original_feature_names()
 
             self.numerical_feature_names = [f for f in self.original_feature_names if
-                                            not self.pipeline_preprocessor.fn_transformer.is_categorical(name=f)]
+                                            not self.pipeline_preprocessor.is_categorical(name=f)]
 
         self._train_leaf_ids = error_analyzer.train_leaf_ids
 
@@ -222,7 +221,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
             min_values, max_values = x.min(axis=0), x.max(axis=0)
             feature_names = self.mpp_feature_names
         else:
-            ranked_feature_ids = [self.pipeline_preprocessor.fn_transformer.inverse_transform(idx) for idx in
+            ranked_feature_ids = [self.pipeline_preprocessor.inverse_transform_feature_id(idx) for idx in
                                   ranked_feature_ids]
             if top_k_features > 0:
                 ranked_feature_ids = ranked_feature_ids[:top_k_features]
@@ -248,41 +247,58 @@ class ErrorVisualizer(_BaseErrorVisualizer):
 
                 feature_name = feature_names[feature_idx]
                 feature_is_numerical = True if self.pipeline_preprocessor is None else (
-                    not self.pipeline_preprocessor.fn_transformer.is_categorical(feature_idx))
+                    not self.pipeline_preprocessor.is_categorical(feature_idx))
 
                 feature_column = x[:, i]
 
                 if feature_is_numerical:
                     bins = np.round(np.linspace(min_values[i], max_values[i], nr_bins + 1), 2)
-                    histogram_func = lambda f_samples: np.histogram(f_samples, bins=bins, density=True)[0]
-
+                    if show_class:
+                        histogram_func = lambda f_samples: np.histogram(f_samples, bins=bins, density=False)[0]
+                    else:
+                        histogram_func = lambda f_samples: np.histogram(f_samples, bins=bins, density=True)[0]
+                        
                 else:
 
                     bins = np.unique(feature_column)[:nr_bins]
-                    histogram_func = lambda f_samples: \
-                        np.bincount(np.searchsorted(bins, f_samples),
-                                    minlength=len(bins))[:nr_bins].astype(float)/len(f_samples)
+                    if show_class:
+                        histogram_func = lambda f_samples: \
+                            np.bincount(np.searchsorted(bins, f_samples),
+                                        minlength=len(bins))[:nr_bins].astype(float)
+                    else:
+                        histogram_func = lambda f_samples: \
+                            np.bincount(np.searchsorted(bins, f_samples),
+                                        minlength=len(bins))[:nr_bins].astype(float) / len(f_samples)
 
                 if show_global:
                     if show_class:
+                        hist_wrong = histogram_func(feature_column[global_error_sample_ids])
+                        hist_correct = histogram_func(feature_column[~global_error_sample_ids])
+                        n_samples = np.sum(hist_wrong + hist_correct)
+                        normalized_hist_wrong = hist_wrong / n_samples
+                        normalized_hist_correct = hist_correct / n_samples
                         root_hist_data = {
                             ErrorAnalyzerConstants.WRONG_PREDICTION:
-                                histogram_func(feature_column[global_error_sample_ids]),
+                                normalized_hist_wrong,
                             ErrorAnalyzerConstants.CORRECT_PREDICTION:
-                                histogram_func(feature_column[~global_error_sample_ids])
+                                normalized_hist_correct
                         }
                     else:
-                        root_prediction = ErrorAnalyzerConstants.CORRECT_PREDICTION if int(nr_correct[0]) >= int(nr_wrong[
-                            0]) else ErrorAnalyzerConstants.WRONG_PREDICTION
+                        root_prediction = ErrorAnalyzerConstants.CORRECT_PREDICTION if int(nr_correct[0]) >= int(
+                            nr_wrong[0]) else ErrorAnalyzerConstants.WRONG_PREDICTION
                         root_hist_data = {root_prediction: histogram_func(feature_column)}
 
-                leaf_hist_data = {}
                 if show_class:
+                    hist_wrong = histogram_func(feature_column[leaf_sample_ids & global_error_sample_ids])
+                    hist_correct = histogram_func(feature_column[leaf_sample_ids & ~global_error_sample_ids])
+                    n_samples = np.sum(hist_wrong + hist_correct)
+                    normalized_hist_wrong = hist_wrong / n_samples
+                    normalized_hist_correct = hist_correct / n_samples
                     leaf_hist_data = {
                         ErrorAnalyzerConstants.WRONG_PREDICTION:
-                            histogram_func(feature_column[leaf_sample_ids & global_error_sample_ids]),
+                            normalized_hist_wrong,
                         ErrorAnalyzerConstants.CORRECT_PREDICTION:
-                            histogram_func(feature_column[leaf_sample_ids & ~global_error_sample_ids])
+                            normalized_hist_correct
                     }
                 else:
                     leaf_prediction = ErrorAnalyzerConstants.CORRECT_PREDICTION if proba_correct_leaf > proba_wrong_leaf else ErrorAnalyzerConstants.WRONG_PREDICTION

@@ -12,7 +12,6 @@ This is an alpha version.
 MEA [documentation](https://dataiku.github.io/mealy/) features some examples helping you getting started with Model Error Analysis:
 * [Error Analysis on scikit-learn model](https://dataiku.github.io/mealy/auto_examples/plot_mealy.html) presents a basic error analysis on a regression model for structured data
 * [Error Analysis on pipeline model](https://dataiku.github.io/mealy/auto_examples/plot_mealy_pipeline.html) presents a basic error analysis on a pipeline regression model for structured data
-* TODO: add examples from text data 
 
 ## Model Error Analysis
 
@@ -160,7 +159,6 @@ mealy depends on:
 - graphviz >= 0.14
 - pydotplus >= 2.0
 - kneed >= 0.6
-
 
 ### Installing with pip
 
