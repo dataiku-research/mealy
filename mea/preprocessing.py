@@ -58,7 +58,7 @@ class FeatureNameTransformer(object):
 
                 # We take by default the first step in the pipeline
                 single_tr = transformer.steps[0][1]
-                # Now we check if there is a step than changes the output dimension, if that's the case single_tr will be it
+                # Check if there is a step than changes the output dimension, if that's the case single_tr will be it
                 for (step_name, step) in transformer.steps:
                     if isinstance(step, ErrorAnalyzerConstants.STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES):
                         single_tr = step
@@ -97,9 +97,7 @@ class FeatureNameTransformer(object):
         out_feature_names = list(single_transformer.get_feature_names(input_features=transformer_feature_names))
         self.preprocessed_feature_names.extend(out_feature_names)
         for orig_id, orig_name in zip(original_feature_ids, transformer_feature_names):
-            #TODO This approach only works for OnehotEncoder
             part_out_feature_names = [i for i, name in enumerate(out_feature_names) if orig_name + '_' in name]
-
             self.original2preprocessed.update({orig_id: [self.len_preproc + i for i in range(len(part_out_feature_names))]})
             self.preprocessed2original.update({self.len_preproc + i: orig_id for i in range(len(part_out_feature_names))})
             self.len_preproc += len(part_out_feature_names)
@@ -189,13 +187,14 @@ class PipelinePreprocessor(FeatureNameTransformer):
         undo_prep_test_x = np.zeros((preprocessed_x.shape[0], len(original_features)), dtype='O')
 
         for (transformer_name, transformer, transformer_feature_names) in self.ct_preprocessor.transformers_:
+            if transformer_name == 'remainder' and transformer == 'drop':
+                continue
             original_feature_ids, preprocessed_feature_ids = self._get_feature_ids_related_to_transformer(transformer_feature_names)
             output_of_transformer = preprocessed_x[:, preprocessed_feature_ids]
 
             is_cat = np.vectorize(self.is_categorical)
             any_numeric = np.any(~is_cat(original_feature_ids))
             if issparse(output_of_transformer) and any_numeric:
-                logger.info("Converting to dense matrix to enable inverse_transform.")
                 output_of_transformer = output_of_transformer.todense()
 
             input_of_transformer = None
@@ -204,8 +203,6 @@ class PipelinePreprocessor(FeatureNameTransformer):
                     input_of_transformer = _inverse_single_step(step, output_of_transformer)
                     output_of_transformer = input_of_transformer
                 undo_prep_test_x[:, original_feature_ids] = input_of_transformer
-            elif transformer_name == 'remainder' and transformer == 'drop':
-                continue
             else:
                 input_of_transformer = _inverse_single_step(transformer, output_of_transformer)
                 undo_prep_test_x[:, original_feature_ids] = input_of_transformer
