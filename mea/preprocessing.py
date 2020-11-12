@@ -35,6 +35,7 @@ class FeatureNameTransformer(object):
             else:
                 raise ValueError('The list of features given by user does not correspond to the list of features handled by the Pipeline.')
 
+        logger.info('Generating the feature id mapping dict')
         self._create_feature_mapping(ct_preprocessor)
 
     def get_original_feature_names(self):
