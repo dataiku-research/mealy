@@ -5,10 +5,10 @@
 
 Computation times
 =================
-**00:40.340** total execution time for **auto_examples** files:
+**00:45.702** total execution time for **auto_examples** files:
 
 +-----------------------------------------------------------------------------------+-----------+-----------+
-| :ref:`sphx_glr_auto_examples_plot_mealy_pipeline.py` (``plot_mealy_pipeline.py``) | 00:40.340 | 2205.5 MB |
+| :ref:`sphx_glr_auto_examples_plot_mealy_pipeline.py` (``plot_mealy_pipeline.py``) | 00:41.881 | 1973.5 MB |
 +-----------------------------------------------------------------------------------+-----------+-----------+
-| :ref:`sphx_glr_auto_examples_plot_mealy.py` (``plot_mealy.py``)                   | 00:00.000 | 0.0 MB    |
+| :ref:`sphx_glr_auto_examples_plot_mealy.py` (``plot_mealy.py``)                   | 00:03.821 | 174.4 MB  |
 +-----------------------------------------------------------------------------------+-----------+-----------+
