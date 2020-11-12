@@ -1,17 +1,17 @@
-![Model Error Analysis Workflow](doc/_static/mea.png)
+![Model Error Analysis Workflow](doc/_static/mealy.png)
 
 ## Introduction
 
 mealy is a Python package to perform Model Error Analysis of scikit-learn models leveraging a Model Performance Predictor.
 
 The project is currently maintained by [Dataiku's](https://www.dataiku.com/) research team.
+This is an alpha version.
 
 ## Getting started
 
-mealy [documentation](https://dataiku.github.io/mea/) features some examples helping you getting started with Model Error Analysis:
-* [Error Analysis on scikit-learn model](https://dataiku.github.io/mea/auto_examples/sklearn_structured.html) presents a basic error analysis on a regression model for structured data
-* [Error Analysis on pipeline model](https://dataiku.github.io/mea/auto_examples/pipeline_structured.html) presents a basic error analysis on a pipeline regression model for structured data
-* TODO: add examples from text data 
+MEA [documentation](https://dataiku.github.io/mealy/) features some examples helping you getting started with Model Error Analysis:
+* [Error Analysis on scikit-learn model](https://dataiku.github.io/mealy/auto_examples/plot_mealy.html) presents a basic error analysis on a regression model for structured data
+* [Error Analysis on pipeline model](https://dataiku.github.io/mealy/auto_examples/plot_mealy_pipeline.html) presents a basic error analysis on a pipeline regression model for structured data
 
 ## Model Error Analysis
 
@@ -52,9 +52,9 @@ on a problematic subpopulation, ...
 
 The typical workflow in the iterative model design supported by error analysis is illustrated in the figure below.
 
-![Model Error Analysis Workflow](doc/_static/mea_flow.png)
+![Model Error Analysis Workflow](doc/_static/mealy_flow.png)
 
-## Getting started with mea
+## Getting started with mealy
 
 Let `(X_train, y_train)` be the training data of the model to analyze, and `(X_test, y_test)` its test set.
 The Model Error Analysis can be performed as:
@@ -94,6 +94,9 @@ The numeric features `numerical_feature_names` are for instance pre-processed by
 while the categorical `features categorical_feature_names` are one-hot encoded. 
 The full pre-processing is provided to a `Pipeline` object in the form of a scikit-learn column transformer.
 The last step of the pipeline is the model to analyze.
+
+Among the transfomers available in [`sklearn.preprocessing`](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.preprocessing) 
+`KBinDiscretizer` and `PolynomialFeatures` are currently not supported.
 
 The Model Error Analysis can be performed as:
 
@@ -155,13 +158,13 @@ mealy depends on:
 - matplotlib >= 2.0 
 - graphviz >= 0.14
 - pydotplus >= 2.0
-- kneed == 0.7.0
+- kneed >= 0.6
 
 ### Installing with pip
 
 The easiest way to install mealy is to use `pip`. For a vanilla install, simply type:
 
-    pip install -U mea
+    pip install -U mealy
 
 
 ## Contributing

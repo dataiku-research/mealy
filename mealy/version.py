@@ -21,6 +21,7 @@ mealy version, required package versions, and utilities for checking
 # 'X.Y.dev0' is the canonical version of 'X.Y.dev'
 #
 __version__ = '0.1.0'
+
 # This is a tuple to preserve order, so that dependencies are checked
 # in some meaningful order (more => less 'core').
 DEPENDENCIES_METADATA = (

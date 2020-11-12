@@ -3,8 +3,12 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Model Error Analysis's documentation!
+Welcome to mealy's documentation!
 ================================================
+
+mealy is a Python package to perform Model Error AnaLYsis of scikit-learn models,
+leveraging a Model Performance Predictor, a Decision Tree predicting the failures
+and successes of a ML model.
 
 The code of the project is on Github: `mealy <https://github.com/dataiku/mealy>`_
 
@@ -41,6 +45,19 @@ Again, the preferred way is to use pip.
    :caption: Model Error Analysis
 
    introduction
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Example galleries
+
+   auto_examples/index
+
+.. toctree::
+   :maxdepth: 2
+   :caption: API and developer reference
+
+   reference
+   Fork mealy on Github <https://github.com/dataiku/mealy>
 
 
 Indices and tables

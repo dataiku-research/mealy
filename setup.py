@@ -32,9 +32,9 @@ with open('README.md') as fp:
     LONG_DESCRIPTION = fp.read()
 MAINTAINER = 'Du Phan'
 MAINTAINER_EMAIL = 'du.phan@dataiku.com'
-URL = 'https://github.com/dataiku/mea'
+URL = 'https://github.com/dataiku/mealy'
 LICENSE = 'Apache 2.0'
-DOWNLOAD_URL = 'https://github.com/dataiku/mea'
+DOWNLOAD_URL = 'https://github.com/dataiku/mealy'
 VERSION = _VERSION_GLOBALS['__version__']
 
 if __name__ == "__main__":
