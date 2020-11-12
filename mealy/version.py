@@ -20,26 +20,21 @@ mealy version, required package versions, and utilities for checking
 # Dev branch marker is: 'X.Y.dev' or 'X.Y.devN' where N is an integer.
 # 'X.Y.dev0' is the canonical version of 'X.Y.dev'
 #
-__version__ = '0.1'
-
+__version__ = '0.1.0'
 # This is a tuple to preserve order, so that dependencies are checked
 # in some meaningful order (more => less 'core').
 DEPENDENCIES_METADATA = (
     ('numpy', {'min_version': '1.11'}),
     ('scipy', {'min_version': '0.19'}),
-    ('scikit-learn', {
-        'min_version': '0.19',
-        'extra_options': ['sklearn', 'examples', 'submodular', 'doc']}),
-    ('matplotlib', {
-        'min_version': '2.0', 'extra_options': ['examples', 'doc']}),
-    ('graphviz', {
-        'min_version': '0.14', 'extra_options': ['examples', 'doc']}),
-    ('pydotplus', {
-        'min_version': '2.0', 'extra_options': ['examples', 'doc']}),
+    ('kneed', {'exact_version': '0.6.0'}),
+    ('scikit-learn', {'min_version': '0.19'}),
+    ('matplotlib', {'min_version': '2.0'}),
+    ('graphviz', {'min_version': '0.14'}),
+    ('pydotplus', {'min_version': '2.0'}),
     ('sphinx-gallery', {
         'min_version': '0.5.0', 'extra_options': ['doc']}),
     ('sphinx', {
-        'min_version': '2.2.2', 'extra_options': ['doc']}),
+        'min_version': '2.2.2', 'extra_options': ['doc']})
 )
 
 package_to_module = {
@@ -64,11 +59,20 @@ def check_modules(extra_option=None, import_module=None, strict=True):
 
     for package_name, metadata in DEPENDENCIES_METADATA:
 
+
+        if package_name == 'pydotplus':
+            # pydotplus does not have __version__ attribute
+            continue
+
         if not ((extra_option is None and 'extra_options' not in metadata)
                 or (extra_option in metadata.get('extra_options', []))):
             continue
 
-        min_version = metadata['min_version']
+        try:
+            min_version = metadata['min_version']
+        except:
+            min_version = metadata['exact_version']
+
         try:
             module_name = package_to_module.get(package_name, package_name)
             module = __import__(module_name)
