@@ -3,8 +3,6 @@ import numpy as np
 import graphviz as gv
 import pydotplus
 from sklearn.tree import export_graphviz
-import matplotlib
-matplotlib.use('agg')
 import matplotlib.pyplot as plt
 from mea.error_analysis_utils import rank_features_by_error_correlation
 from mea.constants import ErrorAnalyzerConstants
