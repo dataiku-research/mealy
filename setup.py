@@ -1,5 +1,4 @@
-#! /usr/bin/env python
-
+# *- encoding: utf-8 -*-
 import sys
 import os
 from collections import defaultdict
@@ -7,7 +6,6 @@ from collections import defaultdict
 from setuptools import setup, find_packages
 
 descr = """Model Error Analysis python package"""
-
 
 def load_version():
     """Executes mealy/version.py in a globals dictionary and return it.
@@ -48,7 +46,10 @@ if __name__ == "__main__":
     extras_require = defaultdict(list)
 
     for mod, meta in _VERSION_GLOBALS['DEPENDENCIES_METADATA']:
-        dep_str = '%s>=%s' % (mod, meta['min_version'])
+        if 'min_version' in meta:
+            dep_str = '%s>=%s' % (mod, meta['min_version'])
+        elif 'exact_version' in meta:
+            dep_str = '%s==%s' % (mod, meta['exact_version'])
         if 'extra_options' in meta:
             for extra_option in meta['extra_options']:
                 extras_require[extra_option].append(dep_str)
