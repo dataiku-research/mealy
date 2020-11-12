@@ -8,15 +8,17 @@ from sklearn.exceptions import NotFittedError
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.base import BaseEstimator
+from sklearn.metrics import make_scorer
 from kneed import KneeLocator
-from mealy.error_analysis_utils import check_enough_data, ErrorAnalyzerConstants
-from mealy.metrics import mpp_report
-from mealy.preprocessing import PipelinePreprocessor
-
 import logging
 
+from mealy.error_analysis_utils import check_enough_data
+from mealy.constants import ErrorAnalyzerConstants
+from mealy.metrics import mpp_report, fidelity_balanced_accuracy_score
+from mealy.preprocessing import PipelinePreprocessor
+
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='Error Analysis Plugin | %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='mealy | %(levelname)s - %(message)s')
 
 
 class ErrorAnalyzer(object):
@@ -45,7 +47,6 @@ class ErrorAnalyzer(object):
         difference (numpy.ndarray): difference of number of correctly and incorrectly predicted samples in leaf nodes
             (used for ranking the nodes).
         leaf_ids (numpy.ndarray): list of all leaf nodes indices.
-
     """
 
     def __init__(self, predictor, feature_names=None, seed=65537):
@@ -61,7 +62,7 @@ class ErrorAnalyzer(object):
                 raise NotImplementedError("The input preprocessor has to be a ColumnTransformer.")
             self.pipeline_preprocessor = PipelinePreprocessor(ct_preprocessor, feature_names)
 
-            self._features_in_model_performance_predictor = self.pipeline_preprocessor.fn_transformer.preprocessed_feature_names
+            self._features_in_model_performance_predictor = self.pipeline_preprocessor.get_preprocessed_feature_names()
 
         else:
             self._predictor = predictor
@@ -150,7 +151,6 @@ class ErrorAnalyzer(object):
             y (numpy.ndarray or pandas.DataFrame): target data from a test set to evaluate the primary predictor and
                 train a Model Performance Predictor.
             max_nr_rows (int): maximum number of rows to process.
-
         """
         logger.info("Preparing the model performance predictor...")
 
@@ -163,18 +163,27 @@ class ErrorAnalyzer(object):
 
         self._error_train_x, self._error_train_y = self._compute_primary_model_error(prep_x, prep_y, max_nr_rows)
 
+        possible_outcomes = list(set(self._error_train_y.tolist()))
+        if len(possible_outcomes) == 1:
+            logger.warning('All predictions are {}. To build a proper MPP decision tree we need both correct and incorrect predictions'.format(possible_outcomes[0]))
+
         logger.info("Fitting the model performance predictor...")
 
         # entropy/mutual information is used to split nodes in Microsoft Pandora system
         criterion = ErrorAnalyzerConstants.CRITERION
 
-        dt_clf = tree.DecisionTreeClassifier(criterion=criterion, class_weight='balanced', random_state=self._seed)
-        gs_clf = GridSearchCV(dt_clf, param_grid=ErrorAnalyzerConstants.PARAMETERS_GRID, cv=5)
+        dt_clf = tree.DecisionTreeClassifier(criterion=criterion, random_state=self._seed)
+        gs_clf = GridSearchCV(dt_clf, param_grid=ErrorAnalyzerConstants.PARAMETERS_GRID,
+                              cv=5, scoring=make_scorer(fidelity_balanced_accuracy_score))
+
         gs_clf.fit(self._error_train_x, self._error_train_y)
         self._error_clf = gs_clf.best_estimator_
 
         logger.info('Grid search selected parameters:')
         logger.info(gs_clf.best_params_)
+
+        if sum(self._error_clf.tree_.feature > 0) == 0:
+            logger.warning("The MPP tree has only 1 node, there will be problem when using this with ErrorVisualizer")
 
     def _compute_primary_model_error(self, x, y, max_nr_rows):
         """
@@ -349,7 +358,7 @@ class ErrorAnalyzer(object):
         if self.pipeline_preprocessor is None:
             feature_names = self.model_performance_predictor_features
         else:
-            feature_names = self.pipeline_preprocessor.fn_transformer.original_feature_names
+            feature_names = self.pipeline_preprocessor.get_original_feature_names()
 
         children_left = self.model_performance_predictor.tree_.children_left
         children_right = self.model_performance_predictor.tree_.children_right
@@ -373,7 +382,7 @@ class ErrorAnalyzer(object):
 
             is_categorical = False
             if self.pipeline_preprocessor is not None:
-                is_categorical = self.pipeline_preprocessor.fn_transformer.is_categorical(feat)
+                is_categorical = self.pipeline_preprocessor.is_categorical(feat)
 
             thresh = thresh if is_categorical else ("%.2f" % thresh)
 
@@ -414,7 +423,7 @@ class ErrorAnalyzer(object):
 
         for i, f in enumerate(feats_idx):
             if f > 0:
-                feats_idx[i] = self.pipeline_preprocessor.fn_transformer.inverse_transform(f)
+                feats_idx[i] = self.pipeline_preprocessor.inverse_transform_feature_id(f)
 
         self._error_clf_features = feats_idx
 
@@ -442,17 +451,18 @@ class ErrorAnalyzer(object):
         feats_idx = self._error_clf.tree_.feature[self._error_clf.tree_.feature > 0]
         thresholds = self._error_clf.tree_.threshold.copy().astype('O')
         thresh = thresholds[self._error_clf.tree_.feature > 0]
-
         n_rows = np.count_nonzero(self._error_clf.tree_.feature[self._error_clf.tree_.feature > 0])
         n_cols = self._error_train_x.shape[1]
         dummy_x = np.zeros((n_rows, n_cols))
 
         indices = []
         i = 0
+
         for f, t in zip(feats_idx, thresh):
             dummy_x[i, f] = t
-            indices.append((i, self.pipeline_preprocessor.fn_transformer.inverse_transform(f)))
+            indices.append((i, self.pipeline_preprocessor.inverse_transform_feature_id(f)))
             i += 1
+
         undo_dummy_x = self.pipeline_preprocessor.inverse_transform(dummy_x)
 
         descaled_thresh = [undo_dummy_x[i, j] for i, j in indices]
@@ -489,8 +499,8 @@ class ErrorAnalyzer(object):
         leaves_summary = []
         for leaf_id in leaf_nodes:
             values = self.model_performance_predictor.tree_.value[leaf_id, :]
-            n_errors = values[0, error_class_idx]
-            n_corrects = values[0, correct_class_idx]
+            n_errors = int(np.ceil(values[0, error_class_idx]))
+            n_corrects = int(np.ceil(values[0, correct_class_idx]))
             local_error = float(n_errors) / (n_corrects + n_errors)
             global_error = float(n_errors) / n_total_errors
 
@@ -535,11 +545,12 @@ class ErrorAnalyzer(object):
         Return:
             dict or str: metrics regarding the Model Performance Predictor.
         """
+        
         if self.pipeline_preprocessor is None:
             prep_x, prep_y = x_test, y_test
         else:
             prep_x, prep_y = self.pipeline_preprocessor.transform(x_test), np.array(y_test)
 
-        x_test, y_true = self._compute_primary_model_error(prep_x, prep_y, nr_max_rows)
+        prep_x, y_true = self._compute_primary_model_error(prep_x, prep_y, nr_max_rows)
         y_pred = self.model_performance_predictor.predict(prep_x)
         return mpp_report(y_true, y_pred, output_dict)

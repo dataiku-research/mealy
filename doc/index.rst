@@ -25,7 +25,7 @@ mealy can be installed through Pypi using:
 
 .. code-block:: bash
 
-    $ pip install "mealy"
+    $ pip install mealy
 
 Installing locally
 ------------------
