@@ -6,7 +6,7 @@
 Welcome to mealy's documentation!
 ================================================
 
-mealy is a Python package to perform Model Error Analysis of scikit-learn models,
+mealy is a Python package to perform Model Error AnaLYsis of scikit-learn models,
 leveraging a Model Performance Predictor, a Decision Tree predicting the failures
 and successes of a ML model.
 

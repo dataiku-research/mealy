@@ -51,7 +51,11 @@ adult_income_url = 'https://www.openml.org/data/get_csv/54002/adult-census.arff'
 
 df = pd.read_csv(adult_income_url)
 
+row_id = 'ID'
+df = df.drop([row_id], axis=1)
+
 target = 'class'
+
 
 X = df.dropna().drop(target, axis=1)
 y = df.dropna()[target]
@@ -70,6 +74,10 @@ print(numeric_features)
 
 ##############################################################################
 # Build the preprocessing Pipeline.
+##############################################################################
+# The final Pipeline should contain a `sklearn.compose.ColumnTransformer` as a
+# preprocessor and any `sklearn.base.BaseEstimator` as the primary model to
+# investigate.
 
 numeric_transformer = Pipeline(steps=[
     ('imputer', SimpleImputer(strategy='median')),
@@ -111,14 +119,16 @@ print(error_analyzer.mpp_summary(X_test, y_test, output_dict=False))
 error_visualizer = ErrorVisualizer(error_analyzer)
 tree_src = error_visualizer.plot_error_tree()
 
-# the output of ``plot_error_tree`` is rendered automatically in a python notebook
-# the following is for rendering in this sphynx gallery
+# the output of ``plot_error_tree`` is rendered automatically in a python notebook with sliders
+# the following is for rendering in this sphinx gallery
 tree_src.format = 'png'
 tree_src.render('tree')
 tree_img = mpimg.imread('tree.png')
 
-plt.figure(figsize=(20, 20))
-plt.imshow(tree_img)
+plt.figure(figsize=(50, 50))
+plt.imshow(tree_img, origin='upper')
+plt.xlim(8000, 9500);
+plt.ylim(4500, 3500);
 plt.axis('off')
 
 ##############################################################################
@@ -155,7 +165,7 @@ error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=leaf_id, top
 # and purest failure nodes are highlighted when printing the error node summary, and
 # also when plotting the feature distributions in the node (``leaf_selector="all_errors"``).
 # From the feature distributions, sorted by correlation with the error, we can see that
-# the majority of problems occur for married people with high education.
+# the majority of problems occur for married people.
 # In the next iteration of model design, the primary model needs to be improved for these
 # subpopulations.
 #
