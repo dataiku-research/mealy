@@ -413,8 +413,8 @@ class ErrorAnalyzer(object):
         leaves_summary = []
         for leaf_id in leaf_nodes:
             values = self.model_performance_predictor.tree_.value[leaf_id, :]
-            n_errors = np.ceil(values[0, error_class_idx])
-            n_corrects = np.ceil(values[0, correct_class_idx])
+            n_errors = int(np.ceil(values[0, error_class_idx]))
+            n_corrects = int(np.ceil(values[0, correct_class_idx]))
             local_error = float(n_errors) / (n_corrects + n_errors)
             global_error = float(n_errors) / n_total_errors
 
