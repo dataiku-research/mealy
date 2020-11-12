@@ -20,7 +20,7 @@ mealy version, required package versions, and utilities for checking
 # Dev branch marker is: 'X.Y.dev' or 'X.Y.devN' where N is an integer.
 # 'X.Y.dev0' is the canonical version of 'X.Y.dev'
 #
-__version__ = '0.1'
+__version__ = '0.0.1'
 
 # This is a tuple to preserve order, so that dependencies are checked
 # in some meaningful order (more => less 'core').
@@ -36,6 +36,7 @@ DEPENDENCIES_METADATA = (
         'min_version': '0.14', 'extra_options': ['examples', 'doc']}),
     ('pydotplus', {
         'min_version': '2.0', 'extra_options': ['examples', 'doc']}),
+    ('kneed', {'min_version': '0.6'}),
     ('sphinx-gallery', {
         'min_version': '0.5.0', 'extra_options': ['doc']}),
     ('sphinx', {

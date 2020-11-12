@@ -22,11 +22,31 @@ logging.basicConfig(level=logging.INFO, format='mealy | %(levelname)s - %(messag
 
 
 class ErrorAnalyzer(object):
-    """
-    ErrorAnalyzer analyzes the errors of a prediction model on a test set.
+    """ ErrorAnalyzer analyzes the errors of a prediction model on a test set.
+
     It uses model predictions and ground truth target to compute the model errors on the test set.
-    It then trains a Decision Tree on the same test set by using the model error as target.
-    The nodes of the decision tree are different segments of errors to be studied individually.
+    It then trains a Decision Tree, called a Model Performance Predictor, on the same test set by using the model error
+    as target. The nodes of the decision tree are different segments of errors to be studied individually.
+
+    Args:
+        predictor (sklearn.base.BaseEstimator or sklearn.pipeline.Pipeline): a sklearn model to analyze. Either an estimator
+            or a Pipeline containing a ColumnTransformer with the preprocessing steps and an estimator as last step.
+        feature_names (list): list of feature names, default=None.
+        seed (int): random seed.
+
+    Attributes:
+        error_train_x (numpy.ndarray): features used to train the Model performance Predictor.
+        error_train_y (numpy.ndarray): target used to train the Model performance Predictor, it is abinary variable
+            representing whether the input predictor predicted correctly or incorrectly the samples in error_train_x.
+        model_performance_predictor_features (list): feature names used in the Model Performance Predictor.
+        model_performance_predictor (sklearn.tree.DecisionTreeClassifier): performance predictor decision tree.
+        train_leaf_ids (numpy.ndarray): indices of leaf in the Model Performance Predictor, where each of the training
+            sample falls.
+        impurity (numpy.ndarray): impurity of leaf nodes (used for ranking the nodes).
+        quantized_impurity (numpy.ndarray): quantized impurity of leaf nodes (used for ranking the nodes).
+        difference (numpy.ndarray): difference of number of correctly and incorrectly predicted samples in leaf nodes
+            (used for ranking the nodes).
+        leaf_ids (numpy.ndarray): list of all leaf nodes indices.
     """
 
     def __init__(self, predictor, feature_names=None, seed=65537):
@@ -120,11 +140,17 @@ class ErrorAnalyzer(object):
         return self._leaf_ids
 
     def fit(self, x, y, max_nr_rows=ErrorAnalyzerConstants.MAX_NUM_ROW):
-        """
-        Trains a Decision Tree to discriminate between samples that are correctly predicted or wrongly predicted
-        (errors) by a primary model.
+        """ Fit the Model Performance Predictor.
 
-        x must be a numpy array, ie. df[features] won't work, it must be df[features].values
+        Trains the Model Performance Predictor, a Decision Tree to discriminate between samples that are correctly
+        predicted or wrongly predicted (errors) by a primary model.
+
+        Args:
+            x (numpy.ndarray or pandas.DataFrame): feature data from a test set to evaluate the primary predictor and
+                train a Model Performance Predictor.
+            y (numpy.ndarray or pandas.DataFrame): target data from a test set to evaluate the primary predictor and
+                train a Model Performance Predictor.
+            max_nr_rows (int): maximum number of rows to process.
         """
         logger.info("Preparing the model performance predictor...")
 
@@ -136,6 +162,7 @@ class ErrorAnalyzer(object):
             prep_x, prep_y = self.pipeline_preprocessor.transform(x), np.array(y)
 
         self._error_train_x, self._error_train_y = self._compute_primary_model_error(prep_x, prep_y, max_nr_rows)
+
         possible_outcomes = list(set(self._error_train_y.tolist()))
         if len(possible_outcomes) == 1:
             logger.warning('All predictions are {}. To build a proper MPP decision tree we need both correct and incorrect predictions'.format(possible_outcomes[0]))
@@ -182,7 +209,14 @@ class ErrorAnalyzer(object):
         return x, error_y
 
     def predict(self, x):
-        """ Predict model performance on samples """
+        """ Predict model performance on samples
+
+        Args:
+            x (numpy.ndarray or pandas.DataFrame): dataset where to apply the Model Performance Predictor.
+
+        Return:
+            numpy.ndarray: predictions from the Model Performance Predictor (Wrong/Correct primary predictions).
+        """
         if self.pipeline_preprocessor is None:
             prep_x = x
         else:
@@ -259,7 +293,20 @@ class ErrorAnalyzer(object):
         self._difference = correctly_predicted_samples - wrongly_predicted_samples  # only negative numbers
 
     def get_ranked_leaf_ids(self, leaf_selector, rank_by='purity'):
-        """ Select error nodes and rank them by importance."""
+        """ Select error nodes and rank them by importance.
+
+        Args:
+            leaf_selector (int or list or str): the desired leaf nodes to visualize. When int it represents the
+                number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid values are
+                either 'all_error' to plot all leaves of class 'Wrong prediction' or 'all' to plot all leaf nodes.
+            rank_by (str): ranking criterium for the leaf nodes. It can be either 'purity' to rank by the leaf
+                node purity (ratio of wrongly predicted samples over the total for an error node) or 'class_difference'
+                (difference of number of wrongly and correctly predicted samples in a node).
+
+        Return:
+            list or numpy.ndarray: list of selected leaf nodes indices.
+
+        """
         apply_leaf_selector = self._get_leaf_selector(leaf_selector)
         selected_leaves = apply_leaf_selector(self.leaf_ids)
         if selected_leaves.size == 0:
@@ -275,7 +322,7 @@ class ErrorAnalyzer(object):
 
     def _get_leaf_selector(self, leaf_selector):
         """
-            Return a function that select rows of provided arrays. Arrays must be of shape (1, number of leaves)
+        Return a function that select rows of provided arrays. Arrays must be of shape (1, number of leaves)
             Args:
                 leaf_selector: int, str, or array-like
                 How to select the rows of the array
@@ -352,6 +399,20 @@ class ErrorAnalyzer(object):
         return path_to_node
 
     def inverse_transform_features(self):
+        """ Undo preprocessing of feature values.
+
+        If the predictor comes with a Pipeline preprocessor, map the features indices of the Model
+        Performance Predictor Decision Tree back to their indices in the original unpreprocessed space of features.
+        Otherwise simply return the feature indices of the decision tree. The feature indices of a decision tree
+        indicate what features are used to split the training set at each node.
+        See https://scikit-learn.org/stable/auto_examples/tree/plot_unveil_tree_structure.html.
+
+        Return:
+            list or numpy.ndarray:
+                indices of features of the Model Performance Predictor Decision Tree, possibly mapped back to the
+                original unprocessed feature space.
+        """
+
         if self.pipeline_preprocessor is None:
             return self._error_clf.tree_.feature
 
@@ -369,6 +430,17 @@ class ErrorAnalyzer(object):
         return self._error_clf_features
 
     def inverse_transform_thresholds(self):
+        """  Undo preprocessing of feature threshold values.
+
+        If the predictor comes with a Pipeline preprocessor, undo the preprocessing on the thresholds of the Model
+        Performance Predictor Decision Tree for an easier plot interpretation. Otherwise simply return the thresholds of
+        the decision tree. The thresholds of a decision tree are the feature values used to split the training set at
+        each node. See https://scikit-learn.org/stable/auto_examples/tree/plot_unveil_tree_structure.html.
+
+        Return:
+            numpy.ndarray:
+                thresholds of the Model Performance Predictor Decision Tree, possibly with preprocessing undone.
+        """
 
         if self.pipeline_preprocessor is None:
             return self._error_clf.tree_.threshold
@@ -403,7 +475,18 @@ class ErrorAnalyzer(object):
 
     # TODO: rewrite this method using the ranking arrays
     def error_node_summary(self, leaf_selector='all_errors', add_path_to_leaves=False, print_summary=False):
-        """ Return summary information regarding input nodes """
+        """ Return summary information regarding input nodes.
+
+        Args:
+            leaf_selector (int or list or str): the desired leaf nodes to visualize. When int it represents the
+                number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid values
+                are either 'all_error' to plot all leaves of class 'Wrong prediction' or 'all' to plot all leaf nodes.
+            add_path_to_leaves (bool): add information of the feature path across the tree till the selected node.
+            print_summary (bool): print summary for the selected nodes.
+
+        Return:
+            dict: dictionary of metrics for each selected node of the Model Performance Predictor.
+        """
 
         leaf_nodes = self.get_ranked_leaf_ids(leaf_selector=leaf_selector)
 
@@ -449,7 +532,20 @@ class ErrorAnalyzer(object):
         return leaves_summary
 
     def mpp_summary(self, x_test, y_test, nr_max_rows=ErrorAnalyzerConstants.MAX_NUM_ROW, output_dict=False):
-        """ Print ErrorAnalyzer summary metrics """
+        """ Print ErrorAnalyzer summary metrics regarding the Model Performance Predictor.
+
+        Args:
+            x_test (numpy.ndarray or pandas.DataFrame): feature data from a test set to evaluate the primary predictor
+                and train a Model Performance Predictor.
+            y_test (numpy.ndarray or pandas.DataFrame): target data from a test set to evaluate the primary predictor and
+                train a Model Performance Predictor.
+            nr_max_rows (int): maximum number of rows to process.
+            output_dict (bool): whether to return a dict or a string with metrics.
+
+        Return:
+            dict or str: metrics regarding the Model Performance Predictor.
+        """
+        
         if self.pipeline_preprocessor is None:
             prep_x, prep_y = x_test, y_test
         else:
