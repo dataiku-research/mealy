@@ -175,8 +175,8 @@
             
   <h1>Source code for mealy.metrics</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="kn">from</span> <span class="nn">mealy.error_analysis_utils</span> <span class="kn">import</span> <span class="n">ErrorAnalyzerConstants</span>
-<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span>
+<span class="kn">from</span> <span class="nn">mealy.constants</span> <span class="kn">import</span> <span class="n">ErrorAnalyzerConstants</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span> <span class="n">balanced_accuracy_score</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 
@@ -199,6 +199,18 @@
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">y</span> <span class="o">==</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">CORRECT_PREDICTION</span><span class="p">))</span> <span class="o">/</span> <span class="n">n_test_samples</span></div>
 
 
+<div class="viewcode-block" id="fidelity_score"><a class="viewcode-back" href="../../gen_modules/mealy.metrics.html#mealy.metrics.fidelity_score">[docs]</a><span class="k">def</span> <span class="nf">fidelity_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
+    <span class="n">difference_true_pred_accuracy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">compute_primary_model_accuracy</span><span class="p">(</span><span class="n">y_true</span><span class="p">)</span> <span class="o">-</span>
+                                           <span class="n">compute_primary_model_accuracy</span><span class="p">(</span><span class="n">y_pred</span><span class="p">))</span>
+    <span class="n">fidelity</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">-</span> <span class="n">difference_true_pred_accuracy</span>
+
+    <span class="k">return</span> <span class="n">fidelity</span></div>
+
+
+<div class="viewcode-block" id="fidelity_balanced_accuracy_score"><a class="viewcode-back" href="../../gen_modules/mealy.metrics.html#mealy.metrics.fidelity_balanced_accuracy_score">[docs]</a><span class="k">def</span> <span class="nf">fidelity_balanced_accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">fidelity_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span> <span class="o">+</span> <span class="n">balanced_accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="mpp_report"><a class="viewcode-back" href="../../gen_modules/mealy.metrics.html#mealy.metrics.mpp_report">[docs]</a><span class="k">def</span> <span class="nf">mpp_report</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">output_dict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Build a text report showing the main Model Performance Predictor (MPP) metrics.</span>
 
@@ -214,6 +226,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">mpp_accuracy_score</span> <span class="o">=</span> <span class="n">compute_mpp_accuracy</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+    <span class="n">mpp_balanced_accuracy</span> <span class="o">=</span> <span class="n">balanced_accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
     <span class="n">primary_model_predicted_accuracy</span> <span class="o">=</span> <span class="n">compute_primary_model_accuracy</span><span class="p">(</span><span class="n">y_pred</span><span class="p">)</span>
     <span class="n">primary_model_true_accuracy</span> <span class="o">=</span> <span class="n">compute_primary_model_accuracy</span><span class="p">(</span><span class="n">y_true</span><span class="p">)</span>
     <span class="n">fidelity</span><span class="p">,</span> <span class="n">confidence_decision</span> <span class="o">=</span> <span class="n">compute_confidence_decision</span><span class="p">(</span><span class="n">primary_model_true_accuracy</span><span class="p">,</span>
@@ -221,12 +234,15 @@
     <span class="k">if</span> <span class="n">output_dict</span><span class="p">:</span>
         <span class="n">report_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">report_dict</span><span class="p">[</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">MPP_ACCURACY</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpp_accuracy_score</span>
+        <span class="n">report_dict</span><span class="p">[</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">MPP_BALANCED_ACCURACY</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpp_balanced_accuracy</span>
+        <span class="n">report_dict</span><span class="p">[</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">MPP_FIDELITY</span><span class="p">]</span> <span class="o">=</span> <span class="n">fidelity</span>
         <span class="n">report_dict</span><span class="p">[</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">PRIMARY_MODEL_TRUE_ACCURACY</span><span class="p">]</span> <span class="o">=</span> <span class="n">primary_model_true_accuracy</span>
         <span class="n">report_dict</span><span class="p">[</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">PRIMARY_MODEL_PREDICTED_ACCURACY</span><span class="p">]</span> <span class="o">=</span> <span class="n">primary_model_predicted_accuracy</span>
         <span class="n">report_dict</span><span class="p">[</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">CONFIDENCE_DECISION</span><span class="p">]</span> <span class="o">=</span> <span class="n">confidence_decision</span>
         <span class="k">return</span> <span class="n">report_dict</span>
 
-    <span class="n">report</span> <span class="o">=</span> <span class="s1">&#39;The MPP was trained with accuracy </span><span class="si">%.2f%%</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mpp_accuracy_score</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="n">report</span> <span class="o">=</span> <span class="s1">&#39;The MPP was trained with accuracy </span><span class="si">%.2f%%</span><span class="s1"> and balanced accuracy </span><span class="si">%.2f%%</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mpp_accuracy_score</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+                                                                                         <span class="n">mpp_balanced_accuracy</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
     <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
     <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;The Decision Tree estimated the primary model&#39;&#39;s accuracy to </span><span class="si">%.2f%%</span><span class="s1">.&#39;</span> <span class="o">%</span> \
               <span class="p">(</span><span class="n">primary_model_predicted_accuracy</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>

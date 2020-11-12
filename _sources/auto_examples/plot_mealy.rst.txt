@@ -133,10 +133,10 @@ Print metrics regarding the Model Performance Predictor.
 
  .. code-block:: none
 
-    The MPP was trained with accuracy 88.98%.
-    The Decision Tree estimated the primary models accuracy to 80.31%.
+    The MPP was trained with accuracy 92.91% and balanced accuracy 80.65%.
+    The Decision Tree estimated the primary models accuracy to 88.98%.
     The true accuracy of the primary model is 85.04.%
-    The Fidelity of the MPP is 95.28%.
+    The Fidelity of the MPP is 96.06%.
     The MPP is considered representative of the primary model performances.
 
 
@@ -190,11 +190,11 @@ Print the details regarding the decision tree nodes containing the majority of e
 
  .. code-block:: none
 
-    LEAF 5:
-         Correct predictions: 5 | Wrong predictions: 50 | Local error (purity): 0.90 | Global error: 2.64
+    LEAF 7:
+         Correct predictions: 2 | Wrong predictions: 12 | Local error (purity): 0.86 | Global error: 0.63
          Path to leaf:
          AGE > 82.15
-            LSTAT <= 14.03
+            LSTAT <= 8.96
 
 
 
@@ -236,7 +236,7 @@ Rank features by correlation to error.
 
  .. code-block:: none
 
-    Leaf 5 (Wrong prediction: 0.895, Correct prediction: 0.105)
+    Leaf 7 (Wrong prediction: 0.857, Correct prediction: 0.143)
 
 
 
@@ -266,7 +266,7 @@ leaf clustering a subpopulation of errors with different feature values. The lar
 and purest failure nodes are highlighted when printing the error node summary, and
 also when plotting the feature distributions in the node (``leaf_selector="all_errors"``).
 From the feature distributions, sorted by correlation with the error, we can see that
-the majority of problems occur for high values of feature ``AGE``.
+the majority of problems occur for extreme values of features ``LSTAT`` and ``AGE``.
 In the next iteration of model design, the primary model needs to be improved for these
 subpopulations.
 
@@ -274,9 +274,9 @@ subpopulations.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.592 seconds)
+   **Total running time of the script:** ( 0 minutes  3.900 seconds)
 
-**Estimated memory usage:**  120 MB
+**Estimated memory usage:**  177 MB
 
 
 .. _sphx_glr_download_auto_examples_plot_mealy.py:

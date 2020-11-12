@@ -191,7 +191,7 @@
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="mealy.preprocessing.FeatureNameTransformer">
-<em class="property">class </em><code class="sig-prename descclassname">mealy.preprocessing.</code><code class="sig-name descname">FeatureNameTransformer</code><span class="sig-paren">(</span><em class="sig-param">ct_preprocessor</em>, <em class="sig-param">orig_feats=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#FeatureNameTransformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mealy.preprocessing.FeatureNameTransformer" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">mealy.preprocessing.</code><code class="sig-name descname">FeatureNameTransformer</code><span class="sig-paren">(</span><em class="sig-param">ct_preprocessor</em>, <em class="sig-param">original_features=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#FeatureNameTransformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mealy.preprocessing.FeatureNameTransformer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transformer of feature names and indices.</p>
 <p>A FeatureNameTransformer parses an input Pipeline preprocessor and generate
 a mapping between the input unprocessed feature names/indices and the output
@@ -227,8 +227,8 @@ preprocessed feature names/indices.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="mealy.preprocessing.FeatureNameTransformer.inverse_transform">
-<code class="sig-name descname">inverse_transform</code><span class="sig-paren">(</span><em class="sig-param">index=None</em>, <em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#FeatureNameTransformer.inverse_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mealy.preprocessing.FeatureNameTransformer.inverse_transform" title="Permalink to this definition">¶</a></dt>
+<dt id="mealy.preprocessing.FeatureNameTransformer.inverse_transform_feature_id">
+<code class="sig-name descname">inverse_transform_feature_id</code><span class="sig-paren">(</span><em class="sig-param">index=None</em>, <em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#FeatureNameTransformer.inverse_transform_feature_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mealy.preprocessing.FeatureNameTransformer.inverse_transform_feature_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Undo preprocessing of feature name.</p>
 <p>Transform the preprocessed feature name at given index or with given name
 back into the original unprocessed feature name or index.</p>
@@ -278,36 +278,24 @@ returned.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="mealy.preprocessing.FeatureNameTransformer.transform">
-<code class="sig-name descname">transform</code><span class="sig-paren">(</span><em class="sig-param">index=None</em>, <em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#FeatureNameTransformer.transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mealy.preprocessing.FeatureNameTransformer.transform" title="Permalink to this definition">¶</a></dt>
-<dd><p>Apply preprocessing to feature name.</p>
-<p>Transform the unprocessed feature name at given index or with given name
-into the output preprocessed feature names or indices.</p>
-<dl class="field-list simple">
+<dt id="mealy.preprocessing.FeatureNameTransformer.transform_feature_id">
+<code class="sig-name descname">transform_feature_id</code><span class="sig-paren">(</span><em class="sig-param">index=None</em>, <em class="sig-param">name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#FeatureNameTransformer.transform_feature_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mealy.preprocessing.FeatureNameTransformer.transform_feature_id" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – feature index.</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – feature name.</p></li>
+<li><p><strong>index</strong> – int</p></li>
+<li><p><strong>name</strong> – str</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>list of indices (resp. names) of the preprocessed features corresponding to the input feature index</dt><dd><p>(resp.name). If both index and name are provided, the index is retained and output indices are returned.</p>
-</dd>
 </dl>
-</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
-</dd>
-</dl>
+<p>Returns: index of output feature(s) generated by the requested feature</p>
 </dd></dl>
 
 </dd></dl>
 
 <div class="sphx-glr-clear"></div><dl class="class">
 <dt id="mealy.preprocessing.PipelinePreprocessor">
-<em class="property">class </em><code class="sig-prename descclassname">mealy.preprocessing.</code><code class="sig-name descname">PipelinePreprocessor</code><span class="sig-paren">(</span><em class="sig-param">ct_preprocessor</em>, <em class="sig-param">orig_feats=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#PipelinePreprocessor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mealy.preprocessing.PipelinePreprocessor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">mealy.preprocessing.</code><code class="sig-name descname">PipelinePreprocessor</code><span class="sig-paren">(</span><em class="sig-param">ct_preprocessor</em>, <em class="sig-param">original_features=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#PipelinePreprocessor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mealy.preprocessing.PipelinePreprocessor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transformer of feature values from the original values to preprocessed ones.</p>
 <p>A PipelinePreprocessor parses an input Pipeline preprocessor and generate
 a mapping between the input unprocessed feature values and the output

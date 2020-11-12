@@ -121,7 +121,7 @@ error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=leaf_id, top
 # and purest failure nodes are highlighted when printing the error node summary, and
 # also when plotting the feature distributions in the node (``leaf_selector="all_errors"``).
 # From the feature distributions, sorted by correlation with the error, we can see that
-# the majority of problems occur for high values of feature ``AGE``.
+# the majority of problems occur for extreme values of features ``LSTAT`` and ``AGE``.
 # In the next iteration of model design, the primary model needs to be improved for these
 # subpopulations.
 #

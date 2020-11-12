@@ -174,73 +174,58 @@
            <div itemprop="articleBody">
             
   <h1>Source code for mealy.error_analysis_utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">from</span> <span class="nn">mealy.constants</span> <span class="kn">import</span> <span class="n">ErrorAnalyzerConstants</span>
 
 
-<div class="viewcode-block" id="safe_str"><a class="viewcode-back" href="../../gen_modules/mealy.error_analysis_utils.html#mealy.error_analysis_utils.safe_str">[docs]</a><span class="k">def</span> <span class="nf">safe_str</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">unicode</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">val</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span></div>
+<div class="viewcode-block" id="get_feature_list_from_column_transformer"><a class="viewcode-back" href="../../gen_modules/mealy.error_analysis_utils.html#mealy.error_analysis_utils.get_feature_list_from_column_transformer">[docs]</a><span class="k">def</span> <span class="nf">get_feature_list_from_column_transformer</span><span class="p">(</span><span class="n">ct_preprocessor</span><span class="p">):</span>
+    <span class="n">all_feature</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">categorical_features</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">transformer_name</span><span class="p">,</span> <span class="n">transformer</span><span class="p">,</span> <span class="n">transformer_feature_names</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ct_preprocessor</span><span class="o">.</span><span class="n">transformers_</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">transformer_name</span> <span class="o">==</span> <span class="s1">&#39;remainder&#39;</span> <span class="ow">and</span> <span class="n">transformer</span> <span class="o">==</span> <span class="s1">&#39;drop&#39;</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">all_feature</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">transformer_feature_names</span><span class="p">)</span>
+
+        <span class="c1"># check for categorical features</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformer</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">transformer</span><span class="o">.</span><span class="n">steps</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">step</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">VALID_CATEGORICAL_STEPS</span><span class="p">):</span>
+                    <span class="n">categorical_features</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">transformer_feature_names</span><span class="p">)</span>
+                    <span class="k">break</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformer</span><span class="p">,</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">VALID_CATEGORICAL_STEPS</span><span class="p">):</span>
+            <span class="n">categorical_features</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">transformer_feature_names</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+    <span class="k">return</span> <span class="n">all_feature</span><span class="p">,</span> <span class="n">categorical_features</span></div>
+
+
+<div class="viewcode-block" id="check_lists_having_same_elements"><a class="viewcode-back" href="../../gen_modules/mealy.error_analysis_utils.html#mealy.error_analysis_utils.check_lists_having_same_elements">[docs]</a><span class="k">def</span> <span class="nf">check_lists_having_same_elements</span><span class="p">(</span><span class="n">list_A</span><span class="p">,</span> <span class="n">list_B</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">collections</span><span class="o">.</span><span class="n">Counter</span><span class="p">(</span><span class="n">list_A</span><span class="p">)</span> <span class="o">==</span> <span class="n">collections</span><span class="o">.</span><span class="n">Counter</span><span class="p">(</span><span class="n">list_B</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="check_enough_data"><a class="viewcode-back" href="../../gen_modules/mealy.error_analysis_utils.html#mealy.error_analysis_utils.check_enough_data">[docs]</a><span class="k">def</span> <span class="nf">check_enough_data</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">min_len</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Check the input dataset is not too small.</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compare length of dataframe to minimum lenght of the test data.</span>
+<span class="sd">    Used in the relevance of the measure.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        df (pandas.DataFrame): input dataset.</span>
-<span class="sd">        min_len (int): minimum required length.</span>
+<span class="sd">    :param df: Input dataframe</span>
+<span class="sd">    :param min_len:</span>
+<span class="sd">    :return:</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">min_len</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s1">&#39;The original dataset is too small (</span><span class="si">{}</span><span class="s1"> rows) to have stable result, &#39;</span>
-                <span class="s1">&#39;it needs to have at least </span><span class="si">{}</span><span class="s1"> rows&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">min_len</span><span class="p">))</span></div>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The original dataset is too small (</span><span class="si">{}</span><span class="s1"> rows) to have stable result, it needs to have at least </span><span class="si">{}</span><span class="s1"> rows&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">min_len</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="rank_features_by_error_correlation"><a class="viewcode-back" href="../../gen_modules/mealy.error_analysis_utils.html#mealy.error_analysis_utils.rank_features_by_error_correlation">[docs]</a><span class="k">def</span> <span class="nf">rank_features_by_error_correlation</span><span class="p">(</span><span class="n">feature_importances</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Rank indices from the most to the least important according to the input weights.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        feature_importances (numpy.ndarray): feature importance weights.</span>
-
-<span class="sd">    Return:</span>
-<span class="sd">        numpy.ndarray: list of feature indices sorted from the most to the least important.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">sorted_feature_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span> <span class="n">feature_importances</span><span class="p">)</span>
     <span class="n">cut</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">feature_importances</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">sorted_feature_indices</span> <span class="o">=</span> <span class="n">sorted_feature_indices</span><span class="p">[:</span><span class="n">cut</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">sorted_feature_indices</span></div>
-
-
-<div class="viewcode-block" id="ErrorAnalyzerConstants"><a class="viewcode-back" href="../../gen_modules/mealy.error_analysis_utils.html#mealy.error_analysis_utils.ErrorAnalyzerConstants">[docs]</a><span class="k">class</span> <span class="nc">ErrorAnalyzerConstants</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    ErrorAnalyzerConstants stores the values for the configuration parameters of ErrorAnalyzer and ErrorVisualizer.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">WRONG_PREDICTION</span> <span class="o">=</span> <span class="s2">&quot;Wrong prediction&quot;</span>
-    <span class="n">CORRECT_PREDICTION</span> <span class="o">=</span> <span class="s2">&quot;Correct prediction&quot;</span>
-    <span class="n">PARAMETERS_GRID</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;max_depth&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="s1">&#39;min_samples_leaf&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">]}</span>
-    <span class="n">TEST_SIZE</span> <span class="o">=</span> <span class="mf">0.2</span>
-
-    <span class="n">MIN_NUM_ROWS</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># heuristic choice</span>
-    <span class="n">MAX_NUM_ROW</span> <span class="o">=</span> <span class="mi">100000</span>  <span class="c1"># heuristic choice</span>
-
-    <span class="n">MPP_ACCURACY_TOLERANCE</span> <span class="o">=</span> <span class="mf">0.1</span>
-    <span class="n">CRITERION</span> <span class="o">=</span> <span class="s1">&#39;entropy&#39;</span>
-    <span class="n">NUMBER_EPSILON_VALUES</span> <span class="o">=</span> <span class="mi">50</span>
-
-    <span class="n">ERROR_TREE_COLORS</span> <span class="o">=</span> <span class="p">{</span><span class="n">CORRECT_PREDICTION</span><span class="p">:</span> <span class="s1">&#39;#538BC8&#39;</span><span class="p">,</span> <span class="n">WRONG_PREDICTION</span><span class="p">:</span> <span class="s1">&#39;#EC6547&#39;</span><span class="p">}</span>
-
-    <span class="n">TOP_K_FEATURES</span> <span class="o">=</span> <span class="mi">3</span>
-
-    <span class="n">MPP_ACCURACY</span> <span class="o">=</span> <span class="s1">&#39;mpp_accuracy_score&#39;</span>
-    <span class="n">PRIMARY_MODEL_TRUE_ACCURACY</span> <span class="o">=</span> <span class="s1">&#39;primary_model_true_accuracy&#39;</span>
-    <span class="n">PRIMARY_MODEL_PREDICTED_ACCURACY</span> <span class="o">=</span> <span class="s1">&#39;primary_model_predicted_accuracy&#39;</span>
-    <span class="n">CONFIDENCE_DECISION</span> <span class="o">=</span> <span class="s1">&#39;confidence_decision&#39;</span>
-
-    <span class="n">NUMBER_PURITY_LEVELS</span> <span class="o">=</span> <span class="mi">10</span></div>
 </pre></div>
 
            </div>

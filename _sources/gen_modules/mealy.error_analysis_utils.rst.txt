@@ -22,6 +22,22 @@ mealy.error_analysis_utils
 
 	       <div class="sphx-glr-clear"></div>
 
+   .. autofunction:: check_lists_having_same_elements
+
+   .. include:: backreferences/mealy.error_analysis_utils.check_lists_having_same_elements.examples
+
+   .. raw:: html
+
+	       <div class="sphx-glr-clear"></div>
+
+   .. autofunction:: get_feature_list_from_column_transformer
+
+   .. include:: backreferences/mealy.error_analysis_utils.get_feature_list_from_column_transformer.examples
+
+   .. raw:: html
+
+	       <div class="sphx-glr-clear"></div>
+
    .. autofunction:: rank_features_by_error_correlation
 
    .. include:: backreferences/mealy.error_analysis_utils.rank_features_by_error_correlation.examples
@@ -29,32 +45,10 @@ mealy.error_analysis_utils
    .. raw:: html
 
 	       <div class="sphx-glr-clear"></div>
-
-   .. autofunction:: safe_str
-
-   .. include:: backreferences/mealy.error_analysis_utils.safe_str.examples
-
-   .. raw:: html
-
-	       <div class="sphx-glr-clear"></div>
    
    
 
    
-   
-
-   Classes
-   -------
-
-   
-   .. autoclass:: ErrorAnalyzerConstants
-      :members:
-
-   .. include:: backreferences/mealy.error_analysis_utils.ErrorAnalyzerConstants.examples
-
-   .. raw:: html
-
-	       <div class="sphx-glr-clear"></div>
    
    
 

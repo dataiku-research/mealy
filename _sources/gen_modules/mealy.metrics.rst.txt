@@ -38,6 +38,22 @@ mealy.metrics
 
 	       <div class="sphx-glr-clear"></div>
 
+   .. autofunction:: fidelity_balanced_accuracy_score
+
+   .. include:: backreferences/mealy.metrics.fidelity_balanced_accuracy_score.examples
+
+   .. raw:: html
+
+	       <div class="sphx-glr-clear"></div>
+
+   .. autofunction:: fidelity_score
+
+   .. include:: backreferences/mealy.metrics.fidelity_score.examples
+
+   .. raw:: html
+
+	       <div class="sphx-glr-clear"></div>
+
    .. autofunction:: mpp_report
 
    .. include:: backreferences/mealy.metrics.mpp_report.examples

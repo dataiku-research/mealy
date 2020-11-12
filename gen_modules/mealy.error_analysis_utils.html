@@ -129,7 +129,6 @@
 <li class="toctree-l2"><a class="reference internal" href="mealy.preprocessing.html">mealy.preprocessing</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">mealy.error_analysis_utils</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#classes">Classes</a></li>
 </ul>
 </li>
 </ul>
@@ -192,47 +191,35 @@
 <dl class="function">
 <dt id="mealy.error_analysis_utils.check_enough_data">
 <code class="sig-prename descclassname">mealy.error_analysis_utils.</code><code class="sig-name descname">check_enough_data</code><span class="sig-paren">(</span><em class="sig-param">df</em>, <em class="sig-param">min_len</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/error_analysis_utils.html#check_enough_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mealy.error_analysis_utils.check_enough_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check the input dataset is not too small.</p>
+<dd><p>Compare length of dataframe to minimum lenght of the test data.
+Used in the relevance of the measure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.1.4)"><em>pandas.DataFrame</em></a>) – input dataset.</p></li>
-<li><p><strong>min_len</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – minimum required length.</p></li>
+<li><p><strong>df</strong> – Input dataframe</p></li>
+<li><p><strong>min_len</strong> – </p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
 </dd>
 </dl>
 </dd></dl>
+
+<div class="sphx-glr-clear"></div><dl class="function">
+<dt id="mealy.error_analysis_utils.check_lists_having_same_elements">
+<code class="sig-prename descclassname">mealy.error_analysis_utils.</code><code class="sig-name descname">check_lists_having_same_elements</code><span class="sig-paren">(</span><em class="sig-param">list_A</em>, <em class="sig-param">list_B</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/error_analysis_utils.html#check_lists_having_same_elements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mealy.error_analysis_utils.check_lists_having_same_elements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="sphx-glr-clear"></div><dl class="function">
+<dt id="mealy.error_analysis_utils.get_feature_list_from_column_transformer">
+<code class="sig-prename descclassname">mealy.error_analysis_utils.</code><code class="sig-name descname">get_feature_list_from_column_transformer</code><span class="sig-paren">(</span><em class="sig-param">ct_preprocessor</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/error_analysis_utils.html#get_feature_list_from_column_transformer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mealy.error_analysis_utils.get_feature_list_from_column_transformer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <div class="sphx-glr-clear"></div><dl class="function">
 <dt id="mealy.error_analysis_utils.rank_features_by_error_correlation">
 <code class="sig-prename descclassname">mealy.error_analysis_utils.</code><code class="sig-name descname">rank_features_by_error_correlation</code><span class="sig-paren">(</span><em class="sig-param">feature_importances</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/error_analysis_utils.html#rank_features_by_error_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mealy.error_analysis_utils.rank_features_by_error_correlation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Rank indices from the most to the least important according to the input weights.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>feature_importances</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – feature importance weights.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>list of feature indices sorted from the most to the least important.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<div class="sphx-glr-clear"></div><dl class="function">
-<dt id="mealy.error_analysis_utils.safe_str">
-<code class="sig-prename descclassname">mealy.error_analysis_utils.</code><code class="sig-name descname">safe_str</code><span class="sig-paren">(</span><em class="sig-param">val</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/error_analysis_utils.html#safe_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mealy.error_analysis_utils.safe_str" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<div class="sphx-glr-clear"></div></div>
-<div class="section" id="classes">
-<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="mealy.error_analysis_utils.ErrorAnalyzerConstants">
-<em class="property">class </em><code class="sig-prename descclassname">mealy.error_analysis_utils.</code><code class="sig-name descname">ErrorAnalyzerConstants</code><a class="reference internal" href="../_modules/mealy/error_analysis_utils.html#ErrorAnalyzerConstants"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mealy.error_analysis_utils.ErrorAnalyzerConstants" title="Permalink to this definition">¶</a></dt>
-<dd><p>ErrorAnalyzerConstants stores the values for the configuration parameters of ErrorAnalyzer and ErrorVisualizer.</p>
-</dd></dl>
 
 <div class="sphx-glr-clear"></div></div>
 </div>
