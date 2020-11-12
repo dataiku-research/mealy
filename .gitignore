@@ -1,2 +1,6 @@
 .idea/
-mea/__pycache__/
+mealy/__pycache__/
+*.pyc
+build/
+dist/
+mealy.egg-info/
