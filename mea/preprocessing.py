@@ -92,11 +92,6 @@ class FeatureNameTransformer(object):
     def _update_feature_mapping_dict_using_output_names(self, single_transformer, transformer_feature_names, original_feature_ids):
         """
         For now, this functions only applies for OnehotEncoder
-
-        Args:
-            single_transformer:
-            transformer_feature_names:
-            original_feature_ids:
         """
         out_feature_names = list(single_transformer.get_feature_names(input_features=transformer_feature_names))
         self.preprocessed_feature_names.extend(out_feature_names)
@@ -163,6 +158,18 @@ class PipelinePreprocessor(FeatureNameTransformer):
     def transform(self, x):
         return self.ct_preprocessor.transform(x)
 
+    def _get_feature_ids_related_to_transformer(self, transformer_feature_names):
+        original_features = self.get_original_feature_names()
+        original_feature_ids = np.where(np.in1d(original_features, transformer_feature_names))[0]
+        preprocessed_feature_ids = []
+        for i in original_feature_ids:
+            out_ids = self.transform_feature_id(i)
+            if isinstance(out_ids, int):
+                preprocessed_feature_ids.append(out_ids)
+            else:  # list of ids
+                preprocessed_feature_ids.extend(out_ids)
+        return original_feature_ids, preprocessed_feature_ids
+
     def inverse_transform(self, preprocessed_x):
 
         def _inverse_single_step(single_step, step_output):
@@ -181,15 +188,7 @@ class PipelinePreprocessor(FeatureNameTransformer):
         undo_prep_test_x = np.zeros((preprocessed_x.shape[0], len(original_features)), dtype='O')
 
         for (transformer_name, transformer, transformer_feature_names) in self.ct_preprocessor.transformers_:
-            original_feature_ids = np.where(np.in1d(original_features, transformer_feature_names))[0]
-            preprocessed_feature_ids = []
-            for i in original_feature_ids:
-                out_ids = self.transform_feature_id(i)
-                if isinstance(out_ids, int):
-                    preprocessed_feature_ids.append(out_ids)
-                else:  # list of ids
-                    preprocessed_feature_ids.extend(out_ids)
-
+            original_feature_ids, preprocessed_feature_ids = self._get_feature_ids_related_to_transformer(transformer_feature_names)
             output_of_transformer = preprocessed_x[:, preprocessed_feature_ids]
             input_of_transformer = None
             if isinstance(transformer, Pipeline):
