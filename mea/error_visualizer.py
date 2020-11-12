@@ -214,22 +214,35 @@ class ErrorVisualizer(_BaseErrorVisualizer):
 
                 if feature_is_numerical:
                     bins = np.round(np.linspace(min_values[i], max_values[i], nr_bins + 1), 2)
-                    histogram_func = lambda f_samples: np.histogram(f_samples, bins=bins, density=True)[0]
+                    if show_class:
+                        histogram_func = lambda f_samples: np.histogram(f_samples, bins=bins, density=False)[0]
+                    else:
+                        histogram_func = lambda f_samples: np.histogram(f_samples, bins=bins, density=True)[0]
 
                 else:
 
                     bins = np.unique(feature_column)[:nr_bins]
-                    histogram_func = lambda f_samples: \
-                        np.bincount(np.searchsorted(bins, f_samples),
-                                    minlength=len(bins))[:nr_bins].astype(float) / len(f_samples)
+                    if show_class:
+                        histogram_func = lambda f_samples: \
+                            np.bincount(np.searchsorted(bins, f_samples),
+                                        minlength=len(bins))[:nr_bins].astype(float)
+                    else:
+                        histogram_func = lambda f_samples: \
+                            np.bincount(np.searchsorted(bins, f_samples),
+                                        minlength=len(bins))[:nr_bins].astype(float) / len(f_samples)
 
                 if show_global:
                     if show_class:
+                        hist_wrong = histogram_func(feature_column[global_error_sample_ids])
+                        hist_correct = histogram_func(feature_column[~global_error_sample_ids])
+                        n_samples = np.sum(hist_wrong + hist_correct)
+                        normalized_hist_wrong = hist_wrong / n_samples
+                        normalized_hist_correct = hist_correct / n_samples
                         root_hist_data = {
                             ErrorAnalyzerConstants.WRONG_PREDICTION:
-                                histogram_func(feature_column[global_error_sample_ids]),
+                                normalized_hist_wrong,
                             ErrorAnalyzerConstants.CORRECT_PREDICTION:
-                                histogram_func(feature_column[~global_error_sample_ids])
+                                normalized_hist_correct
                         }
                     else:
                         root_prediction = ErrorAnalyzerConstants.CORRECT_PREDICTION if int(nr_correct[0]) >= int(
@@ -237,11 +250,16 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                         root_hist_data = {root_prediction: histogram_func(feature_column)}
 
                 if show_class:
+                    hist_wrong = histogram_func(feature_column[leaf_sample_ids & global_error_sample_ids])
+                    hist_correct = histogram_func(feature_column[leaf_sample_ids & ~global_error_sample_ids])
+                    n_samples = np.sum(hist_wrong + hist_correct)
+                    normalized_hist_wrong = hist_wrong / n_samples
+                    normalized_hist_correct = hist_correct / n_samples
                     leaf_hist_data = {
                         ErrorAnalyzerConstants.WRONG_PREDICTION:
-                            histogram_func(feature_column[leaf_sample_ids & global_error_sample_ids]),
+                            normalized_hist_wrong,
                         ErrorAnalyzerConstants.CORRECT_PREDICTION:
-                            histogram_func(feature_column[leaf_sample_ids & ~global_error_sample_ids])
+                            normalized_hist_correct
                     }
                 else:
                     leaf_prediction = ErrorAnalyzerConstants.CORRECT_PREDICTION if proba_correct_leaf > proba_wrong_leaf else ErrorAnalyzerConstants.WRONG_PREDICTION
