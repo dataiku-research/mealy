@@ -24,7 +24,7 @@ class FeatureNameTransformer(object):
         self.preprocessed_feature_names = list()
         self.len_preproc = 0
 
-        logger.info('Retrieving the list features used in the pipeline')
+        logger.info('Retrieving the list of features used in the pipeline')
         original_features_from_ct, self.categorical_features = get_feature_list_from_column_transformer(self.ct_preprocessor)
         if original_features is None:
             self.original_feature_names = original_features_from_ct
@@ -33,7 +33,7 @@ class FeatureNameTransformer(object):
             if check_lists_having_same_elements(original_features, original_features_from_ct) is True:
                 self.original_feature_names = original_features
             else:
-                raise ValueError('The list of input feature does not correspond to the list of features handled by the Pipeline.')
+                raise ValueError('The list of features given by user does not correspond to the list of features handled by the Pipeline.')
 
         self._create_feature_mapping(ct_preprocessor)
 
