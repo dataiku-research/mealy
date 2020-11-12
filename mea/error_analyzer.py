@@ -8,12 +8,13 @@ from sklearn.exceptions import NotFittedError
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.base import BaseEstimator
+from sklearn.metrics import make_scorer
 from kneed import KneeLocator
 import logging
 
 from mea.error_analysis_utils import check_enough_data
 from mea.constants import ErrorAnalyzerConstants
-from mea.metrics import mpp_report
+from mea.metrics import mpp_report, fidelity_balanced_accuracy_score
 from mea.preprocessing import PipelinePreprocessor
 
 logger = logging.getLogger(__name__)
@@ -144,8 +145,10 @@ class ErrorAnalyzer(object):
         # entropy/mutual information is used to split nodes in Microsoft Pandora system
         criterion = ErrorAnalyzerConstants.CRITERION
 
-        dt_clf = tree.DecisionTreeClassifier(criterion=criterion, class_weight='balanced', random_state=self._seed)
-        gs_clf = GridSearchCV(dt_clf, param_grid=ErrorAnalyzerConstants.PARAMETERS_GRID, cv=5)
+        dt_clf = tree.DecisionTreeClassifier(criterion=criterion, random_state=self._seed)
+        gs_clf = GridSearchCV(dt_clf, param_grid=ErrorAnalyzerConstants.PARAMETERS_GRID,
+                              cv=5, scoring=make_scorer(fidelity_balanced_accuracy_score))
+
         gs_clf.fit(self._error_train_x, self._error_train_y)
         self._error_clf = gs_clf.best_estimator_
 
