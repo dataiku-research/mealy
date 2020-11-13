@@ -2,16 +2,17 @@
 
 ## Introduction
 
-mealy is a Python package to perform Model Error Analysis of scikit-learn models leveraging a Model Performance Predictor.
+mealy is a Python package to perform **M**odel **E**rror **A**na**LY**sis of scikit-learn models leveraging a Model Performance Predictor.
 
 The project is currently maintained by [Dataiku's](https://www.dataiku.com/) research team.
+
 This is an alpha version.
 
 ## Getting started
 
 MEA [documentation](https://dataiku.github.io/mealy/) features some examples helping you getting started with Model Error Analysis:
-* [Error Analysis on scikit-learn model](https://dataiku.github.io/mealy/auto_examples/plot_mealy.html) presents a basic error analysis on a regression model for structured data
-* [Error Analysis on pipeline model](https://dataiku.github.io/mealy/auto_examples/plot_mealy_pipeline.html) presents a basic error analysis on a pipeline regression model for structured data
+* [Error Analysis on scikit-learn model](https://dataiku.github.io/mealy/auto_examples/plot_mealy.html) presents a basic error analysis on a regression model for structured data.
+* [Error Analysis on pipeline model](https://dataiku.github.io/mealy/auto_examples/plot_mealy_pipeline.html) presents a basic error analysis on a classification pipeline for structured data.
 
 ## Model Error Analysis
 
