@@ -1,4 +1,4 @@
-![Model Error Analysis Workflow](https://raw.githubusercontent.com/dataiku/mealy/main/doc/_static/mealy.png?token=ACQTHLL6IQNRJJE34KNXHKC7W2PTG)
+![Model Error Analysis Workflow](https://raw.githubusercontent.com/dataiku/mealy/main/doc/_static/Logo_mealy_final.png)
 
 ## Introduction
 
