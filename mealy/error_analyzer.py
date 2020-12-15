@@ -15,7 +15,7 @@ import logging
 from mealy.error_analysis_utils import check_enough_data
 from mealy.constants import ErrorAnalyzerConstants
 from mealy.metrics import mpp_report, fidelity_balanced_accuracy_score
-from mealy.preprocessing import PipelinePreprocessor
+from mealy.preprocessing import PipelinePreprocessor, DummyPipelinePreprocessor
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='mealy | %(levelname)s - %(message)s')
@@ -55,22 +55,19 @@ class ErrorAnalyzer(object):
             if not isinstance(estimator, BaseEstimator):
                 raise NotImplementedError("The last step of the pipeline has to be a BaseEstimator.")
             self._predictor = estimator
-
             ct_preprocessor = Pipeline(predictor.steps[:-1]).steps[0][1]
-
             if not isinstance(ct_preprocessor, ColumnTransformer):
                 raise NotImplementedError("The input preprocessor has to be a ColumnTransformer.")
             self.pipeline_preprocessor = PipelinePreprocessor(ct_preprocessor, feature_names)
-
             self._features_in_model_performance_predictor = self.pipeline_preprocessor.get_preprocessed_feature_names()
-
-        else:
+        elif isinstance(predictor, BaseEstimator):
             self._predictor = predictor
             self._features_in_model_performance_predictor = feature_names
-            self.pipeline_preprocessor = None
+            self.pipeline_preprocessor = DummyPipelinePreprocessor(self.model_performance_predictor_features)
+        else:
+            raise ValueError('ErrorAnalyzer needs as input either a scikit Estimator or a scikit Pipeline.')
 
         self._is_regression = is_regressor(self._predictor)
-
         self._error_clf = None
         self._error_train_x = None
         self._error_train_y = None
@@ -155,17 +152,13 @@ class ErrorAnalyzer(object):
         logger.info("Preparing the model performance predictor...")
 
         np.random.seed(self._seed)
-
-        if self.pipeline_preprocessor is None:
-            prep_x, prep_y = x, y
-        else:
-            prep_x, prep_y = self.pipeline_preprocessor.transform(x), np.array(y)
-
+        prep_x, prep_y = self.pipeline_preprocessor.transform(x), np.array(y)
         self._error_train_x, self._error_train_y = self._compute_primary_model_error(prep_x, prep_y, max_nr_rows)
-
         possible_outcomes = list(set(self._error_train_y.tolist()))
         if len(possible_outcomes) == 1:
-            logger.warning('All predictions are {}. To build a proper MPP decision tree we need both correct and incorrect predictions'.format(possible_outcomes[0]))
+            logger.warning(
+                'All predictions are {}. To build a proper MPP decision tree we need both correct and incorrect predictions'.format(
+                    possible_outcomes[0]))
 
         logger.info("Fitting the model performance predictor...")
 
@@ -217,10 +210,7 @@ class ErrorAnalyzer(object):
         Return:
             numpy.ndarray: predictions from the Model Performance Predictor (Wrong/Correct primary predictions).
         """
-        if self.pipeline_preprocessor is None:
-            prep_x = x
-        else:
-            prep_x = self.pipeline_preprocessor.transform(x)
+        prep_x = self.pipeline_preprocessor.transform(x)
         return self.model_performance_predictor.predict(prep_x)
 
     @staticmethod
@@ -249,7 +239,7 @@ class ErrorAnalyzer(object):
 
             difference = np.abs(y - y_pred)
 
-            epsilon = ErrorAnalyzer._get_epsilon(difference, mode='rec')
+            epsilon = ErrorAnalyzerNew._get_epsilon(difference, mode='rec')
 
             error = difference > epsilon
         else:
@@ -272,15 +262,15 @@ class ErrorAnalyzer(object):
 
     def _get_error_leaves(self):
         error_class_idx = \
-        np.where(self.model_performance_predictor.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
+            np.where(self.model_performance_predictor.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
         error_node_ids = \
-        np.where(self.model_performance_predictor.tree_.value[:, 0, :].argmax(axis=1) == error_class_idx)[0]
+            np.where(self.model_performance_predictor.tree_.value[:, 0, :].argmax(axis=1) == error_class_idx)[0]
         return np.in1d(self.leaf_ids, error_node_ids)
 
     def _compute_ranking_arrays(self, n_purity_levels=ErrorAnalyzerConstants.NUMBER_PURITY_LEVELS):
         """ Compute ranking array """
         error_class_idx = \
-        np.where(self.model_performance_predictor.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
+            np.where(self.model_performance_predictor.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
         correct_class_idx = 1 - error_class_idx
 
         wrongly_predicted_samples = self.model_performance_predictor.tree_.value[self.leaf_ids, 0, error_class_idx]
@@ -355,11 +345,7 @@ class ErrorAnalyzer(object):
 
     def _get_path_to_node(self, node_id):
         """ Return path to node as a list of split steps from the nodes of the sklearn Tree object """
-        if self.pipeline_preprocessor is None:
-            feature_names = self.model_performance_predictor_features
-        else:
-            feature_names = self.pipeline_preprocessor.get_original_feature_names()
-
+        feature_names = self.pipeline_preprocessor.get_original_feature_names()
         children_left = self.model_performance_predictor.tree_.children_left
         children_right = self.model_performance_predictor.tree_.children_right
         # feature = self.model_performance_predictor.tree_.feature
@@ -380,10 +366,7 @@ class ErrorAnalyzer(object):
             feat = feature[parent_id]
             thresh = threshold[parent_id]
 
-            is_categorical = False
-            if self.pipeline_preprocessor is not None:
-                is_categorical = self.pipeline_preprocessor.is_categorical(feat)
-
+            is_categorical = self.pipeline_preprocessor.is_categorical(feat)
             thresh = thresh if is_categorical else ("%.2f" % thresh)
 
             decision_rule = ''
@@ -413,9 +396,6 @@ class ErrorAnalyzer(object):
                 original unprocessed feature space.
         """
 
-        if self.pipeline_preprocessor is None:
-            return self._error_clf.tree_.feature
-
         if self._error_clf_features is not None:
             return self._error_clf_features
 
@@ -441,9 +421,6 @@ class ErrorAnalyzer(object):
             numpy.ndarray:
                 thresholds of the Model Performance Predictor Decision Tree, possibly with preprocessing undone.
         """
-
-        if self.pipeline_preprocessor is None:
-            return self._error_clf.tree_.threshold
 
         if self._error_clf_thresholds is not None:
             return self._error_clf_thresholds
@@ -493,7 +470,7 @@ class ErrorAnalyzer(object):
         y = self._error_train_y
         n_total_errors = y[y == ErrorAnalyzerConstants.WRONG_PREDICTION].shape[0]
         error_class_idx = \
-        np.where(self.model_performance_predictor.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
+            np.where(self.model_performance_predictor.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
         correct_class_idx = 1 - error_class_idx
 
         leaves_summary = []
@@ -545,12 +522,7 @@ class ErrorAnalyzer(object):
         Return:
             dict or str: metrics regarding the Model Performance Predictor.
         """
-        
-        if self.pipeline_preprocessor is None:
-            prep_x, prep_y = x_test, y_test
-        else:
-            prep_x, prep_y = self.pipeline_preprocessor.transform(x_test), np.array(y_test)
-
+        prep_x, prep_y = self.pipeline_preprocessor.transform(x_test), np.array(y_test)
         prep_x, y_true = self._compute_primary_model_error(prep_x, prep_y, nr_max_rows)
         y_pred = self.model_performance_predictor.predict(prep_x)
         return mpp_report(y_true, y_pred, output_dict)

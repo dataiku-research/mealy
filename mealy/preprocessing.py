@@ -266,3 +266,27 @@ class PipelinePreprocessor(FeatureNameTransformer):
                 undo_prep_test_x[:, original_feature_ids] = input_of_transformer
 
         return undo_prep_test_x
+
+
+class DummyPipelinePreprocessor(object):
+
+    def __init__(self, model_performance_predictor_features):
+        self.model_performance_predictor_features = model_performance_predictor_features
+
+    def transform(self, x):
+        return x
+
+    def get_original_feature_names(self):
+        return self.model_performance_predictor_features
+
+    def is_categorical(self, index=None, name=None):
+        return False
+
+    def inverse_transform_feature_id(self, index=None, name=None):
+        if index is not None:
+            return index
+        if name is not None:
+            return name
+
+    def inverse_transform(self, x):
+        return x
