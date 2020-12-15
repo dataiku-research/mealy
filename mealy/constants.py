@@ -1,4 +1,4 @@
-from sklearn.impute import SimpleImputer, KNNImputer
+from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, StandardScaler, PowerTransformer, QuantileTransformer, \
     MaxAbsScaler, Binarizer, Normalizer, MinMaxScaler, RobustScaler
 
@@ -34,7 +34,7 @@ class ErrorAnalyzerConstants(object):
     VALID_CATEGORICAL_STEPS = (OneHotEncoder, OrdinalEncoder)
     STEPS_THAT_DOES_NOT_CHANGE_OUTPUT_DIMENSION = (StandardScaler, PowerTransformer, QuantileTransformer, MaxAbsScaler,
                                                    Binarizer, Normalizer, MinMaxScaler, RobustScaler, SimpleImputer,
-                                                   KNNImputer, OrdinalEncoder)
+                                                   OrdinalEncoder)
     STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES = (OneHotEncoder,)
     # for imputers we don't need inverse function
-    STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION = (SimpleImputer, KNNImputer)
+    STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION = (SimpleImputer)
