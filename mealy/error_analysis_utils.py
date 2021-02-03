@@ -47,6 +47,4 @@ def check_enough_data(df, min_len):
 
 def rank_features_by_error_correlation(feature_importances):
     sorted_feature_indices = np.argsort(- feature_importances)
-    cut = len(np.where(feature_importances != 0)[0])
-    sorted_feature_indices = sorted_feature_indices[:cut]
     return sorted_feature_indices
