@@ -9,13 +9,14 @@ from mealy.constants import ErrorAnalyzerConstants
 from mealy.error_analyzer import ErrorAnalyzer
 
 import logging
+
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='mealy | %(levelname)s - %(message)s')
 
 plt.rc('font', family="sans-serif")
 SMALL_SIZE, MEDIUM_SIZE, BIGGER_SIZE = 8, 10, 12
 plt.rc('axes', titlesize=BIGGER_SIZE, labelsize=MEDIUM_SIZE)
-plt.rc('xtick', labelsize=SMALL_SIZE) 
+plt.rc('xtick', labelsize=SMALL_SIZE)
 plt.rc('ytick', labelsize=SMALL_SIZE)
 plt.rc('legend', fontsize=SMALL_SIZE)
 plt.rc("hatch", color="white", linewidth=4)
@@ -27,7 +28,8 @@ class _BaseErrorVisualizer(object):
             raise NotImplementedError('You need to input an ErrorAnalyzer object.')
 
         self._error_analyzer = error_analyzer
-        self.get_ranked_leaf_ids = lambda leaf_selector, rank_by: error_analyzer.get_ranked_leaf_ids(leaf_selector, rank_by)
+        self.get_ranked_leaf_ids = lambda leaf_selector, rank_by: error_analyzer.get_ranked_leaf_ids(leaf_selector,
+                                                                                                     rank_by)
 
     @staticmethod
     def _plot_histograms(hist_data, label, **params):
@@ -138,8 +140,8 @@ class ErrorVisualizer(_BaseErrorVisualizer):
         nodes = pydot_graph.get_node_list()
         for node in nodes:
             if node.get_label():
-                node_label = node.get_label()
-
+                node_label = node.get_label().strip('"')
+                new_label = node_label
                 if ' <= ' in node_label:
                     idx = int(node_label.split('node #')[1].split('\\n')[0])
                     lte_split = node_label.split(' <= ')
@@ -156,12 +158,12 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                         lte_split_without_feature = lte_split[0].split('\\n')[0]
                         lte_split_with_new_feature = lte_split_without_feature + '\\n' + split_feature
                         lte_modified = ' != '.join([lte_split_with_new_feature, str(descaled_value)])
-                    new_label = '\\nentropy'.join([lte_modified, entropy_split[1]]).strip('"')
+                    new_label = '\\nentropy'.join([lte_modified, entropy_split[1]])
 
-                    global_error = float(wrongly_predicted_samples[idx]) / n_total_errors
-                    new_label += '\\nglobal error = %.3f %%\\n' % (global_error * 100)
+                global_error = float(wrongly_predicted_samples[idx]) / n_total_errors
+                new_label += '\\nglobal error = %.3f %%\\n' % (global_error * 100)
 
-                    node.set_label(new_label)
+                node.set_label(new_label)
 
                 alpha = 0.0
                 entropy = 0.0
@@ -276,7 +278,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                         histogram_func = lambda f_samples: np.histogram(f_samples, bins=bins, density=False)[0]
                     else:
                         histogram_func = lambda f_samples: np.histogram(f_samples, bins=bins, density=True)[0]
-                        
+
                 else:
 
                     bins = np.unique(feature_column)[:nr_bins]
