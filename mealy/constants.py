@@ -7,10 +7,10 @@ class ErrorAnalyzerConstants(object):
 
     WRONG_PREDICTION = "Wrong prediction"
     CORRECT_PREDICTION = "Correct prediction"
-    PARAMETERS_GRID = {'max_depth': [5, 10, 20, None], 'min_samples_leaf': [10, 20]}
+    PARAMETERS_GRID = {'max_depth': [5, 10], 'min_samples_leaf': [10, 20]}
     TEST_SIZE = 0.2
 
-    MIN_NUM_ROWS = 100 #500  # heuristic choice
+    MIN_NUM_ROWS = 100  # heuristic choice
     MAX_NUM_ROW = 100000  # heuristic choice
 
     MPP_ACCURACY_TOLERANCE = 0.1

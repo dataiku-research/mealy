@@ -29,7 +29,7 @@ def test_with_only_scikit_model():
     rf = RandomForestClassifier()
     rf.fit(X_train, y_train)
     mpp = ErrorAnalyzer(rf, feature_names=numeric_features)
-    mpp.fit(X_test, y_test)
+    mpp.fit(X_test, y_test, tree_params={'max_depth': [5, 10, None], 'min_samples_leaf': [10, 20]})
 
     prep_x, y_true = mpp._compute_primary_model_error(X_test, y_test, max_nr_rows=100000)
     y_pred = mpp.model_performance_predictor.predict(prep_x)
@@ -89,7 +89,7 @@ def test_with_scikit_pipeline():
 
     rf.fit(X_train, y_train)
     mpp = ErrorAnalyzer(rf)
-    mpp.fit(X_test, y_test)
+    mpp.fit(X_test, y_test, tree_params={'max_depth': [5, 10, None], 'min_samples_leaf': [10, 20]})
 
     X_test_prep, y_test_prep = mpp.pipeline_preprocessor.transform(X_test), np.array(y_test)
 
