@@ -121,25 +121,25 @@ class ErrorAnalyzer(object):
     @property
     def impurity(self):
         if self._impurity is None:
-            self._compute_ranking_arrays()
+            self._compute_leaf_nodes_properties()
         return self._impurity
 
     @property
     def quantized_impurity(self):
         if self._quantized_impurity is None:
-            self._compute_ranking_arrays()
+            self._compute_leaf_nodes_properties()
         return self._quantized_impurity
 
     @property
     def difference(self):
         if self._difference is None:
-            self._compute_ranking_arrays()
+            self._compute_leaf_nodes_properties()
         return self._difference
 
     @property
     def global_error(self):
         if self._global_error is None:
-            self._compute_ranking_arrays()
+            self._compute_leaf_nodes_properties()
         return self._global_error
 
     @property
@@ -286,7 +286,7 @@ class ErrorAnalyzer(object):
         np.where(self.model_performance_predictor.tree_.value[:, 0, :].argmax(axis=1) == error_class_idx)[0]
         return np.in1d(self.leaf_ids, error_node_ids)
 
-    def _compute_ranking_arrays(self, n_purity_levels=ErrorAnalyzerConstants.NUMBER_PURITY_LEVELS):
+    def _compute_leaf_nodes_properties(self, n_purity_levels=ErrorAnalyzerConstants.NUMBER_PURITY_LEVELS):
         """ Compute ranking array """
         error_class_idx = \
         np.where(self.model_performance_predictor.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
