@@ -139,7 +139,8 @@ class ErrorAnalyzer(object):
             self._compute_leaf_ids()
         return self._leaf_ids
 
-    def fit(self, x, y, max_nr_rows=ErrorAnalyzerConstants.MAX_NUM_ROW):
+    def fit(self, x, y, max_nr_rows=ErrorAnalyzerConstants.MAX_NUM_ROW,
+            tree_params=ErrorAnalyzerConstants.PARAMETERS_GRID):
         """ Fit the Model Performance Predictor.
 
         Trains the Model Performance Predictor, a Decision Tree to discriminate between samples that are correctly
@@ -151,6 +152,7 @@ class ErrorAnalyzer(object):
             y (numpy.ndarray or pandas.DataFrame): target data from a test set to evaluate the primary predictor and
                 train a Model Performance Predictor.
             max_nr_rows (int): maximum number of rows to process.
+            tree_params (dict): sklearn.tree.DecisionTree hyper-parameters values for grid search.
         """
         logger.info("Preparing the model performance predictor...")
 
@@ -165,7 +167,8 @@ class ErrorAnalyzer(object):
 
         possible_outcomes = list(set(self._error_train_y.tolist()))
         if len(possible_outcomes) == 1:
-            logger.warning('All predictions are {}. To build a proper MPP decision tree we need both correct and incorrect predictions'.format(possible_outcomes[0]))
+            logger.warning('All predictions are {}. To build a proper MPP decision tree we need both correct and '
+                           'incorrect predictions'.format(possible_outcomes[0]))
 
         logger.info("Fitting the model performance predictor...")
 
@@ -173,7 +176,7 @@ class ErrorAnalyzer(object):
         criterion = ErrorAnalyzerConstants.CRITERION
 
         dt_clf = tree.DecisionTreeClassifier(criterion=criterion, random_state=self._seed)
-        gs_clf = GridSearchCV(dt_clf, param_grid=ErrorAnalyzerConstants.PARAMETERS_GRID,
+        gs_clf = GridSearchCV(dt_clf, param_grid=tree_params,
                               cv=5, scoring=make_scorer(fidelity_balanced_accuracy_score))
 
         gs_clf.fit(self._error_train_x, self._error_train_y)
