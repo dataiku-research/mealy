@@ -175,10 +175,10 @@ class ErrorVisualizer(_BaseErrorVisualizer):
 
         return gvz_graph
 
-    def plot_feature_distributions_on_leaves(self, leaf_selector='all_errors',
+    def plot_feature_distributions_on_leaves(self, leaf_selector='all',
                                              top_k_features=ErrorAnalyzerConstants.TOP_K_FEATURES,
-                                             show_global=True, show_class=False, rank_leaves_by="purity", nr_bins=10,
-                                             figsize=(15, 10)):
+                                             show_global=True, show_class=True, rank_leaves_by="global_error",
+                                             nr_bins=10, figsize=(15, 10)):
         """Return plot of error node feature distribution and compare to global baseline.
 
         The top-k features are sorted by importance in the Model Performance Predictor.
@@ -188,8 +188,8 @@ class ErrorVisualizer(_BaseErrorVisualizer):
         Args:
 
             leaf_selector (int or list or str): the desired leaf nodes to visualize. When int it represents the
-                number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid values
-                are either 'all_error' to plot all leaves of class 'Wrong prediction' or 'all' to plot all leaf nodes.
+                number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid value
+                is 'all' to plot all leaf nodes.
 
             top_k_features (int): number of features to plot per node.
 
@@ -199,9 +199,10 @@ class ErrorVisualizer(_BaseErrorVisualizer):
             show_class (bool): show the proportion of Wrongly and Correctly predicted samples in the feature
                 distributions.
 
-            rank_leaves_by (str): ranking criterium for the leaf nodes. It can be either 'purity' to rank by the leaf
-                node purity (ratio of wrongly predicted samples over the total for an error node) or 'class_difference'
-                (difference of number of wrongly and correctly predicted samples in a node).
+            rank_leaves_by (str): ranking criterion for the leaf nodes. It can be 'global_error' to rank by the global
+                error (percentage of total error in the node), 'purity' to rank by the leaf node purity (ratio of
+                wrongly predicted samples over the total for an error node) or 'class_difference' (difference of number
+                of wrongly and correctly predicted samples in a node).
 
             nr_bins (int): number of bins in the feature distribution plots.
 

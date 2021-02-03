@@ -46,6 +46,8 @@ class ErrorAnalyzer(object):
         quantized_impurity (numpy.ndarray): quantized impurity of leaf nodes (used for ranking the nodes).
         difference (numpy.ndarray): difference of number of correctly and incorrectly predicted samples in leaf nodes
             (used for ranking the nodes).
+        global_error (numpy.ndarray): percentage of incorrectly predicted samples in leaf nodes over the total number of
+            errors (used for ranking the nodes).
         leaf_ids (numpy.ndarray): list of all leaf nodes indices.
     """
 
@@ -81,6 +83,7 @@ class ErrorAnalyzer(object):
         self._impurity = None
         self._quantized_impurity = None
         self._difference = None
+        self._global_error = None
 
         self._error_clf_thresholds = None
         self._error_clf_features = None
@@ -132,6 +135,12 @@ class ErrorAnalyzer(object):
         if self._difference is None:
             self._compute_ranking_arrays()
         return self._difference
+
+    @property
+    def global_error(self):
+        if self._global_error is None:
+            self._compute_ranking_arrays()
+        return self._global_error
 
     @property
     def leaf_ids(self):
@@ -292,16 +301,21 @@ class ErrorAnalyzer(object):
         self._quantized_impurity = np.digitize(self._impurity, purity_bins)
         self._difference = correctly_predicted_samples - wrongly_predicted_samples  # only negative numbers
 
-    def get_ranked_leaf_ids(self, leaf_selector, rank_by='purity'):
+        y = self._error_train_y
+        n_total_errors = y[y == ErrorAnalyzerConstants.WRONG_PREDICTION].shape[0]
+        self._global_error = wrongly_predicted_samples.astype(float) / n_total_errors
+
+    def get_ranked_leaf_ids(self, leaf_selector, rank_by='global_error'):
         """ Select error nodes and rank them by importance.
 
         Args:
             leaf_selector (int or list or str): the desired leaf nodes to visualize. When int it represents the
-                number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid values are
-                either 'all_error' to plot all leaves of class 'Wrong prediction' or 'all' to plot all leaf nodes.
-            rank_by (str): ranking criterium for the leaf nodes. It can be either 'purity' to rank by the leaf
-                node purity (ratio of wrongly predicted samples over the total for an error node) or 'class_difference'
-                (difference of number of wrongly and correctly predicted samples in a node).
+                number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid value
+                 is 'all' to plot all leaf nodes.
+            rank_by (str): ranking criterion for the leaf nodes. It can be 'global_error' to rank by the leaf nodes
+                global error (% total error in the node), 'purity' to rank by the leaf node purity (ratio of wrongly
+                predicted samples over the total for an error node) or 'class_difference' (difference of number of
+                wrongly and correctly predicted samples in a node).
 
         Return:
             list or numpy.ndarray: list of selected leaf nodes indices.
@@ -311,7 +325,9 @@ class ErrorAnalyzer(object):
         selected_leaves = apply_leaf_selector(self.leaf_ids)
         if selected_leaves.size == 0:
             return selected_leaves
-        if rank_by == 'purity':
+        if rank_by == 'global_error':
+            sorted_ids = np.argsort(-apply_leaf_selector(self.global_error), )
+        elif rank_by == 'purity':
             sorted_ids = np.lexsort(
                 (apply_leaf_selector(self.difference), apply_leaf_selector(self.quantized_impurity)))
         elif rank_by == 'class_difference':
@@ -329,8 +345,7 @@ class ErrorAnalyzer(object):
                   * int: Only keep the row corresponding to this leaf id
                   * array-like: Only keep the rows corresponding to these leaf ids
                   * str:
-                    - "all": Keep the whole array
-                    - "all_errors": Keep the rows with indices corresponding to the leaf ids classifying the primary model prediction as wrong
+                    - "all": Keep the whole array of leaf ids
 
             Return:
                 A function with one argument array as a selector of leaf ids
@@ -341,8 +356,6 @@ class ErrorAnalyzer(object):
         if isinstance(leaf_selector, str):
             if leaf_selector == "all":
                 return lambda array: array
-            if leaf_selector == "all_errors":
-                return lambda array: array[self._get_error_leaves()]
 
         leaf_selector_as_array = np.array(leaf_selector)
         leaf_selector = np.in1d(self.leaf_ids, leaf_selector_as_array)
@@ -474,13 +487,13 @@ class ErrorAnalyzer(object):
         return self._error_clf_thresholds
 
     # TODO: rewrite this method using the ranking arrays
-    def error_node_summary(self, leaf_selector='all_errors', add_path_to_leaves=False, print_summary=False):
+    def error_node_summary(self, leaf_selector='all', add_path_to_leaves=False, print_summary=False):
         """ Return summary information regarding input nodes.
 
         Args:
             leaf_selector (int or list or str): the desired leaf nodes to visualize. When int it represents the
-                number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid values
-                are either 'all_error' to plot all leaves of class 'Wrong prediction' or 'all' to plot all leaf nodes.
+                number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid value
+                is 'all' to plot all leaf nodes.
             add_path_to_leaves (bool): add information of the feature path across the tree till the selected node.
             print_summary (bool): print summary for the selected nodes.
 
