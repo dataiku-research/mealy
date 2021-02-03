@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO, format='mealy | %(levelname)s - %(messag
 plt.rc('font', family="sans-serif")
 SMALL_SIZE, MEDIUM_SIZE, BIGGER_SIZE = 8, 10, 12
 plt.rc('axes', titlesize=BIGGER_SIZE, labelsize=MEDIUM_SIZE)
-plt.rc('xtick', labelsize=SMALL_SIZE) 
+plt.rc('xtick', labelsize=SMALL_SIZE)
 plt.rc('ytick', labelsize=SMALL_SIZE)
 plt.rc('legend', fontsize=SMALL_SIZE)
 plt.rc("hatch", color="white", linewidth=4)
@@ -221,12 +221,18 @@ class ErrorVisualizer(_BaseErrorVisualizer):
             min_values, max_values = x.min(axis=0), x.max(axis=0)
             feature_names = self.mpp_feature_names
         else:
-            ranked_feature_ids = [self.pipeline_preprocessor.inverse_transform_feature_id(idx) for idx in
-                                  ranked_feature_ids]
+
             if top_k_features > 0:
                 ranked_feature_ids = ranked_feature_ids[:top_k_features]
-            x, y = self.pipeline_preprocessor.inverse_transform(self._error_train_x)[:,
-                   ranked_feature_ids], self._error_train_y
+
+            ranked_feature_ids = [self.pipeline_preprocessor.inverse_transform_feature_id(idx) for idx in ranked_feature_ids]
+            if top_k_features > 0:
+                ranked_feature_ids = ranked_feature_ids[:top_k_features]
+            print(')))) TEST')
+            print(self._error_train_x)
+            print(')))))')
+            print(ranked_feature_ids)
+            x, y = self.pipeline_preprocessor.inverse_transform(self._error_train_x)[:,ranked_feature_ids], self._error_train_y
             # TODO
             min_values, max_values = x.min(axis=0), x.max(axis=0)
             feature_names = self.original_feature_names
@@ -257,7 +263,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                         histogram_func = lambda f_samples: np.histogram(f_samples, bins=bins, density=False)[0]
                     else:
                         histogram_func = lambda f_samples: np.histogram(f_samples, bins=bins, density=True)[0]
-                        
+
                 else:
 
                     bins = np.unique(feature_column)[:nr_bins]

@@ -217,6 +217,7 @@ class ErrorAnalyzer(object):
     def _get_epsilon(difference, mode='rec'):
         """ Compute epsilon to define errors in regression task """
         assert (mode in ['std', 'rec'])
+        epsilon = None
         if mode == 'std':
             std_diff = np.std(difference)
             mean_diff = np.mean(difference)
@@ -239,7 +240,7 @@ class ErrorAnalyzer(object):
 
             difference = np.abs(y - y_pred)
 
-            epsilon = ErrorAnalyzerNew._get_epsilon(difference, mode='rec')
+            epsilon = ErrorAnalyzer._get_epsilon(difference, mode='rec')
 
             error = difference > epsilon
         else:
