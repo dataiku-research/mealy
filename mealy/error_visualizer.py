@@ -221,8 +221,8 @@ class ErrorVisualizer(_BaseErrorVisualizer):
             min_values, max_values = x.min(axis=0), x.max(axis=0)
             feature_names = self.mpp_feature_names
         else:
-            ranked_feature_ids = [self.pipeline_preprocessor.inverse_transform_feature_id(idx) for idx in
-                                  ranked_feature_ids]
+            ranked_feature_ids = list(set([self.pipeline_preprocessor.inverse_transform_feature_id(idx) for idx in
+                                  ranked_feature_ids]))
             if top_k_features > 0:
                 ranked_feature_ids = ranked_feature_ids[:top_k_features]
             x, y = self.pipeline_preprocessor.inverse_transform(self._error_train_x)[:,
