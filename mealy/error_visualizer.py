@@ -228,10 +228,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
             ranked_feature_ids = [self.pipeline_preprocessor.inverse_transform_feature_id(idx) for idx in ranked_feature_ids]
             if top_k_features > 0:
                 ranked_feature_ids = ranked_feature_ids[:top_k_features]
-            print(')))) TEST')
-            print(self._error_train_x)
-            print(')))))')
-            print(ranked_feature_ids)
+
             x, y = self.pipeline_preprocessor.inverse_transform(self._error_train_x)[:,ranked_feature_ids], self._error_train_y
             # TODO
             min_values, max_values = x.min(axis=0), x.max(axis=0)
@@ -312,7 +309,6 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                         leaf_prediction: histogram_func(feature_column[leaf_sample_ids])}
 
                 x_ticks = _BaseErrorVisualizer._add_new_plot(figsize, bins, feature_name, leaf)
-                _BaseErrorVisualizer._plot_feature_distribution(x_ticks, feature_is_numerical, leaf_hist_data,
-                                                                root_hist_data if show_global else None)
+                _BaseErrorVisualizer._plot_feature_distribution(x_ticks, feature_is_numerical, leaf_hist_data, root_hist_data if show_global else None)
 
         plt.show()
