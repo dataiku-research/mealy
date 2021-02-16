@@ -28,19 +28,17 @@ def test_with_only_scikit_model():
 
     rf = RandomForestClassifier()
     rf.fit(X_train, y_train)
-    mpp = ErrorAnalyzer(rf, feature_names=numeric_features)
+    mpp = ErrorAnalyzer(rf, feature_names=numeric_features, param_grid={'max_depth': [5, 10, None], 'min_samples_leaf': [10, 20]})
     mpp.fit(X_test, y_test)
 
     prep_x, y_true = mpp._compute_primary_model_error(X_test, y_test, max_nr_rows=100000)
     y_pred = mpp.model_performance_predictor.predict(prep_x)
 
-
     mpp_accuracy_score = compute_mpp_accuracy(y_true, y_pred)
     mpp_balanced_accuracy = balanced_accuracy_score(y_true, y_pred)
     primary_model_predicted_accuracy = compute_primary_model_accuracy(y_pred)
     primary_model_true_accuracy = compute_primary_model_accuracy(y_true)
-    fidelity, confidence_decision = compute_confidence_decision(primary_model_true_accuracy,
-                                                            primary_model_predicted_accuracy)
+    fidelity, confidence_decision = compute_confidence_decision(primary_model_true_accuracy, primary_model_predicted_accuracy)
 
     metric_to_check = {
         'mpp_accuracy_score': mpp_accuracy_score,
@@ -88,7 +86,7 @@ def test_with_scikit_pipeline():
                          ('classifier', RandomForestClassifier())])
 
     rf.fit(X_train, y_train)
-    mpp = ErrorAnalyzer(rf)
+    mpp = ErrorAnalyzer(rf, param_grid={'max_depth': [5, 10, None], 'min_samples_leaf': [10, 20]})
     mpp.fit(X_test, y_test)
 
     X_test_prep, y_test_prep = mpp.pipeline_preprocessor.transform(X_test), np.array(y_test)

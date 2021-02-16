@@ -32,6 +32,8 @@ class ErrorAnalyzer(object):
         predictor (sklearn.base.BaseEstimator or sklearn.pipeline.Pipeline): a sklearn model to analyze. Either an estimator
             or a Pipeline containing a ColumnTransformer with the preprocessing steps and an estimator as last step.
         feature_names (list): list of feature names, default=None.
+        max_nr_rows (int): maximum number of rows to process.
+        param_grid (dict): sklearn.tree.DecisionTree hyper-parameters values for grid search.
         seed (int): random seed.
 
     Attributes:
@@ -49,7 +51,11 @@ class ErrorAnalyzer(object):
         leaf_ids (numpy.ndarray): list of all leaf nodes indices.
     """
 
-    def __init__(self, predictor, feature_names=None, seed=65537):
+    def __init__(self, predictor,
+                 feature_names=None,
+                 max_nr_rows=ErrorAnalyzerConstants.MAX_NUM_ROW,
+                 param_grid=ErrorAnalyzerConstants.PARAMETERS_GRID,
+                 seed=65537):
         if isinstance(predictor, Pipeline):
             estimator = predictor.steps[-1][1]
             if not isinstance(estimator, BaseEstimator):
@@ -85,6 +91,8 @@ class ErrorAnalyzer(object):
         self._error_clf_thresholds = None
         self._error_clf_features = None
 
+        self._max_nr_rows = max_nr_rows
+        self._param_grid = param_grid
         self._seed = seed
 
     @property
@@ -139,7 +147,7 @@ class ErrorAnalyzer(object):
             self._compute_leaf_ids()
         return self._leaf_ids
 
-    def fit(self, x, y, max_nr_rows=ErrorAnalyzerConstants.MAX_NUM_ROW):
+    def fit(self, x, y):
         """ Fit the Model Performance Predictor.
 
         Trains the Model Performance Predictor, a Decision Tree to discriminate between samples that are correctly
@@ -150,7 +158,6 @@ class ErrorAnalyzer(object):
                 train a Model Performance Predictor.
             y (numpy.ndarray or pandas.DataFrame): target data from a test set to evaluate the primary predictor and
                 train a Model Performance Predictor.
-            max_nr_rows (int): maximum number of rows to process.
         """
         logger.info("Preparing the model performance predictor...")
 
@@ -161,11 +168,12 @@ class ErrorAnalyzer(object):
         else:
             prep_x, prep_y = self.pipeline_preprocessor.transform(x), np.array(y)
 
-        self._error_train_x, self._error_train_y = self._compute_primary_model_error(prep_x, prep_y, max_nr_rows)
+        self._error_train_x, self._error_train_y = self._compute_primary_model_error(prep_x, prep_y, self._max_nr_rows)
 
         possible_outcomes = list(set(self._error_train_y.tolist()))
         if len(possible_outcomes) == 1:
-            logger.warning('All predictions are {}. To build a proper MPP decision tree we need both correct and incorrect predictions'.format(possible_outcomes[0]))
+            logger.warning('All predictions are {}. To build a proper MPP decision tree we need both correct and '
+                           'incorrect predictions'.format(possible_outcomes[0]))
 
         logger.info("Fitting the model performance predictor...")
 
@@ -173,7 +181,7 @@ class ErrorAnalyzer(object):
         criterion = ErrorAnalyzerConstants.CRITERION
 
         dt_clf = tree.DecisionTreeClassifier(criterion=criterion, random_state=self._seed)
-        gs_clf = GridSearchCV(dt_clf, param_grid=ErrorAnalyzerConstants.PARAMETERS_GRID,
+        gs_clf = GridSearchCV(dt_clf, param_grid=self._param_grid,
                               cv=5, scoring=make_scorer(fidelity_balanced_accuracy_score))
 
         gs_clf.fit(self._error_train_x, self._error_train_y)
