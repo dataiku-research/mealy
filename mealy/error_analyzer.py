@@ -34,7 +34,7 @@ class ErrorAnalyzer(object):
         feature_names (list): list of feature names, default=None.
         max_nr_rows (int): maximum number of rows to process.
         param_grid (dict): sklearn.tree.DecisionTree hyper-parameters values for grid search.
-        seed (int): random seed.
+        random_state (int): random seed.
 
     Attributes:
         error_train_x (numpy.ndarray): features used to train the Model performance Predictor.
@@ -55,7 +55,7 @@ class ErrorAnalyzer(object):
                  feature_names=None,
                  max_nr_rows=ErrorAnalyzerConstants.MAX_NUM_ROW,
                  param_grid=ErrorAnalyzerConstants.PARAMETERS_GRID,
-                 seed=65537):
+                 random_state=65537):
         if isinstance(predictor, Pipeline):
             estimator = predictor.steps[-1][1]
             if not isinstance(estimator, BaseEstimator):
@@ -90,7 +90,7 @@ class ErrorAnalyzer(object):
 
         self._max_nr_rows = max_nr_rows
         self._param_grid = param_grid
-        self._seed = seed
+        self.random_state = random_state
 
     @property
     def error_train_x(self):
@@ -133,6 +133,7 @@ class ErrorAnalyzer(object):
         return self._quantized_impurity
 
     @property
+    #TODO function name too vague
     def difference(self):
         if self._difference is None:
             self._compute_ranking_arrays()
@@ -158,22 +159,17 @@ class ErrorAnalyzer(object):
         """
         logger.info("Preparing the model performance predictor...")
 
-        np.random.seed(self._seed)
-        prep_x, prep_y = self.pipeline_preprocessor.transform(x), np.array(y)
-        self._error_train_x, self._error_train_y = self._compute_primary_model_error(prep_x, prep_y, self.max_nr_rows)
+        np.random.seed(self.random_state)
+        preprocessed_x = self.pipeline_preprocessor.transform(x)
+        self._error_train_x, self._error_train_y = self._compute_primary_model_error(preprocessed_x, y, self._max_nr_rows)
         possible_outcomes = list(set(self._error_train_y.tolist()))
         if len(possible_outcomes) == 1:
-            logger.warning(
-                'All predictions are {}. To build a proper MPP decision tree we need both correct and incorrect predictions'.format(
-                    possible_outcomes[0]))
-
+            logger.warning('All predictions are {}. To build a proper MPP decision tree we need both correct and incorrect predictions'.format(possible_outcomes[0]))
 
         logger.info("Fitting the model performance predictor...")
-
         # entropy/mutual information is used to split nodes in Microsoft Pandora system
         criterion = ErrorAnalyzerConstants.CRITERION
-
-        dt_clf = tree.DecisionTreeClassifier(criterion=criterion, random_state=self._seed)
+        dt_clf = tree.DecisionTreeClassifier(criterion=criterion, random_state=self.random_state)
         gs_clf = GridSearchCV(dt_clf, param_grid=self._param_grid,
                               cv=5, scoring=make_scorer(fidelity_balanced_accuracy_score))
 
@@ -189,6 +185,7 @@ class ErrorAnalyzer(object):
     def _compute_primary_model_error(self, x, y, max_nr_rows):
         """
         Computes the errors of the primary model predictions and samples
+        :input:
         :return: an array with error target (correctly predicted vs wrongly predicted)
         """
 
@@ -196,16 +193,12 @@ class ErrorAnalyzer(object):
 
         check_enough_data(x, min_len=ErrorAnalyzerConstants.MIN_NUM_ROWS)
 
-        if x.shape[0] > max_nr_rows:
-            logger.info("Rebalancing data: original dataset had {} rows, selecting the first {}.".format(x.shape[0],
-                                                                                                         max_nr_rows))
+        logger.info("Rebalancing data: original dataset had {} rows, selecting the first {}.".format(x.shape[0], max_nr_rows))
+        sampled_x = x[:max_nr_rows, :]
+        sampled_y = y[:max_nr_rows]
 
-            x = x[:max_nr_rows, :]
-            y = y[:max_nr_rows]
-
-        y_pred = self._predictor.predict(x)
-
-        error_y = self._get_errors(y, y_pred)
+        y_pred = self._predictor.predict(sampled_x)
+        error_y = self._get_errors(sampled_y, y_pred)
 
         return x, error_y
 
@@ -244,18 +237,17 @@ class ErrorAnalyzer(object):
 
     def _get_errors(self, y, y_pred):
         """ Compute errors of the primary model on the test set """
+
+
+        # error here is a boolean array
         if self._is_regression:
-
             difference = np.abs(y - y_pred)
-
             epsilon = ErrorAnalyzer._get_epsilon(difference, mode='rec')
-
             error = difference > epsilon
         else:
-
             error = (y != y_pred)
 
-        error = list(error)
+        #error = list(error)
         transdict = {True: ErrorAnalyzerConstants.WRONG_PREDICTION, False: ErrorAnalyzerConstants.CORRECT_PREDICTION}
         error = np.array([transdict[elem] for elem in error], dtype=object)
 
