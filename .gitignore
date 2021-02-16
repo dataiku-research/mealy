@@ -1,3 +1,5 @@
+.coverage
+.python-version
 .idea/
 mealy/__pycache__/
 *.pyc
