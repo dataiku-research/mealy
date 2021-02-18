@@ -210,19 +210,6 @@ class ErrorAnalyzer(object):
 
         return x, error_y
 
-
-    def predict_deprecated(self, x):
-        """ Predict model performance on samples
-
-        Args:
-            x (numpy.ndarray or pandas.DataFrame): dataset where to apply the Model Performance Predictor.
-
-        Return:
-            numpy.ndarray: predictions from the Model Performance Predictor (Wrong/Correct primary predictions).
-        """
-        prep_x = self.pipeline_preprocessor.transform(x)
-        return self.error_clf.predict(prep_x)
-
     @staticmethod
     def _get_epsilon(difference, mode='rec'):
         """ Compute epsilon to define errors in regression task """
