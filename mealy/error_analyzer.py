@@ -109,9 +109,9 @@ class ErrorAnalyzer(object):
         return self._features_in_model_performance_predictor
 
     @property
-    def model_performance_predictor(self):
+    def error_clf(self):
         if self._error_clf is None:
-            raise NotFittedError("You should fit a model performance predictor first")
+            raise NotFittedError("You should fit the ErrorAnalyzer first")
         return self._error_clf
 
     @property
@@ -146,7 +146,8 @@ class ErrorAnalyzer(object):
         return self._leaf_ids
 
     def fit(self, x, y):
-        """ Fit the Model Performance Predictor.
+        """
+        Fit the Model Performance Predictor.
 
         Trains the Model Performance Predictor, a Decision Tree to discriminate between samples that are correctly
         predicted or wrongly predicted (errors) by a primary model.
@@ -161,17 +162,16 @@ class ErrorAnalyzer(object):
 
         np.random.seed(self.random_state)
         preprocessed_x = self.pipeline_preprocessor.transform(x)
-        self._error_train_x, self._error_train_y = self._compute_primary_model_error(preprocessed_x, y, self._max_nr_rows)
-        possible_outcomes = list(set(self._error_train_y.tolist()))
-        if len(possible_outcomes) == 1:
-            logger.warning('All predictions are {}. To build a proper MPP decision tree we need both correct and incorrect predictions'.format(possible_outcomes[0]))
+        self._error_train_x, self._error_train_y = self._compute_primary_model_error(preprocessed_x, y)
 
         logger.info("Fitting the model performance predictor...")
         # entropy/mutual information is used to split nodes in Microsoft Pandora system
-        criterion = ErrorAnalyzerConstants.CRITERION
-        dt_clf = tree.DecisionTreeClassifier(criterion=criterion, random_state=self.random_state)
-        gs_clf = GridSearchCV(dt_clf, param_grid=self._param_grid,
-                              cv=5, scoring=make_scorer(fidelity_balanced_accuracy_score))
+        dt_clf = tree.DecisionTreeClassifier(criterion=ErrorAnalyzerConstants.CRITERION,
+                                             random_state=self.random_state)
+        gs_clf = GridSearchCV(dt_clf,
+                              param_grid=self._param_grid,
+                              cv=5,
+                              scoring=make_scorer(fidelity_balanced_accuracy_score))
 
         gs_clf.fit(self._error_train_x, self._error_train_y)
         self._error_clf = gs_clf.best_estimator_
@@ -179,13 +179,17 @@ class ErrorAnalyzer(object):
         logger.info('Grid search selected parameters:')
         logger.info(gs_clf.best_params_)
 
+        self._check_error_tree()
+
+    def _check_error_tree(self):
         if sum(self._error_clf.tree_.feature > 0) == 0:
             logger.warning("The MPP tree has only 1 node, there will be problem when using this with ErrorVisualizer")
 
-    def _compute_primary_model_error(self, x, y, max_nr_rows):
+    def _compute_primary_model_error(self, x, y):
         """
         Computes the errors of the primary model predictions and samples
-        :input:
+
+        :input: feature array x  and ground truth y
         :return: an array with error target (correctly predicted vs wrongly predicted)
         """
 
@@ -193,16 +197,21 @@ class ErrorAnalyzer(object):
 
         check_enough_data(x, min_len=ErrorAnalyzerConstants.MIN_NUM_ROWS)
 
-        logger.info("Rebalancing data: original dataset had {} rows, selecting the first {}.".format(x.shape[0], max_nr_rows))
-        sampled_x = x[:max_nr_rows, :]
-        sampled_y = y[:max_nr_rows]
+        logger.info("Rebalancing data: original dataset had {} rows, selecting the first {}.".format(x.shape[0], self._max_nr_rows))
+        sampled_x = x[:self._max_nr_rows, :]
+        sampled_y = y[:self._max_nr_rows]
 
         y_pred = self._predictor.predict(sampled_x)
         error_y = self._get_errors(sampled_y, y_pred)
 
+        possible_outcomes = list(set(error_y.tolist()))
+        if len(possible_outcomes) == 1:
+            logger.warning('All predictions are {}. To build a proper MPP decision tree we need both correct and incorrect predictions'.format(possible_outcomes[0]))
+
         return x, error_y
 
-    def predict(self, x):
+
+    def predict_deprecated(self, x):
         """ Predict model performance on samples
 
         Args:
@@ -212,7 +221,7 @@ class ErrorAnalyzer(object):
             numpy.ndarray: predictions from the Model Performance Predictor (Wrong/Correct primary predictions).
         """
         prep_x = self.pipeline_preprocessor.transform(x)
-        return self.model_performance_predictor.predict(prep_x)
+        return self.error_clf.predict(prep_x)
 
     @staticmethod
     def _get_epsilon(difference, mode='rec'):
@@ -236,10 +245,14 @@ class ErrorAnalyzer(object):
         return epsilon
 
     def _get_errors(self, y, y_pred):
-        """ Compute errors of the primary model on the test set """
+        """
+        Compute errors of the primary model on the test set
 
+        Return:
+            a string array of WRONG_PREDICTION and CORRECT_PREDICTION that will be serve as target
+        """
 
-        # error here is a boolean array
+        # the variable "error" here is a boolean array
         if self._is_regression:
             difference = np.abs(y - y_pred)
             epsilon = ErrorAnalyzer._get_epsilon(difference, mode='rec')
@@ -255,27 +268,27 @@ class ErrorAnalyzer(object):
 
     def _compute_train_leaf_ids(self):
         """ Compute indices of leaf nodes for the train set """
-        self._error_train_leaf_id = self.model_performance_predictor.apply(self._error_train_x)
+        self._error_train_leaf_id = self.error_clf.apply(self._error_train_x)
 
     def _compute_leaf_ids(self):
         """ Compute indices of leaf nodes """
-        self._leaf_ids = np.where(self.model_performance_predictor.tree_.feature < 0)[0]
+        self._leaf_ids = np.where(self.error_clf.tree_.feature < 0)[0]
 
     def _get_error_leaves(self):
         error_class_idx = \
-            np.where(self.model_performance_predictor.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
+            np.where(self.error_clf.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
         error_node_ids = \
-            np.where(self.model_performance_predictor.tree_.value[:, 0, :].argmax(axis=1) == error_class_idx)[0]
+            np.where(self.error_clf.tree_.value[:, 0, :].argmax(axis=1) == error_class_idx)[0]
         return np.in1d(self.leaf_ids, error_node_ids)
 
     def _compute_ranking_arrays(self, n_purity_levels=ErrorAnalyzerConstants.NUMBER_PURITY_LEVELS):
         """ Compute ranking array """
         error_class_idx = \
-            np.where(self.model_performance_predictor.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
+            np.where(self.error_clf.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
         correct_class_idx = 1 - error_class_idx
 
-        wrongly_predicted_samples = self.model_performance_predictor.tree_.value[self.leaf_ids, 0, error_class_idx]
-        correctly_predicted_samples = self.model_performance_predictor.tree_.value[self.leaf_ids, 0, correct_class_idx]
+        wrongly_predicted_samples = self.error_clf.tree_.value[self.leaf_ids, 0, error_class_idx]
+        correctly_predicted_samples = self.error_clf.tree_.value[self.leaf_ids, 0, correct_class_idx]
 
         self._impurity = correctly_predicted_samples / (wrongly_predicted_samples + correctly_predicted_samples)
 
@@ -347,8 +360,8 @@ class ErrorAnalyzer(object):
     def _get_path_to_node(self, node_id):
         """ Return path to node as a list of split steps from the nodes of the sklearn Tree object """
         feature_names = self.pipeline_preprocessor.get_original_feature_names()
-        children_left = self.model_performance_predictor.tree_.children_left
-        children_right = self.model_performance_predictor.tree_.children_right
+        children_left = self.error_clf.tree_.children_left
+        children_right = self.error_clf.tree_.children_right
         # feature = self.model_performance_predictor.tree_.feature
         # threshold = self.model_performance_predictor.tree_.threshold
 
@@ -471,12 +484,12 @@ class ErrorAnalyzer(object):
         y = self._error_train_y
         n_total_errors = y[y == ErrorAnalyzerConstants.WRONG_PREDICTION].shape[0]
         error_class_idx = \
-            np.where(self.model_performance_predictor.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
+            np.where(self.error_clf.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
         correct_class_idx = 1 - error_class_idx
 
         leaves_summary = []
         for leaf_id in leaf_nodes:
-            values = self.model_performance_predictor.tree_.value[leaf_id, :]
+            values = self.error_clf.tree_.value[leaf_id, :]
             n_errors = int(np.ceil(values[0, error_class_idx]))
             n_corrects = int(np.ceil(values[0, correct_class_idx]))
             local_error = float(n_errors) / (n_corrects + n_errors)
@@ -509,7 +522,7 @@ class ErrorAnalyzer(object):
 
         return leaves_summary
 
-    def mpp_summary(self, x_test, y_test, nr_max_rows=ErrorAnalyzerConstants.MAX_NUM_ROW, output_dict=False):
+    def mpp_summary(self, x_test, y_test, output_dict=False):
         """ Print ErrorAnalyzer summary metrics regarding the Model Performance Predictor.
 
         Args:
@@ -524,6 +537,6 @@ class ErrorAnalyzer(object):
             dict or str: metrics regarding the Model Performance Predictor.
         """
         prep_x, prep_y = self.pipeline_preprocessor.transform(x_test), np.array(y_test)
-        prep_x, y_true = self._compute_primary_model_error(prep_x, prep_y, nr_max_rows)
-        y_pred = self.model_performance_predictor.predict(prep_x)
+        prep_x, y_true = self._compute_primary_model_error(prep_x, prep_y)
+        y_pred = self.error_clf.predict(prep_x)
         return mpp_report(y_true, y_pred, output_dict)
