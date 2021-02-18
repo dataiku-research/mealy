@@ -27,7 +27,7 @@ class _BaseErrorVisualizer(object):
             raise NotImplementedError('You need to input an ErrorAnalyzer object.')
 
         self._error_analyzer = error_analyzer
-        self.get_ranked_leaf_ids = lambda leaf_selector, rank_by: error_analyzer.get_ranked_leaf_ids(leaf_selector, rank_by)
+        self.get_ranked_leaf_ids = lambda leaf_selector, rank_by: error_analyzer._get_ranked_leaf_ids(leaf_selector, rank_by)
 
     @staticmethod
     def _plot_histograms(hist_data, label, **params):
@@ -81,15 +81,16 @@ class ErrorVisualizer(_BaseErrorVisualizer):
     def __init__(self, error_analyzer):
         super(ErrorVisualizer, self).__init__(error_analyzer)
 
-        self._error_clf = error_analyzer.model_performance_predictor
-        self._error_train_x = error_analyzer.error_train_x
-        self._error_train_y = error_analyzer.error_train_y
+        self._error_clf = error_analyzer.error_tree.estimator_
+        self._error_train_x = error_analyzer.error_tree.error_train_x
+        self._error_train_y = error_analyzer.error_tree.error_train_y
+        self._train_leaf_ids = error_analyzer.error_tree.train_leaf_ids
 
         self.pipeline_preprocessor = error_analyzer.pipeline_preprocessor
-        self.thresholds = error_analyzer.inverse_transform_thresholds()
-        self.features = error_analyzer.inverse_transform_features()
+        self.thresholds = error_analyzer._inverse_transform_thresholds()
+        self.features = error_analyzer._inverse_transform_features()
 
-        self.mpp_feature_names = error_analyzer.model_performance_predictor_features
+        self.mpp_feature_names = error_analyzer.error_analyzer_predictor_features
 
         if self.pipeline_preprocessor is None:
             self.original_feature_names = self.mpp_feature_names
@@ -101,7 +102,6 @@ class ErrorVisualizer(_BaseErrorVisualizer):
             self.numerical_feature_names = [f for f in self.original_feature_names if
                                             not self.pipeline_preprocessor.is_categorical(name=f)]
 
-        self._train_leaf_ids = error_analyzer.train_leaf_ids
 
     def plot_error_tree(self, size=None):
         """Plot the graph of the decision tree.
