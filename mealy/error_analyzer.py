@@ -417,7 +417,7 @@ class ErrorAnalyzer(BaseEstimator):
             thresh = threshold[parent_id]
 
             is_categorical = self.pipeline_preprocessor.is_categorical(feat)
-            thresh = thresh if is_categorical else ("%.2f" % thresh)
+            thresh = str(thresh if is_categorical else ("%.2f" % thresh))
 
             decision_rule = ''
             if cur_node_id in children_left:
@@ -490,7 +490,8 @@ class ErrorAnalyzer(BaseEstimator):
             indices.append((i, self.pipeline_preprocessor.inverse_transform_feature_id(f)))
             i += 1
 
-p        descaled_thresh = [undo_dummy_x[i, j] for i, j in indices]
+        undo_dummy_x = self.pipeline_preprocessor.inverse_transform(dummy_x)
+        descaled_thresh = [undo_dummy_x[i, j] for i, j in indices]
         thresholds[self.error_tree.estimator_.tree_.feature > 0] = descaled_thresh
         self._error_clf_thresholds = thresholds
         return self._error_clf_thresholds
