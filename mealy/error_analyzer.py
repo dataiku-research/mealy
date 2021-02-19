@@ -26,7 +26,7 @@ class ErrorAnalyzer(BaseEstimator):
     """ ErrorAnalyzer analyzes the errors of a prediction model on a test set.
 
     It uses model predictions and ground truth target to compute the model errors on the test set.
-    It then trains a Decision Tree, called a Error Analyzer Predictor, on the same test set by using the model error
+    It then trains a Decision Tree, called a Error Analyzer Tree, on the same test set by using the model error
     as target. The nodes of the decision tree are different segments of errors to be studied individually.
 
     Args:
@@ -38,12 +38,12 @@ class ErrorAnalyzer(BaseEstimator):
         random_state (int): random seed.
 
     Attributes:
-        error_train_x (numpy.ndarray): features used to train the Error Analyzer Predictor.
-        error_train_y (numpy.ndarray): target used to train the Error Analyzer Predictor, it is abinary variable
+        error_train_x (numpy.ndarray): features used to train the Error Analyzer Tree.
+        error_train_y (numpy.ndarray): target used to train the Error Analyzer Tree, it is abinary variable
             representing whether the input predictor predicted correctly or incorrectly the samples in error_train_x.
-        model_performance_predictor_features (list): feature names used in the Error Analyzer Predictor.
+        model_performance_predictor_features (list): feature names used in the Error Analyzer Tree.
         model_performance_predictor (sklearn.tree.DecisionTreeClassifier): performance predictor decision tree.
-        train_leaf_ids (numpy.ndarray): indices of leaf in the Error Analyzer Predictor, where each of the training
+        train_leaf_ids (numpy.ndarray): indices of leaf in the Error Analyzer Tree, where each of the training
             sample falls.
         impurity (numpy.ndarray): impurity of leaf nodes (used for ranking the nodes).
         quantized_impurity (numpy.ndarray): quantized impurity of leaf nodes (used for ranking the nodes).
@@ -84,6 +84,9 @@ class ErrorAnalyzer(BaseEstimator):
         self.error_tree = None
         self._error_clf_thresholds = None
         self._error_clf_features = None
+        self._error_train_x = None
+        self._error_train_y = None
+        self._train_leaf_id = None
 
     @property
     def feature_names(self):
@@ -105,7 +108,10 @@ class ErrorAnalyzer(BaseEstimator):
     def random_state(self):
         return self._random_state
 
-    #TODO better naming ?
+
+
+    #TODO is this used somewhere ?
+    """ 
     @property
     def error_analyzer_predictor_features(self):
         if self._error_analyzer_predictor_features is None:
@@ -113,27 +119,36 @@ class ErrorAnalyzer(BaseEstimator):
                                                        for feature_index in range(self.error_tree.estimator_.n_features_)]
 
         return self._error_analyzer_predictor_features
+    """
+
+    def get_error_analyzer_preprocessed_feature_names(self):
+        if self._error_analyzer_predictor_features is None:
+            self._error_analyzer_predictor_features = ["feature#%s" % feature_index
+                                                       for feature_index in
+                                                       range(self.error_tree.estimator_.n_features_)]
+
+        return self._error_analyzer_predictor_features
 
     def fit(self, X, y):
         """
-        Fit the Error Analyzer Predictor.
+        Fit the Error Analyzer Tree.
 
-        Trains the Error Analyzer Predictor, a Decision Tree to discriminate between samples that are correctly
+        Trains the Error Analyzer Tree, a Decision Tree to discriminate between samples that are correctly
         predicted or wrongly predicted (errors) by a primary model.
 
         Args:
             X (numpy.ndarray or pandas.DataFrame): feature data from a test set to evaluate the primary predictor and
-                train a Error Analyzer Predictor.
+                train a Error Analyzer Tree.
             y (numpy.ndarray or pandas.DataFrame): target data from a test set to evaluate the primary predictor and
-                train a Error Analyzer Predictor.
+                train a Error Analyzer Tree.
         """
-        logger.info("Preparing the Error Analyzer predictor...")
+        logger.info("Preparing the Error Analyzer Tree...")
 
         np.random.seed(self._random_state)
         preprocessed_x = self.pipeline_preprocessor.transform(X)
-        error_train_x, error_train_y = self._compute_primary_model_error(preprocessed_x, y)
+        self._error_train_x, self._error_train_y = self._compute_primary_model_error(preprocessed_x, y)
 
-        logger.info("Fitting the Error Analyzer predictor...")
+        logger.info("Fitting the Error Analyzer Tree...")
         # entropy/mutual information is used to split nodes in Microsoft Pandora system
         dt_clf = tree.DecisionTreeClassifier(criterion=ErrorAnalyzerConstants.CRITERION,
                                              random_state=self._random_state)
@@ -142,15 +157,96 @@ class ErrorAnalyzer(BaseEstimator):
                               cv=5,
                               scoring=make_scorer(fidelity_balanced_accuracy_score))
 
-        gs_clf.fit(error_train_x, error_train_y)
+        gs_clf.fit(self._error_train_x, self._error_train_y)
 
         self.error_tree = ErrorTree(error_decision_tree=gs_clf.best_estimator_,
-                                    error_train_x=error_train_x,
-                                    error_train_y=error_train_y)
+                                    error_train_x=self._error_train_x,
+                                    error_train_y=self._error_train_y)
 
         logger.info('Grid search selected parameters:')
         logger.info(gs_clf.best_params_)
 
+    #TODO: rewrite this method using the ranking arrays
+    def get_error_node_summary(self, leaf_selector='all_errors', add_path_to_leaves=False, print_summary=False):
+        """ Return summary information regarding input nodes.
+
+        Args:
+            leaf_selector (int or list or str): the desired leaf nodes to visualize. When int it represents the
+                number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid values
+                are either 'all_error' to plot all leaves of class 'Wrong prediction' or 'all' to plot all leaf nodes.
+            add_path_to_leaves (bool): add information of the feature path across the tree till the selected node.
+            print_summary (bool): print summary for the selected nodes.
+
+        Return:
+            dict: dictionary of metrics for each selected node of the Error Analyzer Tree.
+        """
+
+        leaf_nodes = self._get_ranked_leaf_ids(leaf_selector=leaf_selector)
+
+        y = self._error_train_y
+        n_total_errors = y[y == ErrorAnalyzerConstants.WRONG_PREDICTION].shape[0]
+        error_class_idx = np.where(self.error_tree.estimator_.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
+        correct_class_idx = 1 - error_class_idx
+
+        leaves_summary = []
+        path_to_node = None
+        for leaf_id in leaf_nodes:
+            values = self.error_tree.estimator_.tree_.value[leaf_id, :]
+            n_errors = int(np.ceil(values[0, error_class_idx]))
+            n_corrects = int(np.ceil(values[0, correct_class_idx]))
+            local_error = float(n_errors) / (n_corrects + n_errors)
+            global_error = float(n_errors) / n_total_errors
+
+            leaf_dict = {
+                "id": leaf_id,
+                "n_corrects": n_corrects,
+                "n_errors": n_errors,
+                "local_error": local_error,
+                "global_error": global_error
+            }
+
+            leaves_summary.append(leaf_dict)
+
+            if add_path_to_leaves:
+                path_to_node = self._get_path_to_node(leaf_id)
+                leaf_dict["path_to_leaf"] = path_to_node
+
+            if print_summary:
+                print("LEAF %d:" % leaf_id)
+                print("     Correct predictions: %d | Wrong predictions: %d | "
+                      "Local error (purity): %.2f | Global error: %.2f" %
+                      (n_corrects, n_errors, local_error, global_error))
+
+                if add_path_to_leaves:
+                    print('     Path to leaf:')
+                    for (step_idx, step) in enumerate(path_to_node):
+                        print('     ' + '   ' * step_idx + step)
+
+        return leaves_summary
+
+    def evaluate(self, X, y, output_format='text'):
+        """
+        Evaluate performance of ErrorAnalyzer on new the given test data and labels.
+        Print ErrorAnalyzer summary metrics regarding the Error Analyzer Tree.
+
+        Args:
+            X (numpy.ndarray or pandas.DataFrame): feature data from a test set to evaluate the primary predictor
+                and train a Error Analyzer Tree.
+            y (numpy.ndarray or pandas.DataFrame): target data from a test set to evaluate the primary predictor and
+                train a Error Analyzer Tree.
+            output_format (string): whether to return a "dict" or a "text"
+
+        Return:
+            dict or str: metrics regarding the Error Analyzer Tree.
+        """
+        prep_x, prep_y = self.pipeline_preprocessor.transform(X), np.array(y)
+        prep_x, y_true = self._compute_primary_model_error(prep_x, prep_y)
+        y_pred = self.error_tree.estimator_.predict(prep_x)
+        return mpp_report(y_true, y_pred, output_format)
+
+    def compute_train_leaf_ids(self):
+        """ Compute indices of leaf nodes for the train set """
+        return self.error_tree.estimator_.apply(self._error_train_x)
 
     def _prepare_data(self, X, y):
         """Check and sample data
@@ -192,7 +288,7 @@ class ErrorAnalyzer(BaseEstimator):
              error_y: array of string of shape (n_sampled_X, )
              Boolean value of whether or not the primary model got the prediction right.
         """
-        logger.info('Prepare data with model for Error Analyzer predictor')
+        logger.info('Prepare data with model for Error Analyzer Tree')
 
         sampled_X, sampled_y = self._prepare_data(X, y)
         y_pred = self._original_model.predict(sampled_X)
@@ -233,14 +329,14 @@ class ErrorAnalyzer(BaseEstimator):
 
         return error_y
 
-    def _get_ranked_leaf_ids(self, leaf_selector, rank_by='purity'):
+    def _get_ranked_leaf_ids(self, leaf_selector, rank_leaves_by='purity'):
         """ Select error nodes and rank them by importance.
 
         Args:
             leaf_selector (int or list or str): the desired leaf nodes to visualize. When int it represents the
                 number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid values are
                 either 'all_error' to plot all leaves of class 'Wrong prediction' or 'all' to plot all leaf nodes.
-            rank_by (str): ranking criterium for the leaf nodes. It can be either 'purity' to rank by the leaf
+            rank_leaves_by (str): ranking criterium for the leaf nodes. It can be either 'purity' to rank by the leaf
                 node purity (ratio of wrongly predicted samples over the total for an error node) or 'class_difference'
                 (difference of number of wrongly and correctly predicted samples in a node).
 
@@ -252,15 +348,16 @@ class ErrorAnalyzer(BaseEstimator):
         selected_leaves = apply_leaf_selector(self.error_tree.leaf_ids)
         if selected_leaves.size == 0:
             return selected_leaves
-        if rank_by == 'purity':
+        if rank_leaves_by == 'purity':
             sorted_ids = np.lexsort(
                 (apply_leaf_selector(self.error_tree.difference), apply_leaf_selector(self.error_tree.quantized_impurity)))
-        elif rank_by == 'class_difference':
+        elif rank_leaves_by == 'class_difference':
             sorted_ids = np.lexsort((apply_leaf_selector(self.error_tree.impurity), apply_leaf_selector(self.error_tree.difference)))
         else:
-            raise NotImplementedError("Input argument 'rank_by' is invalid. Should be 'purity' or 'class_difference'")
+            raise NotImplementedError("Input value for 'rank_leaves_by' is invalid. It must be 'purity' or 'class_difference'.")
         return selected_leaves.take(sorted_ids)
 
+    #TODO leaf_selector is taking too many different types of data ?
     def _get_leaf_selector(self, leaf_selector):
         """
         Return a function that select rows of provided arrays. Arrays must be of shape (1, number of leaves)
@@ -282,8 +379,10 @@ class ErrorAnalyzer(BaseEstimator):
         if isinstance(leaf_selector, str):
             if leaf_selector == "all":
                 return lambda array: array
-            if leaf_selector == "all_errors":
+            elif leaf_selector == "all_errors":
                 return lambda array: array[self.error_tree.get_error_leaves()]
+            else:
+                raise ValueError('Unknown string value "{}" for leaf_selector, please choose either "all" or "all_errors".'.format(leaf_selector))
 
         leaf_selector_as_array = np.array(leaf_selector)
         leaf_selector = np.in1d(self.error_tree.leaf_ids, leaf_selector_as_array)
@@ -343,7 +442,7 @@ class ErrorAnalyzer(BaseEstimator):
 
         Return:
             list or numpy.ndarray:
-                indices of features of the Error Analyzer Predictor Decision Tree, possibly mapped back to the
+                indices of features of the Error Analyzer Tree Decision Tree, possibly mapped back to the
                 original unprocessed feature space.
         """
 
@@ -370,7 +469,7 @@ class ErrorAnalyzer(BaseEstimator):
 
         Return:
             numpy.ndarray:
-                thresholds of the Error Analyzer Predictor Decision Tree, possibly with preprocessing undone.
+                thresholds of the Error Analyzer Tree Decision Tree, possibly with preprocessing undone.
         """
 
         if self._error_clf_thresholds is not None:
@@ -380,7 +479,7 @@ class ErrorAnalyzer(BaseEstimator):
         thresholds = self.error_tree.estimator_.tree_.threshold.copy().astype('O')
         thresh = thresholds[self.error_tree.estimator_.tree_.feature > 0]
         n_rows = np.count_nonzero(self.error_tree.estimator_.tree_.feature[self.error_tree.estimator_.tree_.feature > 0])
-        n_cols = self.error_tree.error_train_x.shape[1]
+        n_cols = self._error_train_x.shape[1]
         dummy_x = np.zeros((n_rows, n_cols))
 
         indices = []
@@ -391,86 +490,8 @@ class ErrorAnalyzer(BaseEstimator):
             indices.append((i, self.pipeline_preprocessor.inverse_transform_feature_id(f)))
             i += 1
 
-        undo_dummy_x = self.pipeline_preprocessor.inverse_transform(dummy_x)
-        descaled_thresh = [undo_dummy_x[i, j] for i, j in indices]
+p        descaled_thresh = [undo_dummy_x[i, j] for i, j in indices]
         thresholds[self.error_tree.estimator_.tree_.feature > 0] = descaled_thresh
         self._error_clf_thresholds = thresholds
         return self._error_clf_thresholds
 
-    # TODO: rewrite this method using the ranking arrays
-    def get_error_node_summary(self, leaf_selector='all_errors', add_path_to_leaves=False, print_summary=False):
-        """ Return summary information regarding input nodes.
-
-        Args:
-            leaf_selector (int or list or str): the desired leaf nodes to visualize. When int it represents the
-                number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid values
-                are either 'all_error' to plot all leaves of class 'Wrong prediction' or 'all' to plot all leaf nodes.
-            add_path_to_leaves (bool): add information of the feature path across the tree till the selected node.
-            print_summary (bool): print summary for the selected nodes.
-
-        Return:
-            dict: dictionary of metrics for each selected node of the Error Analyzer Predictor.
-        """
-
-        leaf_nodes = self._get_ranked_leaf_ids(leaf_selector=leaf_selector)
-
-        y = self.error_tree.error_train_y
-        n_total_errors = y[y == ErrorAnalyzerConstants.WRONG_PREDICTION].shape[0]
-        error_class_idx = np.where(self.error_tree.estimator_.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
-        correct_class_idx = 1 - error_class_idx
-
-        leaves_summary = []
-        path_to_node = None
-        for leaf_id in leaf_nodes:
-            values = self.error_tree.estimator_.tree_.value[leaf_id, :]
-            n_errors = int(np.ceil(values[0, error_class_idx]))
-            n_corrects = int(np.ceil(values[0, correct_class_idx]))
-            local_error = float(n_errors) / (n_corrects + n_errors)
-            global_error = float(n_errors) / n_total_errors
-
-            leaf_dict = {
-                "id": leaf_id,
-                "n_corrects": n_corrects,
-                "n_errors": n_errors,
-                "local_error": local_error,
-                "global_error": global_error
-            }
-
-            leaves_summary.append(leaf_dict)
-
-            if add_path_to_leaves:
-                path_to_node = self._get_path_to_node(leaf_id)
-                leaf_dict["path_to_leaf"] = path_to_node
-
-            if print_summary:
-                print("LEAF %d:" % leaf_id)
-                print("     Correct predictions: %d | Wrong predictions: %d | "
-                      "Local error (purity): %.2f | Global error: %.2f" %
-                      (n_corrects, n_errors, local_error, global_error))
-
-                if add_path_to_leaves:
-                    print('     Path to leaf:')
-                    for (step_idx, step) in enumerate(path_to_node):
-                        print('     ' + '   ' * step_idx + step)
-
-        return leaves_summary
-
-    def evaluate(self, X, y, output_format='text'):
-        """
-        Evaluate performance of ErrorAnalyzer on new the given test data and labels.
-        Print ErrorAnalyzer summary metrics regarding the Error Analyzer Predictor.
-
-        Args:
-            X (numpy.ndarray or pandas.DataFrame): feature data from a test set to evaluate the primary predictor
-                and train a Error Analyzer Predictor.
-            y (numpy.ndarray or pandas.DataFrame): target data from a test set to evaluate the primary predictor and
-                train a Error Analyzer Predictor.
-            output_format (string): whether to return a "dict" or a "text"
-
-        Return:
-            dict or str: metrics regarding the Error Analyzer Predictor.
-        """
-        prep_x, prep_y = self.pipeline_preprocessor.transform(X), np.array(y)
-        prep_x, y_true = self._compute_primary_model_error(prep_x, prep_y)
-        y_pred = self.error_tree.estimator_.predict(prep_x)
-        return mpp_report(y_true, y_pred, output_format)

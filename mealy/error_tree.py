@@ -27,7 +27,6 @@ class ErrorTree(object):
         self._error_train_x = error_train_x
         self._error_train_y = error_train_y
 
-        self._error_train_leaf_id = None
         self._leaf_ids = None
         self._impurity = None
         self._quantized_impurity = None
@@ -48,12 +47,6 @@ class ErrorTree(object):
     @property
     def error_train_y(self):
         return self._error_train_y
-
-    @property
-    def train_leaf_ids(self):
-        if self._error_train_leaf_id is None:
-            self._compute_train_leaf_ids()
-        return self._error_train_leaf_id
 
     @property
     def impurity(self):
@@ -82,10 +75,6 @@ class ErrorTree(object):
     def _check_error_tree(self):
         if sum(self.estimator_.tree_.feature > 0) == 0:
             logger.warning("The error tree has only 1 node, there will be problem when using this with ErrorVisualizer")
-
-    def _compute_train_leaf_ids(self):
-        """ Compute indices of leaf nodes for the train set """
-        self._error_train_leaf_id = self.estimator_.apply(self._error_train_x)
 
     def _compute_leaf_ids(self):
         """ Compute indices of leaf nodes """
