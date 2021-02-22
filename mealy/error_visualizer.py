@@ -187,7 +187,6 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                 if not (parent_id is None):
                     parent_edge = pydot_graph.get_edge(str(parent_id), node.get_name())[0]
                     parent_edge.set_penwidth(max(1, ErrorAnalyzerConstants.GRAPH_MAX_EDGE_WIDTH * global_error))
-                    parent_edge.set_label('%.3f %%' % (global_error * 100))
 
         if size is not None:
             pydot_graph.set_size('"%d,%d!"' % (size[0], size[1]))
