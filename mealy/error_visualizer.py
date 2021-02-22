@@ -28,8 +28,8 @@ class _BaseErrorVisualizer(object):
             raise NotImplementedError('You need to input an ErrorAnalyzer object.')
 
         self._error_analyzer = error_analyzer
-        self.get_ranked_leaf_ids = lambda leaf_selector, rank_by: error_analyzer.get_ranked_leaf_ids(leaf_selector,
-                                                                                                     rank_by)
+
+        self._get_ranked_leaf_ids = lambda leaf_selector, rank_by: error_analyzer._get_ranked_leaf_ids(leaf_selector, rank_by)
 
     @staticmethod
     def _plot_histograms(hist_data, label, **params):
@@ -83,27 +83,17 @@ class ErrorVisualizer(_BaseErrorVisualizer):
     def __init__(self, error_analyzer):
         super(ErrorVisualizer, self).__init__(error_analyzer)
 
-        self._error_clf = error_analyzer.model_performance_predictor
-        self._error_train_x = error_analyzer.error_train_x
-        self._error_train_y = error_analyzer.error_train_y
+        self._error_clf = self._error_analyzer.error_tree.estimator_
+        self._train_leaf_ids = self._error_clf.apply(self._error_analyzer._error_train_x)
+        self._thresholds = self._error_analyzer._inverse_transform_thresholds()
+        self._features = self._error_analyzer._inverse_transform_features()
 
-        self.pipeline_preprocessor = error_analyzer.pipeline_preprocessor
-        self.thresholds = error_analyzer.inverse_transform_thresholds()
-        self.features = error_analyzer.inverse_transform_features()
-
-        self.mpp_feature_names = error_analyzer.model_performance_predictor_features
-
-        if self.pipeline_preprocessor is None:
-            self.original_feature_names = self.mpp_feature_names
-
-            self.numerical_feature_names = self.mpp_feature_names
+        if self._error_analyzer.pipeline_preprocessor is None:
+            self._original_feature_names = self._error_analyzer.preprocessed_feature_names
+            self._numerical_feature_names = self._error_analyzer.preprocessed_feature_names
         else:
-            self.original_feature_names = self.pipeline_preprocessor.get_original_feature_names()
-
-            self.numerical_feature_names = [f for f in self.original_feature_names if
-                                            not self.pipeline_preprocessor.is_categorical(name=f)]
-
-        self._train_leaf_ids = error_analyzer.train_leaf_ids
+            self._original_feature_names = self._error_analyzer.pipeline_preprocessor.get_original_feature_names()
+            self._numerical_feature_names = [f for f in self._original_feature_names if not self._error_analyzer.pipeline_preprocessor.is_categorical(name=f)]
 
     def plot_error_tree(self, size=None):
         """Plot the graph of the decision tree.
@@ -116,7 +106,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
 
         """
         digraph_tree = export_graphviz(self._error_clf,
-                                       feature_names=self.mpp_feature_names,
+                                       feature_names=self._error_analyzer.preprocessed_feature_names,
                                        class_names=self._error_clf.classes_,
                                        node_ids=True,
                                        proportion=True,
@@ -128,8 +118,8 @@ class ErrorVisualizer(_BaseErrorVisualizer):
         pydot_graph = pydotplus.graph_from_dot_data(str(digraph_tree))
 
         # descale threshold value
-        thresholds = self.thresholds
-        features = self.features
+        thresholds = self._thresholds
+        features = self._features
 
         y = self._error_train_y
         n_total_errors = y[y == ErrorAnalyzerConstants.WRONG_PREDICTION].shape[0]
@@ -152,11 +142,11 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                     lte_split = node_label.split(' <= ')
                     entropy_split = lte_split[1].split('\\nentropy')
 
-                    split_feature = self.original_feature_names[features[idx]]
+                    split_feature = self._original_feature_names[features[idx]]
 
                     descaled_value = thresholds[idx]
 
-                    if split_feature in self.numerical_feature_names:
+                    if split_feature in self._numerical_feature_names:
                         descaled_value = '%.2f' % descaled_value
                         lte_modified = ' <= '.join([lte_split[0], descaled_value])
                     else:
@@ -211,6 +201,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                                              top_k_features=ErrorAnalyzerConstants.TOP_K_FEATURES,
                                              show_global=True, show_class=True, rank_leaves_by="global_error",
                                              nr_bins=10, figsize=(15, 10)):
+
         """Return plot of error node feature distribution and compare to global baseline.
 
         The top-k features are sorted by importance in the Model Performance Predictor.
@@ -246,41 +237,42 @@ class ErrorVisualizer(_BaseErrorVisualizer):
         correct_class_idx = 1 - error_class_idx
 
         ranked_feature_ids = rank_features_by_error_correlation(self._error_clf.feature_importances_)
-        if self.pipeline_preprocessor is None:
+        if self._error_analyzer.pipeline_preprocessor is None:
             if top_k_features > 0:
                 ranked_feature_ids = ranked_feature_ids[:top_k_features]
 
-            x, y = self._error_train_x[:, ranked_feature_ids], self._error_train_y
+            x, y = self._error_analyzer._error_train_x[:, ranked_feature_ids], self._error_analyzer._error_train_y
             min_values, max_values = x.min(axis=0), x.max(axis=0)
-            feature_names = self.mpp_feature_names
+            feature_names = self._error_analyzer.preprocessed_feature_names
         else:
-            ranked_feature_ids = [self.pipeline_preprocessor.inverse_transform_feature_id(idx) for idx in
-                                  ranked_feature_ids]
+            """ 
             if top_k_features > 0:
                 ranked_feature_ids = ranked_feature_ids[:top_k_features]
-            x, y = self.pipeline_preprocessor.inverse_transform(self._error_train_x)[:,
-                   ranked_feature_ids], self._error_train_y
-            # TODO
+            """
+            ranked_feature_ids = [self._error_analyzer.pipeline_preprocessor.inverse_transform_feature_id(idx) for idx in ranked_feature_ids]
+            if top_k_features > 0:
+                ranked_feature_ids = ranked_feature_ids[:top_k_features]
+
+            x, y = self._error_analyzer.pipeline_preprocessor.inverse_transform(self._error_analyzer._error_train_x)[:, ranked_feature_ids], self._error_analyzer._error_train_y
+            # TODO to do what ?
             min_values, max_values = x.min(axis=0), x.max(axis=0)
-            feature_names = self.original_feature_names
+            feature_names = self._original_feature_names
 
         global_error_sample_ids = y == ErrorAnalyzerConstants.WRONG_PREDICTION
-        nr_wrong, nr_correct = self._error_clf.tree_.value[:, 0, error_class_idx], self._error_clf.tree_.value[:, 0,
-                                                                                   correct_class_idx]
+        nr_wrong, nr_correct = self._error_clf.tree_.value[:, 0, error_class_idx], self._error_clf.tree_.value[:, 0, correct_class_idx]
 
-        leaf_nodes = self.get_ranked_leaf_ids(leaf_selector, rank_leaves_by)
+        leaf_nodes = self._get_ranked_leaf_ids(leaf_selector, rank_leaves_by)
         for leaf in leaf_nodes:
             leaf_sample_ids = self._train_leaf_ids == leaf
             nr_leaf_samples = nr_wrong[leaf] + nr_correct[leaf]
             proba_wrong_leaf, proba_correct_leaf = nr_wrong[leaf] / nr_leaf_samples, nr_correct[leaf] / nr_leaf_samples
-            print('Leaf {} (Wrong prediction: {:.3f}, Correct prediction: {:.3f})'.format(leaf, proba_wrong_leaf,
-                                                                                          proba_correct_leaf))
+            print('Leaf {} (Wrong prediction: {:.3f}, Correct prediction: {:.3f})'.format(leaf, proba_wrong_leaf, proba_correct_leaf))
 
             for i, feature_idx in enumerate(ranked_feature_ids):
 
                 feature_name = feature_names[feature_idx]
-                feature_is_numerical = True if self.pipeline_preprocessor is None else (
-                    not self.pipeline_preprocessor.is_categorical(feature_idx))
+                feature_is_numerical = True if self._error_analyzer.pipeline_preprocessor is None else (
+                    not self._error_analyzer.pipeline_preprocessor.is_categorical(feature_idx))
 
                 feature_column = x[:, i]
 
@@ -292,17 +284,13 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                         histogram_func = lambda f_samples: np.histogram(f_samples, bins=bins, density=True)[0]
 
                 else:
-
                     bins = np.unique(feature_column)[:nr_bins]
                     if show_class:
-                        histogram_func = lambda f_samples: \
-                            np.bincount(np.searchsorted(bins, f_samples),
-                                        minlength=len(bins))[:nr_bins].astype(float)
+                        histogram_func = lambda f_samples: np.bincount(np.searchsorted(bins, f_samples), minlength=len(bins))[:nr_bins].astype(float)
                     else:
-                        histogram_func = lambda f_samples: \
-                            np.bincount(np.searchsorted(bins, f_samples),
-                                        minlength=len(bins))[:nr_bins].astype(float) / len(f_samples)
+                        histogram_func = lambda f_samples: np.bincount(np.searchsorted(bins, f_samples), minlength=len(bins))[:nr_bins].astype(float) / len(f_samples)
 
+                root_hist_data = {}
                 if show_global:
                     if show_class:
                         hist_wrong = histogram_func(feature_column[global_error_sample_ids])
@@ -311,10 +299,8 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                         normalized_hist_wrong = hist_wrong / n_samples
                         normalized_hist_correct = hist_correct / n_samples
                         root_hist_data = {
-                            ErrorAnalyzerConstants.WRONG_PREDICTION:
-                                normalized_hist_wrong,
-                            ErrorAnalyzerConstants.CORRECT_PREDICTION:
-                                normalized_hist_correct
+                            ErrorAnalyzerConstants.WRONG_PREDICTION: normalized_hist_wrong,
+                            ErrorAnalyzerConstants.CORRECT_PREDICTION: normalized_hist_correct
                         }
                     else:
                         root_prediction = ErrorAnalyzerConstants.CORRECT_PREDICTION if int(nr_correct[0]) >= int(
@@ -335,11 +321,10 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                     }
                 else:
                     leaf_prediction = ErrorAnalyzerConstants.CORRECT_PREDICTION if proba_correct_leaf > proba_wrong_leaf else ErrorAnalyzerConstants.WRONG_PREDICTION
-                    leaf_hist_data = {
-                        leaf_prediction: histogram_func(feature_column[leaf_sample_ids])}
+                    leaf_hist_data = {leaf_prediction: histogram_func(feature_column[leaf_sample_ids])}
 
                 x_ticks = _BaseErrorVisualizer._add_new_plot(figsize, bins, feature_name, leaf)
-                _BaseErrorVisualizer._plot_feature_distribution(x_ticks, feature_is_numerical, leaf_hist_data,
-                                                                root_hist_data if show_global else None)
+                _BaseErrorVisualizer._plot_feature_distribution(x_ticks, feature_is_numerical, leaf_hist_data, root_hist_data if show_global else None)
+                break
 
         plt.show()

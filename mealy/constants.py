@@ -1,4 +1,4 @@
-from sklearn.impute import SimpleImputer, KNNImputer
+from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder, StandardScaler, PowerTransformer, QuantileTransformer, \
     MaxAbsScaler, Binarizer, Normalizer, MinMaxScaler, RobustScaler
 
@@ -7,10 +7,10 @@ class ErrorAnalyzerConstants(object):
 
     WRONG_PREDICTION = "Wrong prediction"
     CORRECT_PREDICTION = "Correct prediction"
-    PARAMETERS_GRID = {'max_depth': [5, 10, 20, None], 'min_samples_leaf': [10, 20]}
+    PARAMETERS_GRID = {'max_depth': [5, 10], 'min_samples_leaf': [0.05, 0.1]}
     TEST_SIZE = 0.2
 
-    MIN_NUM_ROWS = 100 #500  # heuristic choice
+    MIN_NUM_ROWS = 100  # heuristic choice
     MAX_NUM_ROW = 100000  # heuristic choice
 
     MPP_ACCURACY_TOLERANCE = 0.1
@@ -34,10 +34,10 @@ class ErrorAnalyzerConstants(object):
     VALID_CATEGORICAL_STEPS = (OneHotEncoder, OrdinalEncoder)
     STEPS_THAT_DOES_NOT_CHANGE_OUTPUT_DIMENSION = (StandardScaler, PowerTransformer, QuantileTransformer, MaxAbsScaler,
                                                    Binarizer, Normalizer, MinMaxScaler, RobustScaler, SimpleImputer,
-                                                   KNNImputer, OrdinalEncoder)
+                                                   OrdinalEncoder)
     STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES = (OneHotEncoder,)
-    # for imputers we don't need inverse function
-    STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION = (SimpleImputer, KNNImputer)
-
     GRAPH_MAX_EDGE_WIDTH = 10
     GRAPH_MIN_LOCAL_ERROR_OPAQUE = 0.5
+    
+    # for imputers we don't need inverse function
+    STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION = (SimpleImputer,)
