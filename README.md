@@ -155,7 +155,7 @@ mealy depends on:
 - Python >= 3.5
 - NumPy >= 1.11
 - SciPy >= 0.19
-- scikit-learn == 0.22 
+- scikit-learn >= 0.19
 - matplotlib >= 2.0 
 - graphviz >= 0.14
 - pydotplus >= 2.0
