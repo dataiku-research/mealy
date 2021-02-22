@@ -355,9 +355,8 @@ class ErrorAnalyzer(object):
                     array: numpy array of shape (1, number of leaves)
                     An array of which we only want to keep some rows
         """
-        if isinstance(leaf_selector, str):
-            if leaf_selector is None:
-                return lambda array: array
+        if leaf_selector is None:
+            return lambda array: array
 
         leaf_selector_as_array = np.array(leaf_selector)
         leaf_selector = np.in1d(self.leaf_ids, leaf_selector_as_array)
