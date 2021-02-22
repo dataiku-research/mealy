@@ -31,7 +31,7 @@ def test_with_only_scikit_model():
     mpp = ErrorAnalyzer(rf, feature_names=numeric_features, param_grid={'max_depth': [5, 10, None], 'min_samples_leaf': [10, 20]})
     mpp.fit(X_test, y_test)
 
-    prep_x, y_true = mpp._compute_primary_model_error(X_test.values, y_test)
+    prep_x, y_true, _ = mpp._compute_primary_model_error(X_test.values, y_test)
     y_pred = mpp._error_tree.estimator_.predict(prep_x)
 
     mpp_accuracy_score = compute_mpp_accuracy(y_true, y_pred)
@@ -91,7 +91,7 @@ def test_with_scikit_pipeline():
 
     X_test_prep, y_test_prep = mpp.pipeline_preprocessor.transform(X_test), np.array(y_test)
 
-    prep_x, y_true = mpp._compute_primary_model_error(X_test_prep, y_test_prep)
+    prep_x, y_true, _ = mpp._compute_primary_model_error(X_test_prep, y_test_prep)
     y_pred = mpp._error_tree.estimator_.predict(prep_x)
 
     mpp_accuracy_score = compute_mpp_accuracy(y_true, y_pred)

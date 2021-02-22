@@ -75,15 +75,6 @@ class ErrorAnalyzer(BaseEstimator):
         self._error_train_y = None
 
         self._error_train_leaf_id = None
-        self._leaf_ids = None
-
-        self._impurity = None
-        self._quantized_impurity = None
-        self._difference = None
-        self._global_error = None
-
-        self._error_clf_thresholds = None
-        self._error_clf_features = None
 
     @property
     def feature_names(self):
@@ -130,19 +121,7 @@ class ErrorAnalyzer(BaseEstimator):
         return self._error_tree
 
     @property
-    def global_error(self):
-        if self._global_error is None:
-            self._compute_ranking_arrays()
-        return self._global_error
-
-    @property
-    def leaf_ids(self):
-        if self._leaf_ids is None:
-            self._compute_leaf_ids()
-        return self._leaf_ids
-
-   @property
-   def preprocessed_feature_names(self):
+    def preprocessed_feature_names(self):
         if self._preprocessed_feature_names is None:
             self._preprocessed_feature_names = ["feature#%s" % feature_index
                                                 for feature_index in
@@ -350,10 +329,6 @@ class ErrorAnalyzer(BaseEstimator):
         else:
             error_array = np.array(y_true != y_pred)
 
-        y = self._error_train_y
-        n_total_errors = y[y == ErrorAnalyzerConstants.WRONG_PREDICTION].shape[0]
-        self._global_error = wrongly_predicted_samples.astype(float) / n_total_errors
-
         target_mapping_dict = {True: ErrorAnalyzerConstants.WRONG_PREDICTION, False: ErrorAnalyzerConstants.CORRECT_PREDICTION}
         error_y = np.array([target_mapping_dict[elem] for elem in error_array], dtype=object)
 
@@ -367,7 +342,7 @@ class ErrorAnalyzer(BaseEstimator):
         logger.info('The original model has an error rate of {}'.format(round(error_rate, 3)))
         return error_y, error_rate
 
-    def _get_ranked_leaf_ids(self, leaf_selector, rank_leaves_by='purity'):
+    def _get_ranked_leaf_ids(self, leaf_selector, rank_by='purity'):
         """ Select error nodes and rank them by importance.
 
         Args:
@@ -388,11 +363,11 @@ class ErrorAnalyzer(BaseEstimator):
         if selected_leaves.size == 0:
             return selected_leaves
         if rank_by == 'global_error':
-            sorted_ids = np.argsort(-apply_leaf_selector(self.global_error), )
+            sorted_ids = np.argsort(-apply_leaf_selector(self._error_tree.global_error), )
         elif rank_by == 'purity':
             sorted_ids = np.lexsort(
                 (apply_leaf_selector(self._error_tree.difference), apply_leaf_selector(self._error_tree.quantized_impurity)))
-        elif rank_leaves_by == 'class_difference':
+        elif rank_by == 'class_difference':
             sorted_ids = np.lexsort((apply_leaf_selector(self._error_tree.impurity), apply_leaf_selector(self._error_tree.difference)))
         else:
             raise NotImplementedError("Input value for 'rank_leaves_by' is invalid. It must be 'purity' or 'class_difference'.")

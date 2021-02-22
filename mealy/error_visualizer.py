@@ -121,14 +121,12 @@ class ErrorVisualizer(_BaseErrorVisualizer):
         thresholds = self._thresholds
         features = self._features
 
-        y = self._error_train_y
+        y = self._error_analyzer._error_train_y
         n_total_errors = y[y == ErrorAnalyzerConstants.WRONG_PREDICTION].shape[0]
-        error_class_idx = \
-            np.where(self._error_clf.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
+        error_class_idx = np.where(self._error_clf.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
         wrongly_predicted_samples = self._error_clf.tree_.value[:, 0, error_class_idx]
 
-        correct_class_idx = \
-            np.where(self._error_clf.classes_ == ErrorAnalyzerConstants.CORRECT_PREDICTION)[0][0]
+        correct_class_idx = np.where(self._error_clf.classes_ == ErrorAnalyzerConstants.CORRECT_PREDICTION)[0][0]
         well_predicted_samples = self._error_clf.tree_.value[:, 0, correct_class_idx]
 
         nodes = pydot_graph.get_node_list()
