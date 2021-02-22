@@ -15,6 +15,7 @@ class ErrorTree(object):
         self._impurity = None
         self._quantized_impurity = None
         self._difference = None
+        self._global_error = None
 
         self._check_error_tree()
 
@@ -41,6 +42,12 @@ class ErrorTree(object):
         if self._difference is None:
             self._compute_ranking_arrays()
         return self._difference
+
+    @property
+    def global_error(self):
+        if self._global_error is None:
+            self._compute_ranking_arrays()
+        return self._global_error
 
     @property
     def leaf_ids(self):
@@ -74,3 +81,7 @@ class ErrorTree(object):
         purity_bins = np.linspace(0, 1., n_purity_levels)
         self._quantized_impurity = np.digitize(self._impurity, purity_bins)
         self._difference = correctly_predicted_samples - wrongly_predicted_samples  # only negative numbers
+
+        #y = self._error_train_y
+        n_total_errors = np.sum(wrongly_predicted_samples) #y[y == ErrorAnalyzerConstants.WRONG_PREDICTION].shape[0]
+        self._global_error = wrongly_predicted_samples.astype(float) / n_total_errors

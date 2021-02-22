@@ -9,6 +9,7 @@ from mealy.constants import ErrorAnalyzerConstants
 from mealy.error_analyzer import ErrorAnalyzer
 
 import logging
+
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='mealy | %(levelname)s - %(message)s')
 
@@ -27,6 +28,7 @@ class _BaseErrorVisualizer(object):
             raise NotImplementedError('You need to input an ErrorAnalyzer object.')
 
         self._error_analyzer = error_analyzer
+
         self._get_ranked_leaf_ids = lambda leaf_selector, rank_by: error_analyzer._get_ranked_leaf_ids(leaf_selector, rank_by)
 
     @staticmethod
@@ -119,13 +121,22 @@ class ErrorVisualizer(_BaseErrorVisualizer):
         thresholds = self._thresholds
         features = self._features
 
+        y = self._error_analyzer._error_train_y
+        n_total_errors = y[y == ErrorAnalyzerConstants.WRONG_PREDICTION].shape[0]
+        error_class_idx = np.where(self._error_clf.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
+        wrongly_predicted_samples = self._error_clf.tree_.value[:, 0, error_class_idx]
+
+        correct_class_idx = np.where(self._error_clf.classes_ == ErrorAnalyzerConstants.CORRECT_PREDICTION)[0][0]
+        well_predicted_samples = self._error_clf.tree_.value[:, 0, correct_class_idx]
+
         nodes = pydot_graph.get_node_list()
+
         for node in nodes:
             if node.get_label():
-                node_label = node.get_label()
-
+                node_label = node.get_label().strip('"')
+                new_label = node_label
+                idx = int(node_label.split('node #')[1].split('\\n')[0])
                 if ' <= ' in node_label:
-                    idx = int(node_label.split('node #')[1].split('\\n')[0])
                     lte_split = node_label.split(' <= ')
                     entropy_split = lte_split[1].split('\\nentropy')
 
@@ -142,16 +153,23 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                         lte_modified = ' != '.join([lte_split_with_new_feature, str(descaled_value)])
                     new_label = '\\nentropy'.join([lte_modified, entropy_split[1]])
 
-                    node.set_label(new_label)
+                global_error = float(wrongly_predicted_samples[idx]) / n_total_errors
+                local_error = float(wrongly_predicted_samples[idx]) / (
+                            well_predicted_samples[idx] + wrongly_predicted_samples[idx])
+                new_label += '\\nglobal error = %.3f %%\\n' % (global_error * 100)
+
+                node.set_label(new_label)
 
                 alpha = 0.0
-                node_class = ErrorAnalyzerConstants.CORRECT_PREDICTION
                 if 'value = [' in node_label:
-                    values = [float(ii) for ii in node_label.split('value = [')[1].split(']')[0].split(',')]
-                    node_arg_class = np.argmax(values)
-                    node_class = self._error_clf.classes_[node_arg_class]
-                    # transparency as the entropy value
-                    alpha = values[node_arg_class]
+                    # transparency as the local error
+                    if local_error >= ErrorAnalyzerConstants.GRAPH_MIN_LOCAL_ERROR_OPAQUE:
+                        alpha = 1.0
+                    else:
+                        alpha = local_error
+
+                node_class = ErrorAnalyzerConstants.CORRECT_PREDICTION if global_error == 0 \
+                    else ErrorAnalyzerConstants.WRONG_PREDICTION
                 class_color = ErrorAnalyzerConstants.ERROR_TREE_COLORS[node_class].strip('#')
                 class_color_rgb = tuple(int(class_color[i:i + 2], 16) for i in (0, 2, 4))
                 # compute the color as alpha against white
@@ -159,20 +177,27 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                 color = '#{:02x}{:02x}{:02x}'.format(color_rgb[0], color_rgb[1], color_rgb[2])
                 node.set_fillcolor(color)
 
+                if idx in self._error_clf.tree_.children_left:
+                    parent_id = np.where(self._error_clf.tree_.children_left == idx)[0][0]
+                elif idx in self._error_clf.tree_.children_right:
+                    parent_id = np.where(self._error_clf.tree_.children_right == idx)[0][0]
+                else:
+                    parent_id = None
+
+                if not (parent_id is None):
+                    parent_edge = pydot_graph.get_edge(str(parent_id), node.get_name())[0]
+                    parent_edge.set_penwidth(max(1, ErrorAnalyzerConstants.GRAPH_MAX_EDGE_WIDTH * global_error))
+
         if size is not None:
             pydot_graph.set_size('"%d,%d!"' % (size[0], size[1]))
         gvz_graph = gv.Source(pydot_graph.to_string())
 
         return gvz_graph
 
-    def plot_feature_distributions_on_leaves(self,
-                                             leaf_selector='all_errors',
+    def plot_feature_distributions_on_leaves(self, leaf_selector='all',
                                              top_k_features=ErrorAnalyzerConstants.TOP_K_FEATURES,
-                                             show_global=True,
-                                             show_class=False,
-                                             rank_leaves_by="purity",
-                                             nr_bins=10,
-                                             figsize=(15, 10)):
+                                             show_global=True, show_class=True, rank_leaves_by="global_error",
+                                             nr_bins=10, figsize=(15, 10)):
 
         """Return plot of error node feature distribution and compare to global baseline.
 
@@ -183,8 +208,8 @@ class ErrorVisualizer(_BaseErrorVisualizer):
         Args:
 
             leaf_selector (int or list or str): the desired leaf nodes to visualize. When int it represents the
-                number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid values
-                are either 'all_error' to plot all leaves of class 'Wrong prediction' or 'all' to plot all leaf nodes.
+                number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid value
+                is 'all' to plot all leaf nodes.
 
             top_k_features (int): number of features to plot per node.
 
@@ -194,9 +219,10 @@ class ErrorVisualizer(_BaseErrorVisualizer):
             show_class (bool): show the proportion of Wrongly and Correctly predicted samples in the feature
                 distributions.
 
-            rank_leaves_by (str): ranking criterium for the leaf nodes. It can be either 'purity' to rank by the leaf
-                node purity (ratio of wrongly predicted samples over the total for an error node) or 'class_difference'
-                (difference of number of wrongly and correctly predicted samples in a node).
+            rank_leaves_by (str): ranking criterion for the leaf nodes. It can be 'global_error' to rank by the global
+                error (percentage of total error in the node), 'purity' to rank by the leaf node purity (ratio of
+                wrongly predicted samples over the total for an error node) or 'class_difference' (difference of number
+                of wrongly and correctly predicted samples in a node).
 
             nr_bins (int): number of bins in the feature distribution plots.
 
