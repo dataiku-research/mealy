@@ -1,21 +1,8 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-import collections
-from sklearn import tree
-from sklearn.model_selection import GridSearchCV
-from sklearn.base import is_regressor
 from sklearn.exceptions import NotFittedError
-from sklearn.pipeline import Pipeline
-from sklearn.compose import ColumnTransformer
-from sklearn.base import BaseEstimator
-from sklearn.metrics import make_scorer
-import logging
-
-from mealy.error_analysis_utils import check_enough_data, get_epsilon
 from mealy.constants import ErrorAnalyzerConstants
-from mealy.metrics import mpp_report, fidelity_balanced_accuracy_score
-from mealy.preprocessing import PipelinePreprocessor, DummyPipelinePreprocessor
-
+import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='mealy | %(levelname)s - %(message)s')
 

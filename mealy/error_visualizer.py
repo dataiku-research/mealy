@@ -82,11 +82,11 @@ class ErrorVisualizer(_BaseErrorVisualizer):
         super(ErrorVisualizer, self).__init__(error_analyzer)
 
         self._error_clf = error_analyzer.error_tree.estimator_
-        self._train_leaf_ids = error_analyzer.compute_train_leaf_ids()
+        self._train_leaf_ids = self._error_clf.apply(error_analyzer._error_train_x)
         self._pipeline_preprocessor = error_analyzer.pipeline_preprocessor
         self._thresholds = error_analyzer._inverse_transform_thresholds()
         self._features = error_analyzer._inverse_transform_features()
-        self._mpp_feature_names = error_analyzer.get_error_analyzer_preprocessed_feature_names() #error_analyzer_predictor_features
+        self._mpp_feature_names = error_analyzer.get_error_analyzer_preprocessed_feature_names()
 
         if self._pipeline_preprocessor is None:
             self._original_feature_names = self._mpp_feature_names

@@ -233,13 +233,10 @@ class PipelinePreprocessor(FeatureNameTransformer):
         def _inverse_single_step(single_step, step_output):
             inverse_transform_function_available = getattr(single_step, "inverse_transform", None)
             if inverse_transform_function_available:
-                logger.info("Reversing step {} using inverse_transform() function on column {}".format(single_step, ', '.join([f for f in transformer_feature_names])))
-                print(single_step)
-                print(step_output)
-                print('-----')
+                logger.info("Reversing step {} using inverse_transform() function on column(s): {}".format(single_step, ', '.join([f for f in transformer_feature_names])))
                 step_input = single_step.inverse_transform(step_output)
             elif isinstance(single_step, ErrorAnalyzerConstants.STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION):
-                logger.info("Reversing step {} using identity transformation on column {}".format(single_step, ', '.join([f for f in transformer_feature_names])))
+                logger.info("Reversing step {} using identity transformation on column(s): {}".format(single_step, ', '.join([f for f in transformer_feature_names])))
                 step_input = step_output
             else:
                 raise ValueError('The package does not support {} because it does not provide inverse_transform function.'.format(single_step))

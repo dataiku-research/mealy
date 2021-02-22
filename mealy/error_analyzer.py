@@ -4,19 +4,16 @@ import collections
 from sklearn import tree
 from sklearn.model_selection import GridSearchCV
 from sklearn.base import is_regressor
-from sklearn.exceptions import NotFittedError
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.base import BaseEstimator
 from sklearn.metrics import make_scorer
-
-import logging
-
 from mealy.error_analysis_utils import check_enough_data, get_epsilon
 from mealy.constants import ErrorAnalyzerConstants
 from mealy.metrics import mpp_report, fidelity_balanced_accuracy_score
 from mealy.preprocessing import PipelinePreprocessor, DummyPipelinePreprocessor
 from mealy.error_tree import ErrorTree
+import logging
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='mealy | %(levelname)s - %(message)s')
@@ -38,18 +35,7 @@ class ErrorAnalyzer(BaseEstimator):
         random_state (int): random seed.
 
     Attributes:
-        error_train_x (numpy.ndarray): features used to train the Error Analyzer Tree.
-        error_train_y (numpy.ndarray): target used to train the Error Analyzer Tree, it is abinary variable
-            representing whether the input predictor predicted correctly or incorrectly the samples in error_train_x.
-        model_performance_predictor_features (list): feature names used in the Error Analyzer Tree.
-        model_performance_predictor (sklearn.tree.DecisionTreeClassifier): performance predictor decision tree.
-        train_leaf_ids (numpy.ndarray): indices of leaf in the Error Analyzer Tree, where each of the training
-            sample falls.
-        impurity (numpy.ndarray): impurity of leaf nodes (used for ranking the nodes).
-        quantized_impurity (numpy.ndarray): quantized impurity of leaf nodes (used for ranking the nodes).
-        difference (numpy.ndarray): difference of number of correctly and incorrectly predicted samples in leaf nodes
-            (used for ranking the nodes).
-        leaf_ids (numpy.ndarray): list of all leaf nodes indices.
+        error_tree (DecisionTreeClassifier): the estimator used to train the Error Analyzer Tree
     """
 
     def __init__(self, original_model,
@@ -82,11 +68,8 @@ class ErrorAnalyzer(BaseEstimator):
 
         self._is_regression = is_regressor(self._original_model)
         self.error_tree = None
-        self._error_clf_thresholds = None
-        self._error_clf_features = None
         self._error_train_x = None
         self._error_train_y = None
-        self._train_leaf_id = None
 
     @property
     def feature_names(self):
@@ -107,19 +90,6 @@ class ErrorAnalyzer(BaseEstimator):
     @property
     def random_state(self):
         return self._random_state
-
-
-
-    #TODO is this used somewhere ?
-    """ 
-    @property
-    def error_analyzer_predictor_features(self):
-        if self._error_analyzer_predictor_features is None:
-            self._error_analyzer_predictor_features = ["feature#%s" % feature_index
-                                                       for feature_index in range(self.error_tree.estimator_.n_features_)]
-
-        return self._error_analyzer_predictor_features
-    """
 
     def get_error_analyzer_preprocessed_feature_names(self):
         if self._error_analyzer_predictor_features is None:
@@ -244,10 +214,6 @@ class ErrorAnalyzer(BaseEstimator):
         y_pred = self.error_tree.estimator_.predict(prep_x)
         return mpp_report(y_true, y_pred, output_format)
 
-    def compute_train_leaf_ids(self):
-        """ Compute indices of leaf nodes for the train set """
-        return self.error_tree.estimator_.apply(self._error_train_x)
-
     def _prepare_data(self, X, y):
         """Check and sample data
 
@@ -286,7 +252,7 @@ class ErrorAnalyzer(BaseEstimator):
              A sample of `X`.
 
              error_y: array of string of shape (n_sampled_X, )
-             Boolean value of whether or not the primary model got the prediction right.
+             Boolean value of whether or not the original model predicted correctly or incorrectly the samples in sampled_X.
         """
         logger.info('Prepare data with model for Error Analyzer Tree')
 
@@ -398,9 +364,6 @@ class ErrorAnalyzer(BaseEstimator):
         feature_names = self.pipeline_preprocessor.get_original_feature_names()
         children_left = self.error_tree.estimator_.tree_.children_left
         children_right = self.error_tree.estimator_.tree_.children_right
-        # feature = self.model_performance_predictor.tree_.feature
-        # threshold = self.model_performance_predictor.tree_.threshold
-
         threshold = self._inverse_transform_thresholds()
         feature = self._inverse_transform_features()
 
@@ -434,46 +397,37 @@ class ErrorAnalyzer(BaseEstimator):
     def _inverse_transform_features(self):
         """ Undo preprocessing of feature values.
 
-        If the predictor comes with a Pipeline preprocessor, map the features indices of the Model
-        Performance Predictor Decision Tree back to their indices in the original unpreprocessed space of features.
+        If the predictor comes with a Pipeline preprocessor, map the features indices of the Error Analysis
+        Decision Tree back to their indices in the original unpreprocessed space of features.
         Otherwise simply return the feature indices of the decision tree. The feature indices of a decision tree
         indicate what features are used to split the training set at each node.
         See https://scikit-learn.org/stable/auto_examples/tree/plot_unveil_tree_structure.html.
 
         Return:
             list or numpy.ndarray:
-                indices of features of the Error Analyzer Tree Decision Tree, possibly mapped back to the
+                indices of features of the Error Analyzer Tree, possibly mapped back to the
                 original unprocessed feature space.
         """
-
-        if self._error_clf_features is not None:
-            return self._error_clf_features
-
         feats_idx = self.error_tree.estimator_.tree_.feature.copy()
 
         for i, f in enumerate(feats_idx):
             if f > 0:
                 feats_idx[i] = self.pipeline_preprocessor.inverse_transform_feature_id(f)
 
-        self._error_clf_features = feats_idx
-
-        return self._error_clf_features
+        return feats_idx
 
     def _inverse_transform_thresholds(self):
         """  Undo preprocessing of feature threshold values.
 
-        If the predictor comes with a Pipeline preprocessor, undo the preprocessing on the thresholds of the Model
-        Performance Predictor Decision Tree for an easier plot interpretation. Otherwise simply return the thresholds of
+        If the predictor comes with a Pipeline preprocessor, undo the preprocessing on the thresholds of the Error Analyzer
+        Tree for an easier plot interpretation. Otherwise simply return the thresholds of
         the decision tree. The thresholds of a decision tree are the feature values used to split the training set at
         each node. See https://scikit-learn.org/stable/auto_examples/tree/plot_unveil_tree_structure.html.
 
         Return:
             numpy.ndarray:
-                thresholds of the Error Analyzer Tree Decision Tree, possibly with preprocessing undone.
+                thresholds of the Error Analyzer Tree, possibly with preprocessing undone.
         """
-
-        if self._error_clf_thresholds is not None:
-            return self._error_clf_thresholds
 
         feats_idx = self.error_tree.estimator_.tree_.feature[self.error_tree.estimator_.tree_.feature > 0]
         thresholds = self.error_tree.estimator_.tree_.threshold.copy().astype('O')
@@ -493,6 +447,6 @@ class ErrorAnalyzer(BaseEstimator):
         undo_dummy_x = self.pipeline_preprocessor.inverse_transform(dummy_x)
         descaled_thresh = [undo_dummy_x[i, j] for i, j in indices]
         thresholds[self.error_tree.estimator_.tree_.feature > 0] = descaled_thresh
-        self._error_clf_thresholds = thresholds
-        return self._error_clf_thresholds
+
+        return thresholds
 
