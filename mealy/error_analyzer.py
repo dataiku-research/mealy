@@ -162,7 +162,7 @@ class ErrorAnalyzer(BaseEstimator):
             'min_samples_leaf': np.linspace(error_rate/5, error_rate, 5)
         }
 
-        logger.info('Grid search the Error Tree with the following grid: ', param_grid)
+        logger.info('Grid search the Error Tree with the following grid: {}'.format(param_grid))
         gs_clf = GridSearchCV(dt_clf,
                               param_grid=param_grid, #self._param_grid,
                               cv=5,
@@ -170,8 +170,7 @@ class ErrorAnalyzer(BaseEstimator):
 
         gs_clf.fit(self._error_train_x, self._error_train_y)
         self._error_tree = ErrorTree(error_decision_tree=gs_clf.best_estimator_)
-        logger.info('Chosen parameters:')
-        logger.info(gs_clf.best_params_)
+        logger.info('Chosen parameters: {}'.format(gs_clf.best_params_))
 
     #TODO: rewrite this method using the ranking arrays
     def get_error_node_summary(self, leaf_selector='all_errors', add_path_to_leaves=False, print_summary=False):
