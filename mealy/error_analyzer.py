@@ -305,7 +305,7 @@ class ErrorAnalyzer(object):
         n_total_errors = y[y == ErrorAnalyzerConstants.WRONG_PREDICTION].shape[0]
         self._global_error = wrongly_predicted_samples / float(n_total_errors)
 
-    def get_ranked_leaf_ids(self, leaf_selector, rank_by='global_error'):
+    def get_ranked_leaf_ids(self, leaf_selector=None, rank_by='global_error'):
         """ Select error nodes and rank them by importance.
 
         Args:
