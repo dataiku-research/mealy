@@ -8,12 +8,9 @@ logging.basicConfig(level=logging.INFO, format='mealy | %(levelname)s - %(messag
 
 class ErrorTree(object):
 
-    def __init__(self, error_decision_tree, error_train_x, error_train_y):
+    def __init__(self, error_decision_tree):
 
         self._estimator = error_decision_tree
-        self._error_train_x = error_train_x
-        self._error_train_y = error_train_y
-
         self._leaf_ids = None
         self._impurity = None
         self._quantized_impurity = None
@@ -26,14 +23,6 @@ class ErrorTree(object):
         if self._estimator is None:
             raise NotFittedError("You should fit the ErrorAnalyzer first")
         return self._estimator
-
-    @property
-    def error_train_x(self):
-        return self._error_train_x
-
-    @property
-    def error_train_y(self):
-        return self._error_train_y
 
     @property
     def impurity(self):
@@ -59,6 +48,11 @@ class ErrorTree(object):
             self._compute_leaf_ids()
         return self._leaf_ids
 
+    def get_error_leaves(self):
+        error_class_idx = np.where(self.estimator_.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
+        error_node_ids = np.where(self.estimator_.tree_.value[:, 0, :].argmax(axis=1) == error_class_idx)[0]
+        return np.in1d(self._leaf_ids, error_node_ids)
+
     def _check_error_tree(self):
         if sum(self.estimator_.tree_.feature > 0) == 0:
             logger.warning("The error tree has only 1 node, there will be problem when using this with ErrorVisualizer")
@@ -80,8 +74,3 @@ class ErrorTree(object):
         purity_bins = np.linspace(0, 1., n_purity_levels)
         self._quantized_impurity = np.digitize(self._impurity, purity_bins)
         self._difference = correctly_predicted_samples - wrongly_predicted_samples  # only negative numbers
-
-    def get_error_leaves(self):
-        error_class_idx = np.where(self.estimator_.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
-        error_node_ids = np.where(self.estimator_.tree_.value[:, 0, :].argmax(axis=1) == error_class_idx)[0]
-        return np.in1d(self._leaf_ids, error_node_ids)
