@@ -80,10 +80,10 @@ error_visualizer = ErrorVisualizer(error_analyzer)
 error_visualizer.plot_error_tree()
 
 # print the details regarding the decision tree nodes containing the majority of errors
-error_analyzer.error_node_summary(leaf_selector="all_errors", add_path_to_leaves=True, print_summary=True);
+error_analyzer.leaf_node_summary(leaf_selector=None, add_path_to_leaves=True, print_summary=True);
 # plot the feature distributions of samples in the nodes containing the majority of errors
 # rank features by correlation to error
-error_visualizer.plot_feature_distributions_on_leaves(leaf_selector="all_errors", top_k_features=3)
+error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=None, top_k_features=3)
 
 ```
 
@@ -140,10 +140,10 @@ error_visualizer = ErrorVisualizer(error_analyzer)
 error_visualizer.plot_error_tree()
 
 # print the details regarding the decision tree nodes containing the majority of errors
-error_analyzer.error_node_summary(leaf_selector="all_errors", add_path_to_leaves=True, print_summary=True);
+error_analyzer.leaf_node_summary(leaf_selector=None, add_path_to_leaves=True, print_summary=True);
 # plot the feature distributions of samples in the nodes containing the majority of errors
 # rank features by correlation to error
-error_visualizer.plot_feature_distributions_on_leaves(leaf_selector="all_errors", top_k_features=3)
+error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=None, top_k_features=3)
 
 ```
 
