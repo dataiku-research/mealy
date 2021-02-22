@@ -36,5 +36,8 @@ class ErrorAnalyzerConstants(object):
                                                    Binarizer, Normalizer, MinMaxScaler, RobustScaler, SimpleImputer,
                                                    OrdinalEncoder)
     STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES = (OneHotEncoder,)
+    GRAPH_MAX_EDGE_WIDTH = 10
+    GRAPH_MIN_LOCAL_ERROR_OPAQUE = 0.5
+    
     # for imputers we don't need inverse function
     STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION = (SimpleImputer,)

@@ -35,6 +35,9 @@ class ErrorAnalyzer(BaseEstimator):
         random_state (int): random seed.
 
     Attributes:
+        global_error (numpy.ndarray): percentage of incorrectly predicted samples in leaf nodes over the total number of
+            errors (used for ranking the nodes).
+        leaf_ids (numpy.ndarray): list of all leaf nodes indices.
         _error_tree (DecisionTreeClassifier): the estimator used to train the Error Analyzer Tree
     """
 
@@ -70,6 +73,8 @@ class ErrorAnalyzer(BaseEstimator):
         self._is_regression = is_regressor(self._original_model)
         self._error_train_x = None
         self._error_train_y = None
+
+        self._error_train_leaf_id = None
 
     @property
     def feature_names(self):
@@ -337,16 +342,17 @@ class ErrorAnalyzer(BaseEstimator):
         logger.info('The original model has an error rate of {}'.format(round(error_rate, 3)))
         return error_y, error_rate
 
-    def _get_ranked_leaf_ids(self, leaf_selector, rank_leaves_by='purity'):
+    def _get_ranked_leaf_ids(self, leaf_selector, rank_by='purity'):
         """ Select error nodes and rank them by importance.
 
         Args:
             leaf_selector (int or list or str): the desired leaf nodes to visualize. When int it represents the
-                number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid values are
-                either 'all_error' to plot all leaves of class 'Wrong prediction' or 'all' to plot all leaf nodes.
-            rank_leaves_by (str): ranking criterium for the leaf nodes. It can be either 'purity' to rank by the leaf
-                node purity (ratio of wrongly predicted samples over the total for an error node) or 'class_difference'
-                (difference of number of wrongly and correctly predicted samples in a node).
+                number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid value
+                 is 'all' to plot all leaf nodes.
+            rank_by (str): ranking criterion for the leaf nodes. It can be 'global_error' to rank by the leaf nodes
+                global error (% total error in the node), 'purity' to rank by the leaf node purity (ratio of wrongly
+                predicted samples over the total for an error node) or 'class_difference' (difference of number of
+                wrongly and correctly predicted samples in a node).
 
         Return:
             list or numpy.ndarray: list of selected leaf nodes indices.
@@ -356,10 +362,12 @@ class ErrorAnalyzer(BaseEstimator):
         selected_leaves = apply_leaf_selector(self._error_tree.leaf_ids)
         if selected_leaves.size == 0:
             return selected_leaves
-        if rank_leaves_by == 'purity':
+        if rank_by == 'global_error':
+            sorted_ids = np.argsort(-apply_leaf_selector(self._error_tree.global_error), )
+        elif rank_by == 'purity':
             sorted_ids = np.lexsort(
                 (apply_leaf_selector(self._error_tree.difference), apply_leaf_selector(self._error_tree.quantized_impurity)))
-        elif rank_leaves_by == 'class_difference':
+        elif rank_by == 'class_difference':
             sorted_ids = np.lexsort((apply_leaf_selector(self._error_tree.impurity), apply_leaf_selector(self._error_tree.difference)))
         else:
             raise NotImplementedError("Input value for 'rank_leaves_by' is invalid. It must be 'purity' or 'class_difference'.")
@@ -375,8 +383,7 @@ class ErrorAnalyzer(BaseEstimator):
                   * int: Only keep the row corresponding to this leaf id
                   * array-like: Only keep the rows corresponding to these leaf ids
                   * str:
-                    - "all": Keep the whole array
-                    - "all_errors": Keep the rows with indices corresponding to the leaf ids classifying the primary model prediction as wrong
+                    - "all": Keep the whole array of leaf ids
 
             Return:
                 A function with one argument array as a selector of leaf ids
@@ -492,6 +499,4 @@ class ErrorAnalyzer(BaseEstimator):
         undo_dummy_x = self.pipeline_preprocessor.inverse_transform(dummy_x)
         descaled_thresh = [undo_dummy_x[i, j] for i, j in indices]
         thresholds[self._error_tree.estimator_.tree_.feature > 0] = descaled_thresh
-
         return thresholds
-
