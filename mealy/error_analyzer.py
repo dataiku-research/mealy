@@ -70,6 +70,7 @@ class ErrorAnalyzer(BaseEstimator):
         self.error_tree = None
         self._error_train_x = None
         self._error_train_y = None
+        self._epsilon = None
 
     @property
     def feature_names(self):
@@ -90,6 +91,10 @@ class ErrorAnalyzer(BaseEstimator):
     @property
     def random_state(self):
         return self._random_state
+
+    @property
+    def regression_error_tolerance(self):
+        return self._epsilon
 
     def get_error_analyzer_preprocessed_feature_names(self):
         if self._error_analyzer_predictor_features is None:
@@ -279,8 +284,8 @@ class ErrorAnalyzer(BaseEstimator):
 
         if self._is_regression:
             difference = np.abs(y_true - y_pred)
-            epsilon = get_epsilon(difference, mode='rec')
-            error_array = np.array(difference > epsilon)
+            self._epsilon = get_epsilon(difference, mode='rec')
+            error_array = np.array(difference > self._epsilon)
         else:
             error_array = np.array(y_true != y_pred)
 
