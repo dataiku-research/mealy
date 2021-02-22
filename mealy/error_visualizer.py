@@ -137,7 +137,12 @@ class ErrorVisualizer(_BaseErrorVisualizer):
             np.where(self._error_clf.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
         wrongly_predicted_samples = self._error_clf.tree_.value[:, 0, error_class_idx]
 
+        correct_class_idx = \
+            np.where(self._error_clf.classes_ == ErrorAnalyzerConstants.CORRECT_PREDICTION)[0][0]
+        well_predicted_samples = self._error_clf.tree_.value[:, 0, correct_class_idx]
+
         nodes = pydot_graph.get_node_list()
+
         for node in nodes:
             if node.get_label():
                 node_label = node.get_label().strip('"')
@@ -161,16 +166,19 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                     new_label = '\\nentropy'.join([lte_modified, entropy_split[1]])
 
                 global_error = float(wrongly_predicted_samples[idx]) / n_total_errors
+                local_error = float(wrongly_predicted_samples[idx]) / (
+                            well_predicted_samples[idx] + wrongly_predicted_samples[idx])
                 new_label += '\\nglobal error = %.3f %%\\n' % (global_error * 100)
 
                 node.set_label(new_label)
 
                 alpha = 0.0
-                global_error = 0.0
                 if 'value = [' in node_label:
-                    # transparency as the global error
-                    global_error = float(wrongly_predicted_samples[idx]) / n_total_errors
-                    alpha = min(1., 2 * global_error)  # scale in [0.5, 1]
+                    # transparency as the local error
+                    if local_error >= ErrorAnalyzerConstants.GRAPH_MIN_LOCAL_ERROR_OPAQUE:
+                        alpha = 1.0
+                    else:
+                        alpha = local_error
 
                 node_class = ErrorAnalyzerConstants.CORRECT_PREDICTION if global_error == 0 \
                     else ErrorAnalyzerConstants.WRONG_PREDICTION
@@ -180,6 +188,18 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                 color_rgb = [int(round(alpha * c + (1 - alpha) * 255, 0)) for c in class_color_rgb]
                 color = '#{:02x}{:02x}{:02x}'.format(color_rgb[0], color_rgb[1], color_rgb[2])
                 node.set_fillcolor(color)
+
+                if idx in self._error_clf.tree_.children_left:
+                    parent_id = np.where(self._error_clf.tree_.children_left == idx)[0][0]
+                elif idx in self._error_clf.tree_.children_right:
+                    parent_id = np.where(self._error_clf.tree_.children_right == idx)[0][0]
+                else:
+                    parent_id = None
+
+                if not (parent_id is None):
+                    parent_edge = pydot_graph.get_edge(str(parent_id), node.get_name())[0]
+                    parent_edge.set_penwidth(ErrorAnalyzerConstants.GRAPH_MAX_EDGE_WIDTH * global_error)
+                    parent_edge.set_label('%.3f %%' % (global_error * 100))
 
         if size is not None:
             pydot_graph.set_size('"%d,%d!"' % (size[0], size[1]))
