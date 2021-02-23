@@ -7,10 +7,10 @@ from sklearn.base import is_regressor
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.base import BaseEstimator
-from sklearn.metrics import make_scorer, accuracy_score
+from sklearn.metrics import make_scorer
 from mealy.error_analysis_utils import check_enough_data, get_epsilon
 from mealy.constants import ErrorAnalyzerConstants
-from mealy.metrics import mpp_report, fidelity_balanced_accuracy_score
+from mealy.metrics import error_decision_tree_report, fidelity_balanced_accuracy_score
 from mealy.preprocessing import PipelinePreprocessor, DummyPipelinePreprocessor
 from mealy.error_tree import ErrorTree
 import logging
@@ -126,18 +126,7 @@ class ErrorAnalyzer(BaseEstimator):
             self._preprocessed_feature_names = ["feature#%s" % feature_index
                                                 for feature_index in
                                                 range(self._error_tree.estimator_.n_features_)]
-
         return self._preprocessed_feature_names
-
-    """ 
-    def get_preprocessed_feature_names(self):
-        if self._preprocessed_feature_names is None:
-            self._preprocessed_feature_names = ["feature#%s" % feature_index
-                                                for feature_index in
-                                                range(self._error_tree.estimator_.n_features_)]
-
-        return self._preprocessed_feature_names
-    """
 
     def fit(self, X, y):
         """
@@ -177,7 +166,7 @@ class ErrorAnalyzer(BaseEstimator):
         self._error_tree = ErrorTree(error_decision_tree=gs_clf.best_estimator_)
         logger.info('Chosen parameters: {}'.format(gs_clf.best_params_))
 
-    #TODO: rewrite this method using the ranking arrays
+    #TODO rewrite this method using the ranking arrays
     def get_error_node_summary(self, leaf_selector='all_errors', add_path_to_leaves=False, print_summary=False):
         """ Return summary information regarding input nodes.
 
@@ -253,7 +242,7 @@ class ErrorAnalyzer(BaseEstimator):
         prep_x, prep_y = self.pipeline_preprocessor.transform(X), np.array(y)
         prep_x, y_true, _ = self._compute_primary_model_error(prep_x, prep_y)
         y_pred = self._error_tree.estimator_.predict(prep_x)
-        return mpp_report(y_true, y_pred, output_format)
+        return error_decision_tree_report(y_true, y_pred, output_format)
 
     def _prepare_data(self, X, y):
         """Check and sample data
@@ -338,7 +327,7 @@ class ErrorAnalyzer(BaseEstimator):
                     possible_outcomes[0]))
 
         error_rate = np.sum(error_array, dtype=float)/len(error_array)
-        logger.info('The original model has an error rate of {}'.format(round(error_rate, 3)))
+        logger.info('The original model has a global error rate of {}'.format(round(error_rate, 3)))
         return error_y, error_rate
 
     def _get_ranked_leaf_ids(self, leaf_selector, rank_by='purity'):

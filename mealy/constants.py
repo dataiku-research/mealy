@@ -13,7 +13,7 @@ class ErrorAnalyzerConstants(object):
     MIN_NUM_ROWS = 100  # heuristic choice
     MAX_NUM_ROW = 100000  # heuristic choice
 
-    MPP_ACCURACY_TOLERANCE = 0.1
+    EDT_ACCURACY_TOLERANCE = 0.1
     CRITERION = 'entropy'
     NUMBER_EPSILON_VALUES = 50
 
@@ -21,9 +21,9 @@ class ErrorAnalyzerConstants(object):
 
     TOP_K_FEATURES = 3
 
-    MPP_ACCURACY = 'mpp_accuracy_score'
-    MPP_FIDELITY = 'mpp_fidelity_score'
-    MPP_BALANCED_ACCURACY = 'mpp_balanced_accuracy_score'
+    EDT_ACCURACY = 'edt_accuracy_score'
+    EDT_FIDELITY = 'edt_fidelity_score'
+    EDT_BALANCED_ACCURACY = 'edt_balanced_accuracy_score'
     PRIMARY_MODEL_TRUE_ACCURACY = 'primary_model_true_accuracy'
     PRIMARY_MODEL_PREDICTED_ACCURACY = 'primary_model_predicted_accuracy'
     CONFIDENCE_DECISION = 'confidence_decision'
