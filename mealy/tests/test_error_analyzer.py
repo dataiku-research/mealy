@@ -9,7 +9,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 
 from mealy import ErrorAnalyzer
-from mealy.metrics import compute_mpp_accuracy, balanced_accuracy_score, compute_primary_model_accuracy, compute_confidence_decision
+from mealy.metrics import compute_accuracy_score, balanced_accuracy_score, compute_primary_model_accuracy, compute_confidence_decision
 
 default_seed = 10
 np.random.seed(default_seed)
@@ -31,10 +31,10 @@ def test_with_only_scikit_model():
     mpp = ErrorAnalyzer(rf, feature_names=numeric_features)
     mpp.fit(X_test, y_test)
 
-    prep_x, y_true, _ = mpp._compute_primary_model_error(X_test.values, y_test)
-    y_pred = mpp._error_tree.estimator_.predict(prep_x)
+    y_true, _ = mpp._compute_primary_model_error(X_test.values, y_test)
+    y_pred = mpp._error_tree.estimator_.predict(X_test.values)
 
-    mpp_accuracy_score = compute_mpp_accuracy(y_true, y_pred)
+    mpp_accuracy_score = compute_accuracy_score(y_true, y_pred)
     mpp_balanced_accuracy = balanced_accuracy_score(y_true, y_pred)
     primary_model_predicted_accuracy = compute_primary_model_accuracy(y_pred)
     primary_model_true_accuracy = compute_primary_model_accuracy(y_true)
@@ -91,10 +91,10 @@ def test_with_scikit_pipeline():
 
     X_test_prep, y_test_prep = mpp.pipeline_preprocessor.transform(X_test), np.array(y_test)
 
-    prep_x, y_true, _ = mpp._compute_primary_model_error(X_test_prep, y_test_prep)
-    y_pred = mpp._error_tree.estimator_.predict(prep_x)
+    y_true, _ = mpp._compute_primary_model_error(X_test_prep, y_test_prep)
+    y_pred = mpp._error_tree.estimator_.predict(X_test_prep)
 
-    mpp_accuracy_score = compute_mpp_accuracy(y_true, y_pred)
+    mpp_accuracy_score = compute_accuracy_score(y_true, y_pred)
     mpp_balanced_accuracy = balanced_accuracy_score(y_true, y_pred)
     primary_model_predicted_accuracy = compute_primary_model_accuracy(y_pred)
     primary_model_true_accuracy = compute_primary_model_accuracy(y_true)
