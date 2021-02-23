@@ -144,21 +144,27 @@ class ErrorAnalyzer(BaseEstimator):
         logger.info("Preparing the Error Analyzer Tree...")
 
         np.random.seed(self._random_state)
-        preprocessed_x = self.pipeline_preprocessor.transform(X)
-        self._error_train_x, self._error_train_y, error_rate = self._compute_primary_model_error(preprocessed_x, y)
+        preprocessed_X = self.pipeline_preprocessor.transform(X)
+
+        check_enough_data(preprocessed_X, min_len=ErrorAnalyzerConstants.MIN_NUM_ROWS)
+        self._error_train_y, error_rate = self._compute_primary_model_error(preprocessed_X, y)
+        self._error_train_x = preprocessed_X
 
         logger.info("Fitting the Error Analyzer Tree...")
         # entropy/mutual information is used to split nodes in Microsoft Pandora system
         dt_clf = tree.DecisionTreeClassifier(criterion=ErrorAnalyzerConstants.CRITERION,
                                              random_state=self._random_state)
+
+        # for the min_sample_leaf, the min value should be 0.01
+        min_samples_leaf_max = min(error_rate, 0.01)
         param_grid = {
-            'max_depth': [3, 5, 10],
-            'min_samples_leaf': np.linspace(error_rate/5, error_rate, 5)
+            'max_depth': [3, 5, 7],
+            'min_samples_leaf': np.linspace(min_samples_leaf_max/5, min_samples_leaf_max, 5)
         }
 
         logger.info('Grid search the Error Tree with the following grid: {}'.format(param_grid))
         gs_clf = GridSearchCV(dt_clf,
-                              param_grid=param_grid, #self._param_grid,
+                              param_grid=param_grid,
                               cv=5,
                               scoring=make_scorer(fidelity_balanced_accuracy_score))
 
@@ -240,31 +246,9 @@ class ErrorAnalyzer(BaseEstimator):
             dict or str: metrics regarding the Error Analyzer Tree.
         """
         prep_x, prep_y = self.pipeline_preprocessor.transform(X), np.array(y)
-        prep_x, y_true, _ = self._compute_primary_model_error(prep_x, prep_y)
+        y_true, _ = self._compute_primary_model_error(prep_x, prep_y)
         y_pred = self._error_tree.estimator_.predict(prep_x)
         return error_decision_tree_report(y_true, y_pred, output_format)
-
-    def _prepare_data(self, X, y):
-        """Check and sample data
-
-        Args:
-            X: array-like of shape (n_samples, n_features)
-            Input samples.
-
-            y: array-like of shape (n_samples,)
-            The target values
-
-        Returns:
-            sampled_X: ndarray of shape (new_n_samples, n_features)
-            sampled_y: array of shape (new_n_samples,)
-        """
-
-        check_enough_data(X, min_len=ErrorAnalyzerConstants.MIN_NUM_ROWS)
-        logger.info("Sampling data: original dataset had {} rows, selecting the first {}.".format(X.shape[0], self._max_num_row))
-        sampled_X = X[:self._max_num_row, :]
-        sampled_y = y[:self._max_num_row]
-
-        return sampled_X, sampled_y
 
     def _compute_primary_model_error(self, X, y):
         """
@@ -284,12 +268,9 @@ class ErrorAnalyzer(BaseEstimator):
              error_y: array of string of shape (n_sampled_X, )
              Boolean value of whether or not the primary model predicted correctly or incorrectly the samples in sampled_X.
         """
-        logger.info('Prepare data with model for Error Analyzer Tree')
-
-        sampled_X, sampled_y = self._prepare_data(X, y)
-        y_pred = self._primary_model.predict(sampled_X)
-        error_y, error_rate = self._evaluate_primary_model_predictions(y_true=sampled_y, y_pred=y_pred)
-        return sampled_X, error_y, error_rate
+        y_pred = self._primary_model.predict(X)
+        error_y, error_rate = self._evaluate_primary_model_predictions(y_true=y, y_pred=y_pred)
+        return error_y, error_rate
 
     def _evaluate_primary_model_predictions(self, y_true, y_pred):
         """
@@ -321,10 +302,9 @@ class ErrorAnalyzer(BaseEstimator):
         error_y = np.array([target_mapping_dict[elem] for elem in error_array], dtype=object)
 
         possible_outcomes = list(set(error_y.tolist()))
+
         if len(possible_outcomes) == 1:
-            logger.warning(
-                'All predictions are {}. To build a proper ErrorAnalyzer decision tree we need both correct and incorrect predictions'.format(
-                    possible_outcomes[0]))
+            logger.warning('All predictions are {}. To build a proper ErrorAnalyzer decision tree we need both correct and incorrect predictions'.format(possible_outcomes[0]))
 
         error_rate = np.sum(error_array, dtype=float)/len(error_array)
         logger.info('The primary model has a global error rate of {}'.format(round(error_rate, 3)))
