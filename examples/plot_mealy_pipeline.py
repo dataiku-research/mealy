@@ -111,7 +111,7 @@ error_analyzer.fit(X_test, y_test)
 ##############################################################################
 # Print metrics regarding the Model Performance Predictor.
 
-print(error_analyzer.mpp_summary(X_test, y_test, output_dict=False))
+print(error_analyzer.evaluate(X_test, y_test, output_format='text'))
 
 ##############################################################################
 # Plot the Model Performance Predictor Decision Tree.
@@ -125,10 +125,8 @@ tree_src.format = 'png'
 tree_src.render('tree')
 tree_img = mpimg.imread('tree.png')
 
-plt.figure(figsize=(50, 50))
-plt.imshow(tree_img, origin='upper')
-plt.xlim(8000, 9500);
-plt.ylim(4500, 3500);
+plt.figure(figsize=(20, 20))
+plt.imshow(tree_img)
 plt.axis('off')
 
 ##############################################################################
@@ -139,7 +137,7 @@ error_analyzer.get_error_node_summary(leaf_selector="all_errors", add_path_to_le
 ##############################################################################
 # Plot the feature distributions of samples in the leaf containing the majority of errors.
 # Rank features by correlation to error.
-leaf_id = error_analyzer._get_ranked_leaf_ids('all_errors')[0]
+leaf_id = error_analyzer._get_ranked_leaf_ids('all')[0]
 error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=leaf_id, top_k_features=3)
 
 ##############################################################################
