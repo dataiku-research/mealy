@@ -168,8 +168,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                     else:
                         alpha = local_error
 
-                node_class = ErrorAnalyzerConstants.CORRECT_PREDICTION if global_error == 0 \
-                    else ErrorAnalyzerConstants.WRONG_PREDICTION
+                node_class = ErrorAnalyzerConstants.CORRECT_PREDICTION if global_error == 0 else ErrorAnalyzerConstants.WRONG_PREDICTION
                 class_color = ErrorAnalyzerConstants.ERROR_TREE_COLORS[node_class].strip('#')
                 class_color_rgb = tuple(int(class_color[i:i + 2], 16) for i in (0, 2, 4))
                 # compute the color as alpha against white
