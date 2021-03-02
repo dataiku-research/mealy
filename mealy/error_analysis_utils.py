@@ -46,5 +46,4 @@ def check_enough_data(df, min_len):
 
 
 def rank_features_by_error_correlation(feature_importances):
-    sorted_feature_indices = np.argsort(- feature_importances)
-    return sorted_feature_indices
+    return np.argsort(- feature_importances)
