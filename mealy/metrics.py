@@ -6,7 +6,7 @@ import numpy as np
 
 def compute_confidence_decision(primary_model_true_accuracy, primary_model_predicted_accuracy):
     difference_true_pred_accuracy = np.abs(primary_model_true_accuracy - primary_model_predicted_accuracy)
-    decision = difference_true_pred_accuracy <= ErrorAnalyzerConstants.MPP_ACCURACY_TOLERANCE
+    decision = difference_true_pred_accuracy <= ErrorAnalyzerConstants.EDT_ACCURACY_TOLERANCE
 
     fidelity = 1. - difference_true_pred_accuracy
 
@@ -14,7 +14,7 @@ def compute_confidence_decision(primary_model_true_accuracy, primary_model_predi
     return fidelity, decision
 
 
-def compute_mpp_accuracy(y_true, y_pred):
+def compute_accuracy_score(y_true, y_pred):
     return accuracy_score(y_true, y_pred)
 
 
@@ -35,54 +35,58 @@ def fidelity_balanced_accuracy_score(y_true, y_pred):
     return fidelity_score(y_true, y_pred) + balanced_accuracy_score(y_true, y_pred)
 
 
-def mpp_report(y_true, y_pred, output_dict=False):
-    """Build a text report showing the main Model Performance Predictor (MPP) metrics.
+def error_decision_tree_report(y_true, y_pred, output_format='text'):
+    """Build a text report showing the main Error Decision Tree (EDT) metrics.
 
     Args:
-        y_true (numpy.ndarray): Ground truth values of wrong/correct predictions of the MPP primary model.
+        y_true (numpy.ndarray): Ground truth values of wrong/correct predictions of the EDT primary model.
             Expected values in [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].
-        y_pred (numpy.ndarray): Estimated targets as returned by a Model Performance Predictor. Expected values in
+        y_pred (numpy.ndarray): Estimated targets as returned by a EDT. Expected values in
             [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].
-        output_dict (bool): If True, return output as dict (default = False).
+        output_format (string): 'dict' or 'text'
 
     Return:
-        dict or str: metrics regarding the Model Performance Predictor.
+        dict or str: metrics regarding the Error Decision Tree.
     """
 
-    mpp_accuracy_score = compute_mpp_accuracy(y_true, y_pred)
-    mpp_balanced_accuracy = balanced_accuracy_score(y_true, y_pred)
+    edt_accuracy_score = compute_accuracy_score(y_true, y_pred)
+    edt_balanced_accuracy = balanced_accuracy_score(y_true, y_pred)
     primary_model_predicted_accuracy = compute_primary_model_accuracy(y_pred)
     primary_model_true_accuracy = compute_primary_model_accuracy(y_true)
     fidelity, confidence_decision = compute_confidence_decision(primary_model_true_accuracy,
                                                                 primary_model_predicted_accuracy)
-    if output_dict:
+    if output_format == 'dict':
         report_dict = dict()
-        report_dict[ErrorAnalyzerConstants.MPP_ACCURACY] = mpp_accuracy_score
-        report_dict[ErrorAnalyzerConstants.MPP_BALANCED_ACCURACY] = mpp_balanced_accuracy
-        report_dict[ErrorAnalyzerConstants.MPP_FIDELITY] = fidelity
+        report_dict[ErrorAnalyzerConstants.EDT_ACCURACY] = edt_accuracy_score
+        report_dict[ErrorAnalyzerConstants.EDT_BALANCED_ACCURACY] = edt_balanced_accuracy
+        report_dict[ErrorAnalyzerConstants.EDT_FIDELITY] = fidelity
         report_dict[ErrorAnalyzerConstants.PRIMARY_MODEL_TRUE_ACCURACY] = primary_model_true_accuracy
         report_dict[ErrorAnalyzerConstants.PRIMARY_MODEL_PREDICTED_ACCURACY] = primary_model_predicted_accuracy
         report_dict[ErrorAnalyzerConstants.CONFIDENCE_DECISION] = confidence_decision
         return report_dict
 
-    report = 'The MPP was trained with accuracy %.2f%% and balanced accuracy %.2f%%.' % (mpp_accuracy_score * 100,
-                                                                                         mpp_balanced_accuracy * 100)
-    report += '\n'
-    report += 'The Decision Tree estimated the primary model''s accuracy to %.2f%%.' % \
-              (primary_model_predicted_accuracy * 100)
-    report += '\n'
-    report += 'The true accuracy of the primary model is %.2f.%%' % (primary_model_true_accuracy * 100)
-    report += '\n'
-    report += 'The Fidelity of the MPP is %.2f%%.' % \
-              (fidelity * 100)
-    report += '\n'
-    if not confidence_decision:
-        report += 'Warning: the built MPP might not be representative of the primary model performances.'
-        report += '\n'
-        report += 'The MPP predicted model accuracy is considered too different from the true model accuracy.'
-        report += '\n'
-    else:
-        report += 'The MPP is considered representative of the primary model performances.'
-        report += '\n'
+    elif output_format == 'text':
 
-    return report
+        report = 'The Error Decision Tree (EDT) was trained with accuracy %.2f%% and balanced accuracy %.2f%%.' % (edt_accuracy_score * 100, edt_balanced_accuracy * 100)
+        report += '\n'
+        report += 'The Decision Tree estimated the primary model''s accuracy to %.2f%%.' % \
+                  (primary_model_predicted_accuracy * 100)
+        report += '\n'
+        report += 'The true accuracy of the primary model is %.2f.%%' % (primary_model_true_accuracy * 100)
+        report += '\n'
+        report += 'The Fidelity of the EDT is %.2f%%.' % \
+                  (fidelity * 100)
+        report += '\n'
+        if not confidence_decision:
+            report += 'Warning: the built EDT might not be representative of the primary model performances.'
+            report += '\n'
+            report += 'The EDT predicted model accuracy is considered too different from the true model accuracy.'
+            report += '\n'
+        else:
+            report += 'The EDT is considered representative of the primary model performances.'
+            report += '\n'
+
+        print(report)
+
+    else:
+        raise ValueError('Output format should either be "dict" or "text"')
