@@ -30,7 +30,6 @@ class FeatureNameTransformer(object):
     def __init__(self, ct_preprocessor, original_features=None):
         self.ct_preprocessor = ct_preprocessor
         self.original_feature_names = None
-        self.preprocessed_feature_names = None
         self.categorical_features = []
         self.original2preprocessed = dict()
         self.preprocessed2original = dict()

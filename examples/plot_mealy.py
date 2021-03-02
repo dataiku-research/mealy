@@ -66,7 +66,7 @@ error_analyzer.fit(X_test, y_test)
 ##############################################################################
 # Print metrics regarding the Model Performance Predictor.
 
-print(error_analyzer.mpp_summary(X_test, y_test, output_dict=False))
+print(error_analyzer.evaluate(X_test, y_test, output_format='text'))
 
 ##############################################################################
 # Plot the Model Performance Predictor Decision Tree.

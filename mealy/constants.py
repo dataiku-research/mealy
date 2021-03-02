@@ -7,13 +7,13 @@ class ErrorAnalyzerConstants(object):
 
     WRONG_PREDICTION = "Wrong prediction"
     CORRECT_PREDICTION = "Correct prediction"
-    PARAMETERS_GRID = {'max_depth': [5, 10], 'min_samples_leaf': [10, 20]}
+    PARAMETERS_GRID = {'max_depth': [5, 10], 'min_samples_leaf': [0.05, 0.1]}
     TEST_SIZE = 0.2
 
     MIN_NUM_ROWS = 100  # heuristic choice
     MAX_NUM_ROW = 100000  # heuristic choice
 
-    MPP_ACCURACY_TOLERANCE = 0.1
+    EDT_ACCURACY_TOLERANCE = 0.1
     CRITERION = 'entropy'
     NUMBER_EPSILON_VALUES = 50
 
@@ -21,9 +21,9 @@ class ErrorAnalyzerConstants(object):
 
     TOP_K_FEATURES = 3
 
-    MPP_ACCURACY = 'mpp_accuracy_score'
-    MPP_FIDELITY = 'mpp_fidelity_score'
-    MPP_BALANCED_ACCURACY = 'mpp_balanced_accuracy_score'
+    EDT_ACCURACY = 'edt_accuracy_score'
+    EDT_FIDELITY = 'edt_fidelity_score'
+    EDT_BALANCED_ACCURACY = 'edt_balanced_accuracy_score'
     PRIMARY_MODEL_TRUE_ACCURACY = 'primary_model_true_accuracy'
     PRIMARY_MODEL_PREDICTED_ACCURACY = 'primary_model_predicted_accuracy'
     CONFIDENCE_DECISION = 'confidence_decision'
@@ -36,5 +36,8 @@ class ErrorAnalyzerConstants(object):
                                                    Binarizer, Normalizer, MinMaxScaler, RobustScaler, SimpleImputer,
                                                    OrdinalEncoder)
     STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES = (OneHotEncoder,)
+    GRAPH_MAX_EDGE_WIDTH = 10
+    GRAPH_MIN_LOCAL_ERROR_OPAQUE = 0.5
+    
     # for imputers we don't need inverse function
     STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION = (SimpleImputer,)

@@ -8,16 +8,14 @@ logging.basicConfig(level=logging.INFO, format='mealy | %(levelname)s - %(messag
 
 class ErrorTree(object):
 
-    def __init__(self, error_decision_tree, error_train_x, error_train_y):
+    def __init__(self, error_decision_tree):
 
         self._estimator = error_decision_tree
-        self._error_train_x = error_train_x
-        self._error_train_y = error_train_y
-
         self._leaf_ids = None
         self._impurity = None
         self._quantized_impurity = None
         self._difference = None
+        self._global_error = None
 
         self._check_error_tree()
 
@@ -26,14 +24,6 @@ class ErrorTree(object):
         if self._estimator is None:
             raise NotFittedError("You should fit the ErrorAnalyzer first")
         return self._estimator
-
-    @property
-    def error_train_x(self):
-        return self._error_train_x
-
-    @property
-    def error_train_y(self):
-        return self._error_train_y
 
     @property
     def impurity(self):
@@ -54,10 +44,21 @@ class ErrorTree(object):
         return self._difference
 
     @property
+    def global_error(self):
+        if self._global_error is None:
+            self._compute_ranking_arrays()
+        return self._global_error
+
+    @property
     def leaf_ids(self):
         if self._leaf_ids is None:
             self._compute_leaf_ids()
         return self._leaf_ids
+
+    def get_error_leaves(self):
+        error_class_idx = np.where(self.estimator_.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
+        error_node_ids = np.where(self.estimator_.tree_.value[:, 0, :].argmax(axis=1) == error_class_idx)[0]
+        return np.in1d(self._leaf_ids, error_node_ids)
 
     def _check_error_tree(self):
         if sum(self.estimator_.tree_.feature > 0) == 0:
@@ -81,7 +82,6 @@ class ErrorTree(object):
         self._quantized_impurity = np.digitize(self._impurity, purity_bins)
         self._difference = correctly_predicted_samples - wrongly_predicted_samples  # only negative numbers
 
-    def get_error_leaves(self):
-        error_class_idx = np.where(self.estimator_.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
-        error_node_ids = np.where(self.estimator_.tree_.value[:, 0, :].argmax(axis=1) == error_class_idx)[0]
-        return np.in1d(self._leaf_ids, error_node_ids)
+        #y = self._error_train_y
+        n_total_errors = np.sum(wrongly_predicted_samples) #y[y == ErrorAnalyzerConstants.WRONG_PREDICTION].shape[0]
+        self._global_error = wrongly_predicted_samples.astype(float) / n_total_errors
