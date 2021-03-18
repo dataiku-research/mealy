@@ -35,7 +35,7 @@ class ErrorAnalyzer(BaseEstimator):
         random_state (int): random seed.
 
     Attributes:
-        global_error (numpy.ndarray): percentage of incorrectly predicted samples in leaf nodes over the total number of
+        total_error_fraction (numpy.ndarray): percentage of incorrectly predicted samples in leaf nodes over the total number of
             errors (used for ranking the nodes).
         leaf_ids (numpy.ndarray): list of all leaf nodes indices.
         _error_tree (DecisionTreeClassifier): the estimator used to train the Error Analyzer Tree
@@ -207,14 +207,14 @@ class ErrorAnalyzer(BaseEstimator):
             n_errors = int(np.ceil(values[0, error_class_idx]))
             n_corrects = int(np.ceil(values[0, correct_class_idx]))
             local_error = float(n_errors) / (n_corrects + n_errors)
-            global_error = float(n_errors) / n_total_errors
+            total_error_fraction = float(n_errors) / n_total_errors
 
             leaf_dict = {
                 "id": leaf_id,
                 "n_corrects": n_corrects,
                 "n_errors": n_errors,
                 "local_error": local_error,
-                "global_error": global_error
+                "total_error_fraction": total_error_fraction
             }
 
             leaves_summary.append(leaf_dict)
@@ -227,7 +227,7 @@ class ErrorAnalyzer(BaseEstimator):
                 print("LEAF %d:" % leaf_id)
                 print("     Correct predictions: %d | Wrong predictions: %d | "
                       "Local error (purity): %.2f | Global error: %.2f" %
-                      (n_corrects, n_errors, local_error, global_error))
+                      (n_corrects, n_errors, local_error, total_error_fraction))
 
                 if add_path_to_leaves:
                     print('     Path to leaf:')
@@ -313,10 +313,10 @@ class ErrorAnalyzer(BaseEstimator):
             logger.warning('All predictions are {}. To build a proper ErrorAnalyzer decision tree we need both correct and incorrect predictions'.format(possible_outcomes[0]))
 
         error_rate = np.sum(error_array, dtype=float)/len(error_array)
-        logger.info('The primary model has a global error rate of {}'.format(round(error_rate, 3)))
+        logger.info('The primary model has an error rate of {}'.format(round(error_rate, 3)))
         return error_y, error_rate
 
-    def _get_ranked_leaf_ids(self, leaf_selector=None, rank_by='global_error'):
+    def _get_ranked_leaf_ids(self, leaf_selector=None, rank_by='total_error_fraction'):
         """ Select error nodes and rank them by importance.
 
         Args:
@@ -325,7 +325,7 @@ class ErrorAnalyzer(BaseEstimator):
                 * array-like: Only return information of the leaves corresponding to these ids
                 * None (default): Return information of all the leaves
             rank_by (str): ranking criterion for the leaf nodes. Valid values are:
-                * 'global_error': rank by the global error (fraction of total error in the node)
+                * 'total_error_fraction': rank by the global error (fraction of total error in the node)
                 * 'purity': rank by the purity (ratio of wrongly predicted samples over the total number of node samples)
                 * 'class_difference': rank by the difference of number of wrongly and correctly predicted samples
                 in a node.
@@ -338,8 +338,8 @@ class ErrorAnalyzer(BaseEstimator):
         selected_leaves = apply_leaf_selector(self._error_tree.leaf_ids)
         if selected_leaves.size == 0:
             return selected_leaves
-        if rank_by == 'global_error':
-            sorted_ids = np.argsort(-apply_leaf_selector(self._error_tree.global_error), )
+        if rank_by == 'total_error_fraction':
+            sorted_ids = np.argsort(-apply_leaf_selector(self._error_tree.total_error_fraction), )
         elif rank_by == 'purity':
             sorted_ids = np.lexsort(
                 (apply_leaf_selector(self._error_tree.difference), apply_leaf_selector(self._error_tree.quantized_impurity)))
@@ -347,7 +347,7 @@ class ErrorAnalyzer(BaseEstimator):
             sorted_ids = np.lexsort((apply_leaf_selector(self._error_tree.impurity), apply_leaf_selector(self._error_tree.difference)))
         else:
             raise NotImplementedError(
-                "Input argument 'rank_by' is invalid. Should be 'global_error', 'purity' or 'class_difference'")
+                "Input argument 'rank_by' is invalid. Should be 'total_error_fraction', 'purity' or 'class_difference'")
         return selected_leaves.take(sorted_ids)
 
     #TODO leaf_selector is taking too many different types of data ?
