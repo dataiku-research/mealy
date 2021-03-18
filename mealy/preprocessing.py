@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from sklearn.pipeline import Pipeline
 import numpy as np
+import pandas as pd
 from scipy.sparse import issparse
 import logging
 from mealy.error_analysis_utils import check_lists_having_same_elements, get_feature_list_from_column_transformer
@@ -29,7 +30,6 @@ class FeatureNameTransformer(object):
     def __init__(self, ct_preprocessor, original_features=None):
         self.ct_preprocessor = ct_preprocessor
         self.original_feature_names = None
-        self.preprocessed_feature_names = None
         self.categorical_features = []
         self.original2preprocessed = dict()
         self.preprocessed2original = dict()
@@ -232,10 +232,10 @@ class PipelinePreprocessor(FeatureNameTransformer):
         def _inverse_single_step(single_step, step_output):
             inverse_transform_function_available = getattr(single_step, "inverse_transform", None)
             if inverse_transform_function_available:
-                logger.info("Reversing step {} using inverse_transform() function on column {}".format(single_step, ', '.join([f for f in transformer_feature_names])))
+                logger.info("Reversing step {} using inverse_transform() function on column(s): {}".format(single_step, ', '.join([f for f in transformer_feature_names])))
                 step_input = single_step.inverse_transform(step_output)
             elif isinstance(single_step, ErrorAnalyzerConstants.STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION):
-                logger.info("Reversing step {} using identity transformation on column {}".format(single_step, ', '.join([f for f in transformer_feature_names])))
+                logger.info("Reversing step {} using identity transformation on column(s): {}".format(single_step, ', '.join([f for f in transformer_feature_names])))
                 step_input = step_output
             else:
                 raise ValueError('The package does not support {} because it does not provide inverse_transform function.'.format(single_step))
@@ -266,3 +266,39 @@ class PipelinePreprocessor(FeatureNameTransformer):
                 undo_prep_test_x[:, original_feature_ids] = input_of_transformer
 
         return undo_prep_test_x
+
+
+class DummyPipelinePreprocessor(object):
+
+    def __init__(self, model_performance_predictor_features):
+        self.model_performance_predictor_features = model_performance_predictor_features
+
+    def transform(self, x):
+        """
+
+        Args:
+            x: dataframe or ndarray
+        Returns:
+            ndarray
+        """
+        if isinstance(x, pd.DataFrame):
+            return x.values
+        elif isinstance(x, np.ndarray):
+            return x
+        else:
+            raise ValueError('x should be either a pandas dataframe or a numpy ndarray')
+
+    def get_original_feature_names(self):
+        return self.model_performance_predictor_features
+
+    def is_categorical(self, index=None, name=None):
+        return False
+
+    def inverse_transform_feature_id(self, index=None, name=None):
+        if index is not None:
+            return index
+        if name is not None:
+            return name
+
+    def inverse_transform(self, x):
+        return x
