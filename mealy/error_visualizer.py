@@ -159,10 +159,8 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                     new_label = samples_split[0]
 
                 value_split = samples_split[1].split('\\nvalue')
-                class_split = value_split[1].split('\\nclass')
 
                 new_label += '\\nsamples' + value_split[0] + \
-                             '\\nclass' + class_split[1] + \
                              '\\nlocal error = %.3f %%' % (local_error * 100) + \
                              '\\nglobal error = %.3f %%\\n' % (global_error * 100)
 
