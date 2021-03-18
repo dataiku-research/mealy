@@ -187,8 +187,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
 
         Args:
 
-            leaf_selector (None, int or array-like): the desired leaf nodes to visualize.
-                The leaves whose information will be returned
+            leaf_selector (None, int or array-like): the leaves whose information will be returned
                 * int: Only return information of the leaf with the corresponding id
                 * array-like: Only return information of the leaves corresponding to these ids
                 * None (default): Return information of all the leaves
@@ -202,10 +201,10 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                 distributions.
 
             rank_leaves_by (str): ranking criterion for the leaf nodes. Valid values are:
-                * 'global_error': rank by the global error (% total error in the node)
-                * 'purity': rank by the purity (ratio of wrongly predicted samples over the total for an error node)
+                * 'global_error': rank by the global error (fraction of total error in the node)
+                * 'purity': rank by the purity (ratio of wrongly predicted samples over the total number of node samples)
                 * 'class_difference': rank by the difference of number of wrongly and correctly predicted samples
-                in a node).
+                in a node.
 
             nr_bins (int): number of bins in the feature distribution plots.
 

@@ -163,7 +163,7 @@ error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=leaf_id, top
 # of class 'Wrong prediction'. These leaves contain the majority of errors, each
 # leaf clustering a subpopulation of errors with different feature values. The largest
 # and purest failure nodes are highlighted when printing the error node summary, and
-# also when plotting the feature distributions in the node (``leaf_selector="all_errors"``).
+# also when plotting the feature distributions in the node (``leaf_selector=None``).
 # From the feature distributions, sorted by correlation with the error, we can see that
 # the majority of problems occur for married people.
 # In the next iteration of model design, the primary model needs to be improved for these

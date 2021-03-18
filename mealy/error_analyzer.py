@@ -309,16 +309,15 @@ class ErrorAnalyzer(object):
         """ Select error nodes and rank them by importance.
 
         Args:
-            leaf_selector (None, int or array-like): the desired leaf nodes to visualize.
-                The leaves whose information will be returned
+            leaf_selector (None, int or array-like): the leaves whose information will be returned
                 * int: Only return information of the leaf with the corresponding id
                 * array-like: Only return information of the leaves corresponding to these ids
                 * None (default): Return information of all the leaves
             rank_by (str): ranking criterion for the leaf nodes. Valid values are:
-                * 'global_error': rank by the global error (% total error in the node)
-                * 'purity': rank by the purity (ratio of wrongly predicted samples over the total for an error node)
+                * 'global_error': rank by the global error (fraction of total error in the node)
+                * 'purity': rank by the purity (ratio of wrongly predicted samples over the total number of node samples)
                 * 'class_difference': rank by the difference of number of wrongly and correctly predicted samples
-                in a node).
+                in a node.
 
         Return:
             list or numpy.ndarray: list of selected leaf nodes indices.
@@ -336,7 +335,8 @@ class ErrorAnalyzer(object):
         elif rank_by == 'class_difference':
             sorted_ids = np.lexsort((apply_leaf_selector(self.impurity), apply_leaf_selector(self.difference)))
         else:
-            raise NotImplementedError("Input argument 'rank_by' is invalid. Should be 'purity' or 'class_difference'")
+            raise NotImplementedError(
+                "Input argument 'rank_by' is invalid. Should be 'global_error', 'purity' or 'class_difference'")
         return selected_leaves.take(sorted_ids)
 
     def _get_leaf_selector(self, leaf_selector):
@@ -492,8 +492,7 @@ class ErrorAnalyzer(object):
         """ Return summary information regarding leaf nodes.
 
         Args:
-            leaf_selector (None, int or array-like): the desired leaf nodes to visualize.
-                The leaves whose information will be returned
+            leaf_selector (None, int or array-like): the leaves whose information will be returned
                 * int: Only return information of the leaf with the corresponding id
                 * array-like: Only return information of the leaves corresponding to these ids
                 * None (default): Return information of all the leaves
