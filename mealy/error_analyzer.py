@@ -325,7 +325,7 @@ class ErrorAnalyzer(BaseEstimator):
                 * array-like: Only return information of the leaves corresponding to these ids
                 * None (default): Return information of all the leaves
             rank_by (str): ranking criterion for the leaf nodes. Valid values are:
-                * 'total_error_fraction': rank by the global error (fraction of total error in the node)
+                * 'total_error_fraction': rank by the fraction of total error in the node
                 * 'purity': rank by the purity (ratio of wrongly predicted samples over the total number of node samples)
                 * 'class_difference': rank by the difference of number of wrongly and correctly predicted samples
                 in a node.

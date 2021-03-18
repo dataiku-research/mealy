@@ -162,7 +162,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
 
                 new_label += '\\nsamples' + value_split[0] + \
                              '\\nlocal error = %.3f %%' % (local_error * 100) + \
-                             '\\nglobal error = %.3f %%\\n' % (total_error_fraction * 100)
+                             '\\nfraction of total error = %.3f %%\\n' % (total_error_fraction * 100)
 
                 node.set_label(new_label)
 
@@ -226,7 +226,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                 distributions.
 
             rank_leaves_by (str): ranking criterion for the leaf nodes. Valid values are:
-                * 'total_error_fraction': rank by the global error (fraction of total error in the node)
+                * 'total_error_fraction': rank by the fraction of total error in the node
                 * 'purity': rank by the purity (ratio of wrongly predicted samples over the total number of node samples)
                 * 'class_difference': rank by the difference of number of wrongly and correctly predicted samples
                 in a node.
