@@ -113,7 +113,8 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                                        rotate=False,
                                        out_file=None,
                                        filled=True,
-                                       rounded=True)
+                                       rounded=True,
+                                       impurity=False)
 
         pydot_graph = pydotplus.graph_from_dot_data(str(digraph_tree))
 
@@ -134,14 +135,15 @@ class ErrorVisualizer(_BaseErrorVisualizer):
         for node in nodes:
             if node.get_label():
                 node_label = node.get_label().strip('"')
-                new_label = node_label
                 idx = int(node_label.split('node #')[1].split('\\n')[0])
+                global_error = float(wrongly_predicted_samples[idx]) / n_total_errors
+                local_error = float(wrongly_predicted_samples[idx]) / (
+                            well_predicted_samples[idx] + wrongly_predicted_samples[idx])
                 if ' <= ' in node_label:
                     lte_split = node_label.split(' <= ')
-                    entropy_split = lte_split[1].split('\\nentropy')
+                    samples_split = lte_split[1].split('\\nsamples')
 
                     split_feature = self._original_feature_names[features[idx]]
-
                     descaled_value = thresholds[idx]
 
                     if split_feature in self._numerical_feature_names:
@@ -151,12 +153,16 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                         lte_split_without_feature = lte_split[0].split('\\n')[0]
                         lte_split_with_new_feature = lte_split_without_feature + '\\n' + split_feature
                         lte_modified = ' != '.join([lte_split_with_new_feature, str(descaled_value)])
-                    new_label = '\\nentropy'.join([lte_modified, entropy_split[1]])
+                    new_label = lte_modified
+                else:
+                    samples_split = node_label.split('\\nsamples')
+                    new_label = samples_split[0]
 
-                global_error = float(wrongly_predicted_samples[idx]) / n_total_errors
-                local_error = float(wrongly_predicted_samples[idx]) / (
-                            well_predicted_samples[idx] + wrongly_predicted_samples[idx])
-                new_label += '\\nglobal error = %.3f %%\\n' % (global_error * 100)
+                value_split = samples_split[1].split('\\nvalue')
+
+                new_label += '\\nsamples' + value_split[0] + \
+                             '\\nlocal error = %.3f %%' % (local_error * 100) + \
+                             '\\nglobal error = %.3f %%\\n' % (global_error * 100)
 
                 node.set_label(new_label)
 
