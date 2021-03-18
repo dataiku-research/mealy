@@ -227,26 +227,26 @@ Print the details regarding the decision tree nodes containing the majority of e
  .. code-block:: none
 
     LEAF 12:
-         Correct predictions: 0 | Wrong predictions: 10 | Local error (purity): 1.00 | Global error: 0.53
+         Correct predictions: 0 | Wrong predictions: 10 | Local error (purity): 1.00 | Fraction of total error: 0.53
          Path to leaf:
          AGE > 82.15
             LSTAT <= 8.96
                RM <= 8.21
     LEAF 14:
-         Correct predictions: 0 | Wrong predictions: 2 | Local error (purity): 1.00 | Global error: 0.11
+         Correct predictions: 0 | Wrong predictions: 2 | Local error (purity): 1.00 | Fraction of total error: 0.11
          Path to leaf:
          AGE > 82.15
             LSTAT <= 8.96
                RM > 8.21
                   AGE <= 89.20
     LEAF 3:
-         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.05
+         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Fraction of total error: 0.05
          Path to leaf:
          AGE <= 82.15
             LSTAT <= 25.53
                TAX <= 204.50
     LEAF 6:
-         Correct predictions: 1 | Wrong predictions: 1 | Local error (purity): 0.50 | Global error: 0.05
+         Correct predictions: 1 | Wrong predictions: 1 | Local error (purity): 0.50 | Fraction of total error: 0.05
          Path to leaf:
          AGE <= 82.15
             LSTAT <= 25.53
@@ -254,25 +254,25 @@ Print the details regarding the decision tree nodes containing the majority of e
                   PTRATIO <= 15.35
                      AGE <= 23.90
     LEAF 9:
-         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.05
+         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Fraction of total error: 0.05
          Path to leaf:
          AGE <= 82.15
             LSTAT > 25.53
     LEAF 17:
-         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.05
+         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Fraction of total error: 0.05
          Path to leaf:
          AGE > 82.15
             LSTAT > 8.96
                DIS <= 1.32
     LEAF 19:
-         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.05
+         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Fraction of total error: 0.05
          Path to leaf:
          AGE > 82.15
             LSTAT > 8.96
                DIS > 1.32
                   TAX <= 213.00
     LEAF 21:
-         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Global error: 0.05
+         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Fraction of total error: 0.05
          Path to leaf:
          AGE > 82.15
             LSTAT > 8.96
@@ -280,7 +280,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                   TAX > 213.00
                      RM <= 4.12
     LEAF 22:
-         Correct predictions: 38 | Wrong predictions: 1 | Local error (purity): 0.03 | Global error: 0.05
+         Correct predictions: 38 | Wrong predictions: 1 | Local error (purity): 0.03 | Fraction of total error: 0.05
          Path to leaf:
          AGE > 82.15
             LSTAT > 8.96
@@ -288,7 +288,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                   TAX > 213.00
                      RM > 4.12
     LEAF 7:
-         Correct predictions: 6 | Wrong predictions: 0 | Local error (purity): 0.00 | Global error: 0.00
+         Correct predictions: 6 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
          Path to leaf:
          AGE <= 82.15
             LSTAT <= 25.53
@@ -296,14 +296,14 @@ Print the details regarding the decision tree nodes containing the majority of e
                   PTRATIO <= 15.35
                      AGE > 23.90
     LEAF 8:
-         Correct predictions: 61 | Wrong predictions: 0 | Local error (purity): 0.00 | Global error: 0.00
+         Correct predictions: 61 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
          Path to leaf:
          AGE <= 82.15
             LSTAT <= 25.53
                TAX > 204.50
                   PTRATIO > 15.35
     LEAF 15:
-         Correct predictions: 2 | Wrong predictions: 0 | Local error (purity): 0.00 | Global error: 0.00
+         Correct predictions: 2 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
          Path to leaf:
          AGE > 82.15
             LSTAT <= 8.96
@@ -379,7 +379,7 @@ subpopulations.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.202 seconds)
+   **Total running time of the script:** ( 0 minutes  2.115 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_mealy.py:

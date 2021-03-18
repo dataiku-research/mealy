@@ -297,7 +297,7 @@ Print the details regarding the decision tree nodes containing the majority of e
  .. code-block:: none
 
     LEAF 90:
-         Correct predictions: 1130 | Wrong predictions: 702 | Local error (purity): 0.38 | Global error: 0.70
+         Correct predictions: 1130 | Wrong predictions: 702 | Local error (purity): 0.38 | Fraction of total error: 0.70
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: <= 5095.50
@@ -307,7 +307,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         age <= 2.04
                            occupation: != Farming-fishing
     LEAF 84:
-         Correct predictions: 175 | Wrong predictions: 36 | Local error (purity): 0.17 | Global error: 0.04
+         Correct predictions: 175 | Wrong predictions: 36 | Local error (purity): 0.17 | Fraction of total error: 0.04
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: <= 5095.50
@@ -317,7 +317,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         education: != Bachelors
                            hours-per-week: > 39.00
     LEAF 50:
-         Correct predictions: 186 | Wrong predictions: 29 | Local error (purity): 0.13 | Global error: 0.03
+         Correct predictions: 186 | Wrong predictions: 29 | Local error (purity): 0.13 | Fraction of total error: 0.03
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: > 12.50
@@ -327,7 +327,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         hours-per-week: <= 49.00
                            hours-per-week: > 33.50
     LEAF 57:
-         Correct predictions: 38 | Wrong predictions: 28 | Local error (purity): 0.42 | Global error: 0.03
+         Correct predictions: 38 | Wrong predictions: 28 | Local error (purity): 0.42 | Fraction of total error: 0.03
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: > 12.50
@@ -337,7 +337,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         age <= 1.82
                            workclass == Private
     LEAF 52:
-         Correct predictions: 32 | Wrong predictions: 23 | Local error (purity): 0.42 | Global error: 0.02
+         Correct predictions: 32 | Wrong predictions: 23 | Local error (purity): 0.42 | Fraction of total error: 0.02
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: > 12.50
@@ -347,7 +347,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         hours-per-week: > 49.00
                            age <= 0.21
     LEAF 34:
-         Correct predictions: 161 | Wrong predictions: 20 | Local error (purity): 0.11 | Global error: 0.02
+         Correct predictions: 161 | Wrong predictions: 20 | Local error (purity): 0.11 | Fraction of total error: 0.02
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: <= 12.50
@@ -357,7 +357,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         education-num: > 8.50
                            occupation: != Sales
     LEAF 19:
-         Correct predictions: 197 | Wrong predictions: 16 | Local error (purity): 0.08 | Global error: 0.02
+         Correct predictions: 197 | Wrong predictions: 16 | Local error (purity): 0.08 | Fraction of total error: 0.02
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: <= 12.50
@@ -367,7 +367,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         fnlwgt: <= 128608.00
                            race: == White
     LEAF 56:
-         Correct predictions: 41 | Wrong predictions: 15 | Local error (purity): 0.27 | Global error: 0.01
+         Correct predictions: 41 | Wrong predictions: 15 | Local error (purity): 0.27 | Fraction of total error: 0.01
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: > 12.50
@@ -377,7 +377,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         age <= 1.82
                            workclass != Private
     LEAF 87:
-         Correct predictions: 10 | Wrong predictions: 15 | Local error (purity): 0.60 | Global error: 0.01
+         Correct predictions: 10 | Wrong predictions: 15 | Local error (purity): 0.60 | Fraction of total error: 0.01
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: <= 5095.50
@@ -387,7 +387,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         education: == Bachelors
                            hours-per-week: > 44.50
     LEAF 67:
-         Correct predictions: 76 | Wrong predictions: 12 | Local error (purity): 0.14 | Global error: 0.01
+         Correct predictions: 76 | Wrong predictions: 12 | Local error (purity): 0.14 | Fraction of total error: 0.01
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: <= 5095.50
@@ -397,7 +397,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         fnlwgt: <= 152677.00
                            education: != 9th
     LEAF 91:
-         Correct predictions: 45 | Wrong predictions: 11 | Local error (purity): 0.20 | Global error: 0.01
+         Correct predictions: 45 | Wrong predictions: 11 | Local error (purity): 0.20 | Fraction of total error: 0.01
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: <= 5095.50
@@ -407,7 +407,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         age <= 2.04
                            occupation: == Farming-fishing
     LEAF 36:
-         Correct predictions: 14 | Wrong predictions: 10 | Local error (purity): 0.42 | Global error: 0.01
+         Correct predictions: 14 | Wrong predictions: 10 | Local error (purity): 0.42 | Fraction of total error: 0.01
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: <= 12.50
@@ -415,7 +415,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                   hours-per-week: > 45.50
                      fnlwgt: > 339189.50
     LEAF 21:
-         Correct predictions: 509 | Wrong predictions: 9 | Local error (purity): 0.02 | Global error: 0.01
+         Correct predictions: 509 | Wrong predictions: 9 | Local error (purity): 0.02 | Fraction of total error: 0.01
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: <= 12.50
@@ -425,7 +425,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         fnlwgt: > 128608.00
                            fnlwgt: <= 307878.00
     LEAF 71:
-         Correct predictions: 40 | Wrong predictions: 9 | Local error (purity): 0.18 | Global error: 0.01
+         Correct predictions: 40 | Wrong predictions: 9 | Local error (purity): 0.18 | Fraction of total error: 0.01
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: <= 5095.50
@@ -435,7 +435,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         fnlwgt: > 152677.00
                            fnlwgt: > 161086.00
     LEAF 94:
-         Correct predictions: 31 | Wrong predictions: 8 | Local error (purity): 0.21 | Global error: 0.01
+         Correct predictions: 31 | Wrong predictions: 8 | Local error (purity): 0.21 | Fraction of total error: 0.01
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: <= 5095.50
@@ -445,7 +445,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         age > 2.04
                            fnlwgt: > 161649.00
     LEAF 102:
-         Correct predictions: 6 | Wrong predictions: 8 | Local error (purity): 0.57 | Global error: 0.01
+         Correct predictions: 6 | Wrong predictions: 8 | Local error (purity): 0.57 | Fraction of total error: 0.01
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: <= 5095.50
@@ -454,7 +454,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                      capital-loss: > 2054.00
                         fnlwgt: <= 151709.00
     LEAF 86:
-         Correct predictions: 26 | Wrong predictions: 8 | Local error (purity): 0.24 | Global error: 0.01
+         Correct predictions: 26 | Wrong predictions: 8 | Local error (purity): 0.24 | Fraction of total error: 0.01
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: <= 5095.50
@@ -464,7 +464,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         education: == Bachelors
                            hours-per-week: <= 44.50
     LEAF 22:
-         Correct predictions: 94 | Wrong predictions: 7 | Local error (purity): 0.07 | Global error: 0.01
+         Correct predictions: 94 | Wrong predictions: 7 | Local error (purity): 0.07 | Fraction of total error: 0.01
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: <= 12.50
@@ -474,7 +474,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         fnlwgt: > 128608.00
                            fnlwgt: > 307878.00
     LEAF 70:
-         Correct predictions: 9 | Wrong predictions: 7 | Local error (purity): 0.44 | Global error: 0.01
+         Correct predictions: 9 | Wrong predictions: 7 | Local error (purity): 0.44 | Fraction of total error: 0.01
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: <= 5095.50
@@ -484,7 +484,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         fnlwgt: > 152677.00
                            fnlwgt: <= 161086.00
     LEAF 77:
-         Correct predictions: 53 | Wrong predictions: 5 | Local error (purity): 0.09 | Global error: 0.00
+         Correct predictions: 53 | Wrong predictions: 5 | Local error (purity): 0.09 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: <= 5095.50
@@ -494,7 +494,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         fnlwgt: > 248984.00
                            occupation: != Craft-repair
     LEAF 78:
-         Correct predictions: 16 | Wrong predictions: 4 | Local error (purity): 0.20 | Global error: 0.00
+         Correct predictions: 16 | Wrong predictions: 4 | Local error (purity): 0.20 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: <= 5095.50
@@ -504,7 +504,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         fnlwgt: > 248984.00
                            occupation: == Craft-repair
     LEAF 98:
-         Correct predictions: 24 | Wrong predictions: 3 | Local error (purity): 0.11 | Global error: 0.00
+         Correct predictions: 24 | Wrong predictions: 3 | Local error (purity): 0.11 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: <= 5095.50
@@ -514,13 +514,13 @@ Print the details regarding the decision tree nodes containing the majority of e
                         education-num: <= 11.50
                            hours-per-week: <= 45.50
     LEAF 106:
-         Correct predictions: 24 | Wrong predictions: 3 | Local error (purity): 0.11 | Global error: 0.00
+         Correct predictions: 24 | Wrong predictions: 3 | Local error (purity): 0.11 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: > 5095.50
                age > 1.60
     LEAF 10:
-         Correct predictions: 27 | Wrong predictions: 3 | Local error (purity): 0.10 | Global error: 0.00
+         Correct predictions: 27 | Wrong predictions: 3 | Local error (purity): 0.10 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: <= 12.50
@@ -530,7 +530,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         hours-per-week: <= 51.00
                            fnlwgt: <= 214461.00
     LEAF 26:
-         Correct predictions: 35 | Wrong predictions: 3 | Local error (purity): 0.08 | Global error: 0.00
+         Correct predictions: 35 | Wrong predictions: 3 | Local error (purity): 0.08 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: <= 12.50
@@ -540,7 +540,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         hours-per-week: <= 38.50
                            education-num: > 9.50
     LEAF 103:
-         Correct predictions: 13 | Wrong predictions: 2 | Local error (purity): 0.13 | Global error: 0.00
+         Correct predictions: 13 | Wrong predictions: 2 | Local error (purity): 0.13 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: <= 5095.50
@@ -549,7 +549,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                      capital-loss: > 2054.00
                         fnlwgt: > 151709.00
     LEAF 58:
-         Correct predictions: 14 | Wrong predictions: 2 | Local error (purity): 0.12 | Global error: 0.00
+         Correct predictions: 14 | Wrong predictions: 2 | Local error (purity): 0.12 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: > 12.50
@@ -558,7 +558,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                      age > 0.65
                         age > 1.82
     LEAF 93:
-         Correct predictions: 26 | Wrong predictions: 2 | Local error (purity): 0.07 | Global error: 0.00
+         Correct predictions: 26 | Wrong predictions: 2 | Local error (purity): 0.07 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: <= 5095.50
@@ -568,14 +568,14 @@ Print the details regarding the decision tree nodes containing the majority of e
                         age > 2.04
                            fnlwgt: <= 161649.00
     LEAF 13:
-         Correct predictions: 20 | Wrong predictions: 2 | Local error (purity): 0.09 | Global error: 0.00
+         Correct predictions: 20 | Wrong predictions: 2 | Local error (purity): 0.09 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: <= 12.50
                age <= -0.74
                   occupation: == Protective-serv
     LEAF 75:
-         Correct predictions: 12 | Wrong predictions: 2 | Local error (purity): 0.14 | Global error: 0.00
+         Correct predictions: 12 | Wrong predictions: 2 | Local error (purity): 0.14 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: <= 5095.50
@@ -585,7 +585,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         fnlwgt: <= 248984.00
                            age > 1.24
     LEAF 43:
-         Correct predictions: 12 | Wrong predictions: 2 | Local error (purity): 0.14 | Global error: 0.00
+         Correct predictions: 12 | Wrong predictions: 2 | Local error (purity): 0.14 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: > 12.50
@@ -594,7 +594,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                      fnlwgt: <= 176888.00
                         fnlwgt: > 138788.50
     LEAF 53:
-         Correct predictions: 15 | Wrong predictions: 1 | Local error (purity): 0.06 | Global error: 0.00
+         Correct predictions: 15 | Wrong predictions: 1 | Local error (purity): 0.06 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: > 12.50
@@ -604,7 +604,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         hours-per-week: > 49.00
                            age > 0.21
     LEAF 7:
-         Correct predictions: 13 | Wrong predictions: 1 | Local error (purity): 0.07 | Global error: 0.00
+         Correct predictions: 13 | Wrong predictions: 1 | Local error (purity): 0.07 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: <= 12.50
@@ -613,7 +613,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                      hours-per-week: <= 49.50
                         capital-loss: > 1609.50
     LEAF 83:
-         Correct predictions: 31 | Wrong predictions: 1 | Local error (purity): 0.03 | Global error: 0.00
+         Correct predictions: 31 | Wrong predictions: 1 | Local error (purity): 0.03 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: <= 5095.50
@@ -623,7 +623,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         education: != Bachelors
                            hours-per-week: <= 39.00
     LEAF 29:
-         Correct predictions: 29 | Wrong predictions: 1 | Local error (purity): 0.03 | Global error: 0.00
+         Correct predictions: 29 | Wrong predictions: 1 | Local error (purity): 0.03 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: <= 12.50
@@ -633,7 +633,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         hours-per-week: > 38.50
                            fnlwgt: > 348041.50
     LEAF 100:
-         Correct predictions: 74 | Wrong predictions: 0 | Local error (purity): 0.00 | Global error: 0.00
+         Correct predictions: 74 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: <= 5095.50
@@ -642,7 +642,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                      capital-loss: <= 2054.00
                         education-num: > 11.50
     LEAF 99:
-         Correct predictions: 20 | Wrong predictions: 0 | Local error (purity): 0.00 | Global error: 0.00
+         Correct predictions: 20 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: <= 5095.50
@@ -652,7 +652,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         education-num: <= 11.50
                            hours-per-week: > 45.50
     LEAF 11:
-         Correct predictions: 21 | Wrong predictions: 0 | Local error (purity): 0.00 | Global error: 0.00
+         Correct predictions: 21 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: <= 12.50
@@ -662,7 +662,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         hours-per-week: <= 51.00
                            fnlwgt: > 214461.00
     LEAF 12:
-         Correct predictions: 54 | Wrong predictions: 0 | Local error (purity): 0.00 | Global error: 0.00
+         Correct predictions: 54 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: <= 12.50
@@ -671,7 +671,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                      hours-per-week: > 49.50
                         hours-per-week: > 51.00
     LEAF 18:
-         Correct predictions: 43 | Wrong predictions: 0 | Local error (purity): 0.00 | Global error: 0.00
+         Correct predictions: 43 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: <= 12.50
@@ -681,7 +681,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         fnlwgt: <= 128608.00
                            race: != White
     LEAF 44:
-         Correct predictions: 34 | Wrong predictions: 0 | Local error (purity): 0.00 | Global error: 0.00
+         Correct predictions: 34 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: > 12.50
@@ -689,7 +689,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                   age > -0.96
                      fnlwgt: > 176888.00
     LEAF 28:
-         Correct predictions: 296 | Wrong predictions: 0 | Local error (purity): 0.00 | Global error: 0.00
+         Correct predictions: 296 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: <= 12.50
@@ -699,7 +699,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         hours-per-week: > 38.50
                            fnlwgt: <= 348041.50
     LEAF 49:
-         Correct predictions: 32 | Wrong predictions: 0 | Local error (purity): 0.00 | Global error: 0.00
+         Correct predictions: 32 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: > 12.50
@@ -709,7 +709,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         hours-per-week: <= 49.00
                            hours-per-week: <= 33.50
     LEAF 74:
-         Correct predictions: 67 | Wrong predictions: 0 | Local error (purity): 0.00 | Global error: 0.00
+         Correct predictions: 67 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: <= 5095.50
@@ -719,7 +719,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         fnlwgt: <= 248984.00
                            age <= 1.24
     LEAF 32:
-         Correct predictions: 30 | Wrong predictions: 0 | Local error (purity): 0.00 | Global error: 0.00
+         Correct predictions: 30 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: <= 12.50
@@ -728,7 +728,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                      fnlwgt: <= 339189.50
                         education-num: <= 8.50
     LEAF 35:
-         Correct predictions: 23 | Wrong predictions: 0 | Local error (purity): 0.00 | Global error: 0.00
+         Correct predictions: 23 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: <= 12.50
@@ -738,7 +738,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         education-num: > 8.50
                            occupation: == Sales
     LEAF 68:
-         Correct predictions: 15 | Wrong predictions: 0 | Local error (purity): 0.00 | Global error: 0.00
+         Correct predictions: 15 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: <= 5095.50
@@ -748,28 +748,28 @@ Print the details regarding the decision tree nodes containing the majority of e
                         fnlwgt: <= 152677.00
                            education: == 9th
     LEAF 39:
-         Correct predictions: 118 | Wrong predictions: 0 | Local error (purity): 0.00 | Global error: 0.00
+         Correct predictions: 118 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: > 12.50
                age <= -0.81
                   age <= -0.96
     LEAF 63:
-         Correct predictions: 36 | Wrong predictions: 0 | Local error (purity): 0.00 | Global error: 0.00
+         Correct predictions: 36 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: <= 5095.50
                education-num: <= 8.50
                   hours-per-week: <= 27.50
     LEAF 59:
-         Correct predictions: 41 | Wrong predictions: 0 | Local error (purity): 0.00 | Global error: 0.00
+         Correct predictions: 41 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: > 12.50
                age > -0.81
                   capital-gain: > 4826.00
     LEAF 42:
-         Correct predictions: 23 | Wrong predictions: 0 | Local error (purity): 0.00 | Global error: 0.00
+         Correct predictions: 23 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: > 12.50
@@ -778,13 +778,13 @@ Print the details regarding the decision tree nodes containing the majority of e
                      fnlwgt: <= 176888.00
                         fnlwgt: <= 138788.50
     LEAF 105:
-         Correct predictions: 216 | Wrong predictions: 0 | Local error (purity): 0.00 | Global error: 0.00
+         Correct predictions: 216 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: == Married-civ-spouse
             capital-gain: > 5095.50
                age <= 1.60
     LEAF 25:
-         Correct predictions: 72 | Wrong predictions: 0 | Local error (purity): 0.00 | Global error: 0.00
+         Correct predictions: 72 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: <= 12.50
@@ -794,7 +794,7 @@ Print the details regarding the decision tree nodes containing the majority of e
                         hours-per-week: <= 38.50
                            education-num: <= 9.50
     LEAF 6:
-         Correct predictions: 1104 | Wrong predictions: 0 | Local error (purity): 0.00 | Global error: 0.00
+         Correct predictions: 1104 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
          Path to leaf:
          marital-status: != Married-civ-spouse
             education-num: <= 12.50
@@ -869,7 +869,7 @@ subpopulations.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  24.615 seconds)
+   **Total running time of the script:** ( 0 minutes  24.103 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_mealy_pipeline.py:
