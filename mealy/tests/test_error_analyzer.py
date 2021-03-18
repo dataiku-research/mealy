@@ -28,29 +28,29 @@ def test_with_only_scikit_model():
 
     rf = RandomForestClassifier()
     rf.fit(X_train, y_train)
-    mpp = ErrorAnalyzer(rf, feature_names=numeric_features)
-    mpp.fit(X_test, y_test)
+    error_tree = ErrorAnalyzer(rf, feature_names=numeric_features)
+    error_tree.fit(X_test, y_test)
 
-    y_true, _ = mpp._compute_primary_model_error(X_test.values, y_test)
-    y_pred = mpp._error_tree.estimator_.predict(X_test.values)
+    y_true, _ = error_tree._compute_primary_model_error(X_test.values, y_test)
+    y_pred = error_tree._error_tree.estimator_.predict(X_test.values)
 
-    mpp_accuracy_score = compute_accuracy_score(y_true, y_pred)
-    mpp_balanced_accuracy = balanced_accuracy_score(y_true, y_pred)
+    error_tree_accuracy_score = compute_accuracy_score(y_true, y_pred)
+    error_tree_balanced_accuracy = balanced_accuracy_score(y_true, y_pred)
     primary_model_predicted_accuracy = compute_primary_model_accuracy(y_pred)
     primary_model_true_accuracy = compute_primary_model_accuracy(y_true)
     fidelity, confidence_decision = compute_confidence_decision(primary_model_true_accuracy, primary_model_predicted_accuracy)
 
     metric_to_check = {
-        'mpp_accuracy_score': mpp_accuracy_score,
-        'mpp_balanced_accuracy': mpp_balanced_accuracy,
+        'error_tree_accuracy_score': error_tree_accuracy_score,
+        'error_tree_balanced_accuracy': error_tree_balanced_accuracy,
         'primary_model_predicted_accuracy': primary_model_predicted_accuracy,
         'primary_model_true_accuracy': primary_model_true_accuracy,
         'fidelity': fidelity
     }
 
     metric_reference = {
-        'mpp_accuracy_score': 0.8651926915399969,
-        'mpp_balanced_accuracy': 0.7003443854497639,
+        'error_tree_accuracy_score': 0.8651926915399969,
+        'error_tree_balanced_accuracy': 0.7003443854497639,
         'primary_model_predicted_accuracy': 1, #0.8836173806233687,
         'primary_model_true_accuracy': 0.8255796100107478,
         'fidelity': 0.9419622293873791,
@@ -86,32 +86,32 @@ def test_with_scikit_pipeline():
                          ('classifier', RandomForestClassifier())])
 
     rf.fit(X_train, y_train)
-    mpp = ErrorAnalyzer(rf)
-    mpp.fit(X_test, y_test)
+    error_tree = ErrorAnalyzer(rf)
+    error_tree.fit(X_test, y_test)
 
-    X_test_prep, y_test_prep = mpp.pipeline_preprocessor.transform(X_test), np.array(y_test)
+    X_test_prep, y_test_prep = error_tree.pipeline_preprocessor.transform(X_test), np.array(y_test)
 
-    y_true, _ = mpp._compute_primary_model_error(X_test_prep, y_test_prep)
-    y_pred = mpp._error_tree.estimator_.predict(X_test_prep)
+    y_true, _ = error_tree._compute_primary_model_error(X_test_prep, y_test_prep)
+    y_pred = error_tree._error_tree.estimator_.predict(X_test_prep)
 
-    mpp_accuracy_score = compute_accuracy_score(y_true, y_pred)
-    mpp_balanced_accuracy = balanced_accuracy_score(y_true, y_pred)
+    error_tree_accuracy_score = compute_accuracy_score(y_true, y_pred)
+    error_tree_balanced_accuracy = balanced_accuracy_score(y_true, y_pred)
     primary_model_predicted_accuracy = compute_primary_model_accuracy(y_pred)
     primary_model_true_accuracy = compute_primary_model_accuracy(y_true)
     fidelity, confidence_decision = compute_confidence_decision(primary_model_true_accuracy,
                                                                 primary_model_predicted_accuracy)
 
     metric_to_check = {
-        'mpp_accuracy_score': mpp_accuracy_score,
-        'mpp_balanced_accuracy': mpp_balanced_accuracy,
+        'error_tree_accuracy_score': error_tree_accuracy_score,
+        'error_tree_balanced_accuracy': error_tree_balanced_accuracy,
         'primary_model_predicted_accuracy': primary_model_predicted_accuracy,
         'primary_model_true_accuracy': primary_model_true_accuracy,
         'fidelity': fidelity
     }
 
     metric_reference = {
-        'mpp_accuracy_score': 0.8952863503761708,
-        'mpp_balanced_accuracy': 0.7209989546416461,
+        'error_tree_accuracy_score': 0.8952863503761708,
+        'error_tree_balanced_accuracy': 0.7209989546416461,
         'primary_model_predicted_accuracy': 1, #0.9011208352525718,
         'primary_model_true_accuracy': 0.8602794411177644,
         'fidelity': 0.9591586058651926
