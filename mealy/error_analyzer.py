@@ -178,18 +178,19 @@ class ErrorAnalyzer(BaseEstimator):
         logger.info('Chosen parameters: {}'.format(gs_clf.best_params_))
 
     #TODO rewrite this method using the ranking arrays
-    def get_error_node_summary(self, leaf_selector='all_errors', add_path_to_leaves=False, print_summary=False):
-        """ Return summary information regarding input nodes.
+    def get_error_node_summary(self, leaf_selector=None, add_path_to_leaves=False, print_summary=False):
+        """ Return summary information regarding leaf nodes.
 
         Args:
-            leaf_selector (int or list or str): the desired leaf nodes to visualize. When int it represents the
-                number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid values
-                are either 'all_error' to plot all leaves of class 'Wrong prediction' or 'all' to plot all leaf nodes.
+            leaf_selector (None, int or array-like): the leaves whose information will be returned
+                * int: Only return information of the leaf with the corresponding id
+                * array-like: Only return information of the leaves corresponding to these ids
+                * None (default): Return information of all the leaves
             add_path_to_leaves (bool): add information of the feature path across the tree till the selected node.
             print_summary (bool): print summary for the selected nodes.
 
         Return:
-            dict: dictionary of metrics for each selected node of the Error Analyzer Tree.
+            dict: dictionary of metrics for each selected node of the Model Performance Predictor.
         """
 
         leaf_nodes = self._get_ranked_leaf_ids(leaf_selector=leaf_selector)
@@ -315,17 +316,19 @@ class ErrorAnalyzer(BaseEstimator):
         logger.info('The primary model has a global error rate of {}'.format(round(error_rate, 3)))
         return error_y, error_rate
 
-    def _get_ranked_leaf_ids(self, leaf_selector, rank_by='purity'):
+    def _get_ranked_leaf_ids(self, leaf_selector=None, rank_by='global_error'):
         """ Select error nodes and rank them by importance.
 
         Args:
-            leaf_selector (int or list or str): the desired leaf nodes to visualize. When int it represents the
-                number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid value
-                 is 'all' to plot all leaf nodes.
-            rank_by (str): ranking criterion for the leaf nodes. It can be 'global_error' to rank by the leaf nodes
-                global error (% total error in the node), 'purity' to rank by the leaf node purity (ratio of wrongly
-                predicted samples over the total for an error node) or 'class_difference' (difference of number of
-                wrongly and correctly predicted samples in a node).
+            leaf_selector (None, int or array-like): the leaves whose information will be returned
+                * int: Only return information of the leaf with the corresponding id
+                * array-like: Only return information of the leaves corresponding to these ids
+                * None (default): Return information of all the leaves
+            rank_by (str): ranking criterion for the leaf nodes. Valid values are:
+                * 'global_error': rank by the global error (fraction of total error in the node)
+                * 'purity': rank by the purity (ratio of wrongly predicted samples over the total number of node samples)
+                * 'class_difference': rank by the difference of number of wrongly and correctly predicted samples
+                in a node.
 
         Return:
             list or numpy.ndarray: list of selected leaf nodes indices.
@@ -343,7 +346,8 @@ class ErrorAnalyzer(BaseEstimator):
         elif rank_by == 'class_difference':
             sorted_ids = np.lexsort((apply_leaf_selector(self._error_tree.impurity), apply_leaf_selector(self._error_tree.difference)))
         else:
-            raise NotImplementedError("Input value for 'rank_leaves_by' is invalid. It must be 'purity' or 'class_difference'.")
+            raise NotImplementedError(
+                "Input argument 'rank_by' is invalid. Should be 'global_error', 'purity' or 'class_difference'")
         return selected_leaves.take(sorted_ids)
 
     #TODO leaf_selector is taking too many different types of data ?
@@ -351,12 +355,11 @@ class ErrorAnalyzer(BaseEstimator):
         """
         Return a function that select rows of provided arrays. Arrays must be of shape (1, number of leaves)
             Args:
-                leaf_selector: int, str, or array-like
-                How to select the rows of the array
-                  * int: Only keep the row corresponding to this leaf id
-                  * array-like: Only keep the rows corresponding to these leaf ids
-                  * str:
-                    - "all": Keep the whole array of leaf ids
+                leaf_selector: None, int or array-like
+                    How to select the rows of the array
+                      * int: Only keep the row corresponding to this leaf id
+                      * array-like: Only keep the rows corresponding to these leaf ids
+                      * None (default): Keep the whole array of leaf ids
 
             Return:
                 A function with one argument array as a selector of leaf ids
@@ -364,13 +367,8 @@ class ErrorAnalyzer(BaseEstimator):
                     array: numpy array of shape (1, number of leaves)
                     An array of which we only want to keep some rows
         """
-        if isinstance(leaf_selector, str):
-            if leaf_selector == "all":
-                return lambda array: array
-            elif leaf_selector == "all_errors":
-                return lambda array: array[self._error_tree.get_error_leaves()]
-            else:
-                raise ValueError('Unknown string value "{}" for leaf_selector, please choose either "all" or "all_errors".'.format(leaf_selector))
+        if leaf_selector is None:
+            return lambda array: array
 
         leaf_selector_as_array = np.array(leaf_selector)
         leaf_selector = np.in1d(self._error_tree.leaf_ids, leaf_selector_as_array)

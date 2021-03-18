@@ -193,7 +193,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
 
         return gvz_graph
 
-    def plot_feature_distributions_on_leaves(self, leaf_selector='all',
+    def plot_feature_distributions_on_leaves(self, leaf_selector=None,
                                              top_k_features=ErrorAnalyzerConstants.TOP_K_FEATURES,
                                              show_global=True, show_class=True, rank_leaves_by="global_error",
                                              nr_bins=10, figsize=(15, 10)):
@@ -206,9 +206,10 @@ class ErrorVisualizer(_BaseErrorVisualizer):
 
         Args:
 
-            leaf_selector (int or list or str): the desired leaf nodes to visualize. When int it represents the
-                number of the leaf node, when a list it represents a list of leaf nodes. When a string, the valid value
-                is 'all' to plot all leaf nodes.
+            leaf_selector (None, int or array-like): the leaves whose information will be returned
+                * int: Only return information of the leaf with the corresponding id
+                * array-like: Only return information of the leaves corresponding to these ids
+                * None (default): Return information of all the leaves
 
             top_k_features (int): number of features to plot per node.
 
@@ -218,10 +219,11 @@ class ErrorVisualizer(_BaseErrorVisualizer):
             show_class (bool): show the proportion of Wrongly and Correctly predicted samples in the feature
                 distributions.
 
-            rank_leaves_by (str): ranking criterion for the leaf nodes. It can be 'global_error' to rank by the global
-                error (percentage of total error in the node), 'purity' to rank by the leaf node purity (ratio of
-                wrongly predicted samples over the total for an error node) or 'class_difference' (difference of number
-                of wrongly and correctly predicted samples in a node).
+            rank_leaves_by (str): ranking criterion for the leaf nodes. Valid values are:
+                * 'global_error': rank by the global error (fraction of total error in the node)
+                * 'purity': rank by the purity (ratio of wrongly predicted samples over the total number of node samples)
+                * 'class_difference': rank by the difference of number of wrongly and correctly predicted samples
+                in a node.
 
             nr_bins (int): number of bins in the feature distribution plots.
 

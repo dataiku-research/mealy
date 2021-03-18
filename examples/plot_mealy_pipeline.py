@@ -132,12 +132,12 @@ plt.axis('off')
 ##############################################################################
 # Print the details regarding the decision tree nodes containing the majority of errors.
 
-error_analyzer.get_error_node_summary(leaf_selector="all_errors", add_path_to_leaves=True, print_summary=True);
+error_analyzer.get_error_node_summary(leaf_selector=None, add_path_to_leaves=True, print_summary=True);
 
 ##############################################################################
 # Plot the feature distributions of samples in the leaf containing the majority of errors.
 # Rank features by correlation to error.
-leaf_id = error_analyzer._get_ranked_leaf_ids('all')[0]
+leaf_id = error_analyzer._get_ranked_leaf_ids()[0]
 error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=leaf_id, top_k_features=3)
 
 ##############################################################################
@@ -161,7 +161,7 @@ error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=leaf_id, top
 # of class 'Wrong prediction'. These leaves contain the majority of errors, each
 # leaf clustering a subpopulation of errors with different feature values. The largest
 # and purest failure nodes are highlighted when printing the error node summary, and
-# also when plotting the feature distributions in the node (``leaf_selector="all_errors"``).
+# also when plotting the feature distributions in the node (``leaf_selector=None``).
 # From the feature distributions, sorted by correlation with the error, we can see that
 # the majority of problems occur for married people.
 # In the next iteration of model design, the primary model needs to be improved for these
