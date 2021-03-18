@@ -226,7 +226,7 @@ class ErrorAnalyzer(BaseEstimator):
             if print_summary:
                 print("LEAF %d:" % leaf_id)
                 print("     Correct predictions: %d | Wrong predictions: %d | "
-                      "Local error (purity): %.2f | Global error: %.2f" %
+                      "Local error (purity): %.2f | Fraction of total error: %.2f" %
                       (n_corrects, n_errors, local_error, total_error_fraction))
 
                 if add_path_to_leaves:

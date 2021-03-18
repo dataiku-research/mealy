@@ -73,4 +73,4 @@ There are four informations characterizing a node in the tree:
 * *Correct predictions*: number of samples the primary model predicts correctly
 * *Wrong predictions*: number of samples the primary model predicts wrongly
 * *Local error*: the ratio `Wrong / (Wrong + Correct)`. This is equivalent to the purity of a leaf node of class Wrong prediction.
-* *Global error*: the ratio between the number of errors in this node vs the number of total errors
+* *Fraction of total error*: the ratio between the number of errors in this node vs the number of total errors
