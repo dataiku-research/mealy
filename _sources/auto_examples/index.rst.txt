@@ -17,6 +17,7 @@ Those examples show basic usage of mealy.
 .. only:: html
 
  .. figure:: /auto_examples/images/thumb/sphx_glr_plot_mealy_thumb.png
+     :alt: Model Error Analysis for the Boston houses dataset
 
      :ref:`sphx_glr_auto_examples_plot_mealy.py`
 
@@ -37,6 +38,7 @@ Those examples show basic usage of mealy.
 .. only:: html
 
  .. figure:: /auto_examples/images/thumb/sphx_glr_plot_mealy_pipeline_thumb.png
+     :alt: Model Error Analysis with scikit-learn Pipeline for the Adult income dataset
 
      :ref:`sphx_glr_auto_examples_plot_mealy_pipeline.py`
 
@@ -61,15 +63,15 @@ Those examples show basic usage of mealy.
     :class: sphx-glr-footer-gallery
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-python
 
-    :download:`Download all examples in Python source code: auto_examples_python.zip <//Users/smaggio/workspace/mea/doc/auto_examples/auto_examples_python.zip>`
+    :download:`Download all examples in Python source code: auto_examples_python.zip </auto_examples/auto_examples_python.zip>`
 
 
 
-  .. container:: sphx-glr-download
+  .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip <//Users/smaggio/workspace/mea/doc/auto_examples/auto_examples_jupyter.zip>`
+    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip </auto_examples/auto_examples_jupyter.zip>`
 
 
 .. only:: html

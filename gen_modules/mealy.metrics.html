@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>mealy.metrics &mdash; mealy 0.1.0-git documentation</title>
   
@@ -13,14 +13,20 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/theme_override.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery-rendered-html.css" type="text/css" />
 
   
   
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
   
+
   
+  
+
   
 
   
@@ -30,10 +36,9 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -55,7 +60,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> mealy
+            <a href="../index.html" class="icon icon-home"> mealy
           
 
           
@@ -189,53 +194,53 @@
 <span id="mealy-metrics"></span><h1>mealy.metrics<a class="headerlink" href="#module-mealy.metrics" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
+<dt id="mealy.metrics.compute_accuracy_score">
+<code class="sig-prename descclassname"><span class="pre">mealy.metrics.</span></code><code class="sig-name descname"><span class="pre">compute_accuracy_score</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/metrics.html#compute_accuracy_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.metrics.compute_accuracy_score" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="sphx-glr-clear"></div><dl class="py function">
 <dt id="mealy.metrics.compute_confidence_decision">
-<code class="sig-prename descclassname">mealy.metrics.</code><code class="sig-name descname">compute_confidence_decision</code><span class="sig-paren">(</span><em class="sig-param">primary_model_true_accuracy</em>, <em class="sig-param">primary_model_predicted_accuracy</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/metrics.html#compute_confidence_decision"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mealy.metrics.compute_confidence_decision" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">mealy.metrics.</span></code><code class="sig-name descname"><span class="pre">compute_confidence_decision</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">primary_model_true_accuracy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">primary_model_predicted_accuracy</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/metrics.html#compute_confidence_decision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.metrics.compute_confidence_decision" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<div class="sphx-glr-clear"></div><dl class="function">
-<dt id="mealy.metrics.compute_mpp_accuracy">
-<code class="sig-prename descclassname">mealy.metrics.</code><code class="sig-name descname">compute_mpp_accuracy</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/metrics.html#compute_mpp_accuracy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mealy.metrics.compute_mpp_accuracy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<div class="sphx-glr-clear"></div><dl class="function">
+<div class="sphx-glr-clear"></div><dl class="py function">
 <dt id="mealy.metrics.compute_primary_model_accuracy">
-<code class="sig-prename descclassname">mealy.metrics.</code><code class="sig-name descname">compute_primary_model_accuracy</code><span class="sig-paren">(</span><em class="sig-param">y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/metrics.html#compute_primary_model_accuracy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mealy.metrics.compute_primary_model_accuracy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">mealy.metrics.</span></code><code class="sig-name descname"><span class="pre">compute_primary_model_accuracy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/metrics.html#compute_primary_model_accuracy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.metrics.compute_primary_model_accuracy" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<div class="sphx-glr-clear"></div><dl class="function">
-<dt id="mealy.metrics.fidelity_balanced_accuracy_score">
-<code class="sig-prename descclassname">mealy.metrics.</code><code class="sig-name descname">fidelity_balanced_accuracy_score</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/metrics.html#fidelity_balanced_accuracy_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mealy.metrics.fidelity_balanced_accuracy_score" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<div class="sphx-glr-clear"></div><dl class="function">
-<dt id="mealy.metrics.fidelity_score">
-<code class="sig-prename descclassname">mealy.metrics.</code><code class="sig-name descname">fidelity_score</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/metrics.html#fidelity_score"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mealy.metrics.fidelity_score" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<div class="sphx-glr-clear"></div><dl class="function">
-<dt id="mealy.metrics.mpp_report">
-<code class="sig-prename descclassname">mealy.metrics.</code><code class="sig-name descname">mpp_report</code><span class="sig-paren">(</span><em class="sig-param">y_true</em>, <em class="sig-param">y_pred</em>, <em class="sig-param">output_dict=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/metrics.html#mpp_report"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mealy.metrics.mpp_report" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build a text report showing the main Model Performance Predictor (MPP) metrics.</p>
+<div class="sphx-glr-clear"></div><dl class="py function">
+<dt id="mealy.metrics.error_decision_tree_report">
+<code class="sig-prename descclassname"><span class="pre">mealy.metrics.</span></code><code class="sig-name descname"><span class="pre">error_decision_tree_report</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'text'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/metrics.html#error_decision_tree_report"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.metrics.error_decision_tree_report" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a text report showing the main Error Decision Tree (EDT) metrics.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>y_true</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – Ground truth values of wrong/correct predictions of the MPP primary model.
+<li><p><strong>y_true</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a>) – Ground truth values of wrong/correct predictions of the EDT primary model.
 Expected values in [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].</p></li>
-<li><p><strong>y_pred</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – Estimated targets as returned by a Model Performance Predictor. Expected values in
+<li><p><strong>y_pred</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a>) – Estimated targets as returned by a EDT. Expected values in
 [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].</p></li>
-<li><p><strong>output_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – If True, return output as dict (default = False).</p></li>
+<li><p><strong>output_format</strong> (<em>string</em>) – ‘dict’ or ‘text’</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>metrics regarding the Model Performance Predictor.</p>
+<dd class="field-even"><p>metrics regarding the Error Decision Tree.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
+
+<div class="sphx-glr-clear"></div><dl class="py function">
+<dt id="mealy.metrics.fidelity_balanced_accuracy_score">
+<code class="sig-prename descclassname"><span class="pre">mealy.metrics.</span></code><code class="sig-name descname"><span class="pre">fidelity_balanced_accuracy_score</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/metrics.html#fidelity_balanced_accuracy_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.metrics.fidelity_balanced_accuracy_score" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="sphx-glr-clear"></div><dl class="py function">
+<dt id="mealy.metrics.fidelity_score">
+<code class="sig-prename descclassname"><span class="pre">mealy.metrics.</span></code><code class="sig-name descname"><span class="pre">fidelity_score</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/metrics.html#fidelity_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.metrics.fidelity_score" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <div class="sphx-glr-clear"></div></div>
 </div>
@@ -245,37 +250,29 @@ Expected values in [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConsta
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="mealy.preprocessing.html" class="btn btn-neutral float-right" title="mealy.preprocessing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="mealy.error_visualizer.html" class="btn btn-neutral float-left" title="mealy.error_visualizer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="mealy.preprocessing.html" class="btn btn-neutral float-right" title="mealy.preprocessing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="mealy.error_visualizer.html" class="btn btn-neutral float-left" title="mealy.error_visualizer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020-2020, Dataiku
+        &#169; Copyright 2020-2021, Dataiku.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

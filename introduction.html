@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Introduction to Model Error Analysis &mdash; mealy 0.1.0-git documentation</title>
   
@@ -13,14 +13,20 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="_static/theme_override.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="_static/gallery-rendered-html.css" type="text/css" />
 
   
   
     <link rel="shortcut icon" href="_static/favicon.ico"/>
   
+
   
+  
+
   
 
   
@@ -30,10 +36,9 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -55,7 +60,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home" alt="Documentation Home"> mealy
+            <a href="index.html" class="icon icon-home"> mealy
           
 
           
@@ -188,19 +193,19 @@ and is usually performed manually.</p>
 automatic tools to break down the model errors into meaningful groups, easier to analyze, and to highlight the most frequent
 type of errors, as well as the problematic features correlated with the failures.</p>
 <p>We call the model under investigation the <em>primary</em> model.</p>
-<p>This approach relies on a <strong>Model Performance Predictor</strong> (MPP), a secondary model trained to predict whether the primary
-model prediction is correct or wrong, i.e. a success or a failure. More precisely, the MPP is a binary DecisionTree classifier
+<p>This approach relies on an <strong>Error Tree</strong>, a secondary model trained to predict whether the primary
+model prediction is correct or wrong, i.e. a success or a failure. More precisely, the Error Tree is a binary DecisionTree classifier
 predicting whether the primary model will yield a Correct Prediction or a Wrong Prediction.</p>
-<p>The MPP can be trained on any dataset meant to evaluate the primary model performances, thus containing ground truth labels.
-In particular the provided primary test set is split into a secondary training set to train the MPP and a secondary test set
-to compute the MPP metrics.</p>
+<p>The Error Tree can be trained on any dataset meant to evaluate the primary model performances, thus containing ground truth labels.
+In particular the provided primary test set is split into a secondary training set to train the Error Tree and a secondary test set
+to compute the Error Tree metrics.</p>
 <p>In classification tasks the model failure is a wrong predicted class, whereas in case of regression tasks the failure is
 defined as a large deviation of the predicted value from the true one. In the latter case, when the absolute difference
 between the predicted and the true value is higher than a threshold ε, the model outcome is considered as a Wrong Prediction.
 The threshold ε is computed as the knee point of the Regression Error Characteristic
 (<a class="reference external" href="http://homepages.rpi.edu/~bennek/papers/rec.pdf">REC</a>) curve, ensuring the absolute error
 of primary predictions to be within tolerable limits.</p>
-<p>The leaves of the MPP decision tree break down the test dataset into smaller segments with similar features and similar
+<p>The leaves of the Error Tree decision tree break down the test dataset into smaller segments with similar features and similar
 model performances. Analyzing the sub-population in the error leaves, and comparing with the global population, provides
 insights about critical features correlated with the model failures.</p>
 <p>The mealy package leads the user to focus on what are the problematic features and what are the typical values of these features
@@ -208,7 +213,7 @@ for the mis-predicted samples. This information can later be exploited to suppor
 <ul class="simple">
 <li><p>improve model design: removing a problematic feature, removing samples likely to be mislabeled, ensemble with a model trained on a problematic subpopulation, …</p></li>
 <li><p>enhance data collection: gather more data regarding the most erroneous under-represented populations,</p></li>
-<li><p>select critical samples for manual inspection thanks to the MPP and avoid primary predictions on them, generating model assertions.</p></li>
+<li><p>select critical samples for manual inspection thanks to the Error Tree and avoid primary predictions on them, generating model assertions.</p></li>
 </ul>
 <p>The typical workflow in the iterative model design supported by error analysis is illustrated in the figure below.</p>
 <img alt="Model Error Analysis workflow" src="_images/mealy_flow.png" />
@@ -217,14 +222,14 @@ for the mis-predicted samples. This information can later be exploited to suppor
 <h2>Metrics<a class="headerlink" href="#metrics" title="Permalink to this headline">¶</a></h2>
 <p>The <strong>actual accuracy</strong> of the primary model is the proportion of samples in the test set the primary model predicts correctly
 (or close enough to the true value in case of regression).</p>
-<p>The Model Performance Predictor provides an estimation of this accuracy, referred to as <strong>estimated accuracy</strong>. This is
-the proportion of samples in the test set the MPP estimates as Correct Prediction</p>
+<p>The Error Tree provides an estimation of this accuracy, referred to as <strong>estimated accuracy</strong>. This is
+the proportion of samples in the test set the Error Tree estimates as Correct Prediction</p>
 <p>If the estimated accuracy of the primary model is too far from the actual one, a warning is triggered.
 Indeed this means that the decision tree is not representative of the primary model performance,
-making the whole error analysis invalid. The metric measuring how the MPP is representative of the primary model
+making the whole error analysis invalid. The metric measuring how the Error Tree is representative of the primary model
 is the <strong>Fidelity</strong> (<cite>1-|actual_acc - estimated_acc|</cite>). The chosen threshold for fidelity is <cite>0.9</cite>,
-below which the MPP predicted model accuracy is considered too different from the true model accuracy.</p>
-<p>As the Model Performance Predictor is simply a tree, it can be visualized and further analyzed by looking at its nodes,
+below which the Error Tree predicted model accuracy is considered too different from the true model accuracy.</p>
+<p>As the Error Tree is simply a tree, it can be visualized and further analyzed by looking at its nodes,
 especially the leaf nodes. The color of a node represents whether the majority of samples falling in the node are
 Correct Prediction (blue) or Wrong Prediction (red).</p>
 <p>In particular the blue leaves represent the subpopulation of the dataset that the primary model managed to predict correctly.
@@ -245,37 +250,29 @@ Those points are particularly interesting as they give us insight on the reasons
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="auto_examples/index.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to mealy’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="auto_examples/index.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to mealy’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020-2020, Dataiku
+        &#169; Copyright 2020-2021, Dataiku.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

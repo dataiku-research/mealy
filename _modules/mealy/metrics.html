@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>mealy.metrics &mdash; mealy 0.1.0-git documentation</title>
   
@@ -13,14 +13,20 @@
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/theme_override.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery-rendered-html.css" type="text/css" />
 
   
   
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
   
+
   
+  
+
   
 
   
@@ -30,10 +36,9 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -53,7 +58,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> mealy
+            <a href="../../index.html" class="icon icon-home"> mealy
           
 
           
@@ -182,7 +187,7 @@
 
 <div class="viewcode-block" id="compute_confidence_decision"><a class="viewcode-back" href="../../gen_modules/mealy.metrics.html#mealy.metrics.compute_confidence_decision">[docs]</a><span class="k">def</span> <span class="nf">compute_confidence_decision</span><span class="p">(</span><span class="n">primary_model_true_accuracy</span><span class="p">,</span> <span class="n">primary_model_predicted_accuracy</span><span class="p">):</span>
     <span class="n">difference_true_pred_accuracy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">primary_model_true_accuracy</span> <span class="o">-</span> <span class="n">primary_model_predicted_accuracy</span><span class="p">)</span>
-    <span class="n">decision</span> <span class="o">=</span> <span class="n">difference_true_pred_accuracy</span> <span class="o">&lt;=</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">MPP_ACCURACY_TOLERANCE</span>
+    <span class="n">decision</span> <span class="o">=</span> <span class="n">difference_true_pred_accuracy</span> <span class="o">&lt;=</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">EDT_ACCURACY_TOLERANCE</span>
 
     <span class="n">fidelity</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">-</span> <span class="n">difference_true_pred_accuracy</span>
 
@@ -190,7 +195,7 @@
     <span class="k">return</span> <span class="n">fidelity</span><span class="p">,</span> <span class="n">decision</span></div>
 
 
-<div class="viewcode-block" id="compute_mpp_accuracy"><a class="viewcode-back" href="../../gen_modules/mealy.metrics.html#mealy.metrics.compute_mpp_accuracy">[docs]</a><span class="k">def</span> <span class="nf">compute_mpp_accuracy</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
+<div class="viewcode-block" id="compute_accuracy_score"><a class="viewcode-back" href="../../gen_modules/mealy.metrics.html#mealy.metrics.compute_accuracy_score">[docs]</a><span class="k">def</span> <span class="nf">compute_accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span></div>
 
 
@@ -211,85 +216,86 @@
     <span class="k">return</span> <span class="n">fidelity_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span> <span class="o">+</span> <span class="n">balanced_accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="mpp_report"><a class="viewcode-back" href="../../gen_modules/mealy.metrics.html#mealy.metrics.mpp_report">[docs]</a><span class="k">def</span> <span class="nf">mpp_report</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">output_dict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Build a text report showing the main Model Performance Predictor (MPP) metrics.</span>
+<div class="viewcode-block" id="error_decision_tree_report"><a class="viewcode-back" href="../../gen_modules/mealy.metrics.html#mealy.metrics.error_decision_tree_report">[docs]</a><span class="k">def</span> <span class="nf">error_decision_tree_report</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;text&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Build a text report showing the main Error Decision Tree (EDT) metrics.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        y_true (numpy.ndarray): Ground truth values of wrong/correct predictions of the MPP primary model.</span>
+<span class="sd">        y_true (numpy.ndarray): Ground truth values of wrong/correct predictions of the EDT primary model.</span>
 <span class="sd">            Expected values in [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].</span>
-<span class="sd">        y_pred (numpy.ndarray): Estimated targets as returned by a Model Performance Predictor. Expected values in</span>
+<span class="sd">        y_pred (numpy.ndarray): Estimated targets as returned by a EDT. Expected values in</span>
 <span class="sd">            [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].</span>
-<span class="sd">        output_dict (bool): If True, return output as dict (default = False).</span>
+<span class="sd">        output_format (string): &#39;dict&#39; or &#39;text&#39;</span>
 
 <span class="sd">    Return:</span>
-<span class="sd">        dict or str: metrics regarding the Model Performance Predictor.</span>
+<span class="sd">        dict or str: metrics regarding the Error Decision Tree.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">mpp_accuracy_score</span> <span class="o">=</span> <span class="n">compute_mpp_accuracy</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
-    <span class="n">mpp_balanced_accuracy</span> <span class="o">=</span> <span class="n">balanced_accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+    <span class="n">edt_accuracy_score</span> <span class="o">=</span> <span class="n">compute_accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+    <span class="n">edt_balanced_accuracy</span> <span class="o">=</span> <span class="n">balanced_accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
     <span class="n">primary_model_predicted_accuracy</span> <span class="o">=</span> <span class="n">compute_primary_model_accuracy</span><span class="p">(</span><span class="n">y_pred</span><span class="p">)</span>
     <span class="n">primary_model_true_accuracy</span> <span class="o">=</span> <span class="n">compute_primary_model_accuracy</span><span class="p">(</span><span class="n">y_true</span><span class="p">)</span>
     <span class="n">fidelity</span><span class="p">,</span> <span class="n">confidence_decision</span> <span class="o">=</span> <span class="n">compute_confidence_decision</span><span class="p">(</span><span class="n">primary_model_true_accuracy</span><span class="p">,</span>
                                                                 <span class="n">primary_model_predicted_accuracy</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">output_dict</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s1">&#39;dict&#39;</span><span class="p">:</span>
         <span class="n">report_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="n">report_dict</span><span class="p">[</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">MPP_ACCURACY</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpp_accuracy_score</span>
-        <span class="n">report_dict</span><span class="p">[</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">MPP_BALANCED_ACCURACY</span><span class="p">]</span> <span class="o">=</span> <span class="n">mpp_balanced_accuracy</span>
-        <span class="n">report_dict</span><span class="p">[</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">MPP_FIDELITY</span><span class="p">]</span> <span class="o">=</span> <span class="n">fidelity</span>
+        <span class="n">report_dict</span><span class="p">[</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">EDT_ACCURACY</span><span class="p">]</span> <span class="o">=</span> <span class="n">edt_accuracy_score</span>
+        <span class="n">report_dict</span><span class="p">[</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">EDT_BALANCED_ACCURACY</span><span class="p">]</span> <span class="o">=</span> <span class="n">edt_balanced_accuracy</span>
+        <span class="n">report_dict</span><span class="p">[</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">EDT_FIDELITY</span><span class="p">]</span> <span class="o">=</span> <span class="n">fidelity</span>
         <span class="n">report_dict</span><span class="p">[</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">PRIMARY_MODEL_TRUE_ACCURACY</span><span class="p">]</span> <span class="o">=</span> <span class="n">primary_model_true_accuracy</span>
         <span class="n">report_dict</span><span class="p">[</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">PRIMARY_MODEL_PREDICTED_ACCURACY</span><span class="p">]</span> <span class="o">=</span> <span class="n">primary_model_predicted_accuracy</span>
         <span class="n">report_dict</span><span class="p">[</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">CONFIDENCE_DECISION</span><span class="p">]</span> <span class="o">=</span> <span class="n">confidence_decision</span>
         <span class="k">return</span> <span class="n">report_dict</span>
 
-    <span class="n">report</span> <span class="o">=</span> <span class="s1">&#39;The MPP was trained with accuracy </span><span class="si">%.2f%%</span><span class="s1"> and balanced accuracy </span><span class="si">%.2f%%</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mpp_accuracy_score</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
-                                                                                         <span class="n">mpp_balanced_accuracy</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
-    <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
-    <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;The Decision Tree estimated the primary model&#39;&#39;s accuracy to </span><span class="si">%.2f%%</span><span class="s1">.&#39;</span> <span class="o">%</span> \
-              <span class="p">(</span><span class="n">primary_model_predicted_accuracy</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
-    <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
-    <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;The true accuracy of the primary model is </span><span class="si">%.2f</span><span class="s1">.</span><span class="si">%%</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">primary_model_true_accuracy</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
-    <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
-    <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;The Fidelity of the MPP is </span><span class="si">%.2f%%</span><span class="s1">.&#39;</span> <span class="o">%</span> \
-              <span class="p">(</span><span class="n">fidelity</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
-    <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">confidence_decision</span><span class="p">:</span>
-        <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;Warning: the built MPP might not be representative of the primary model performances.&#39;</span>
-        <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;The MPP predicted model accuracy is considered too different from the true model accuracy.&#39;</span>
-        <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;The MPP is considered representative of the primary model performances.&#39;</span>
-        <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="k">elif</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s1">&#39;text&#39;</span><span class="p">:</span>
 
-    <span class="k">return</span> <span class="n">report</span></div>
+        <span class="n">report</span> <span class="o">=</span> <span class="s1">&#39;The Error Decision Tree (EDT) was trained with accuracy </span><span class="si">%.2f%%</span><span class="s1"> and balanced accuracy </span><span class="si">%.2f%%</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">edt_accuracy_score</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="n">edt_balanced_accuracy</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;The Decision Tree estimated the primary model&#39;&#39;s accuracy to </span><span class="si">%.2f%%</span><span class="s1">.&#39;</span> <span class="o">%</span> \
+                  <span class="p">(</span><span class="n">primary_model_predicted_accuracy</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;The true accuracy of the primary model is </span><span class="si">%.2f</span><span class="s1">.</span><span class="si">%%</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">primary_model_true_accuracy</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;The Fidelity of the EDT is </span><span class="si">%.2f%%</span><span class="s1">.&#39;</span> <span class="o">%</span> \
+                  <span class="p">(</span><span class="n">fidelity</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">confidence_decision</span><span class="p">:</span>
+            <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;Warning: the built EDT might not be representative of the primary model performances.&#39;</span>
+            <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;The EDT predicted model accuracy is considered too different from the true model accuracy.&#39;</span>
+            <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;The EDT is considered representative of the primary model performances.&#39;</span>
+            <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">report</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Output format should either be &quot;dict&quot; or &quot;text&quot;&#39;</span><span class="p">)</span></div>
 </pre></div>
 
            </div>
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2020-2020, Dataiku
+        &#169; Copyright 2020-2021, Dataiku.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

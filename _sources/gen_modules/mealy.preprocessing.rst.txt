@@ -1,4 +1,4 @@
-.. Please when editing this file make sure to keep it matching the
+﻿.. Please when editing this file make sure to keep it matching the
    docs in ../configuration.rst:reference_to_examples
 
 mealy.preprocessing
@@ -17,6 +17,14 @@ mealy.preprocessing
    -------
 
    
+   .. autoclass:: DummyPipelinePreprocessor
+      :members:
+
+   .. include:: backreferences/mealy.preprocessing.DummyPipelinePreprocessor.examples
+
+   .. raw:: html
+
+	       <div class="sphx-glr-clear"></div>
    .. autoclass:: FeatureNameTransformer
       :members:
 
