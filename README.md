@@ -68,14 +68,14 @@ from mealy.error_visualizer import ErrorVisualizer
 model = RandomForestClassifier()
 model.fit(X_train, y_train)
 
-# fit a Model Performance Predictor on the model performances
+# fit an Error Tree on the model performances
 error_analyzer = ErrorAnalyzer(model, feature_names=feature_names)
 error_analyzer.fit(X_test, y_test)
 
-# print metrics regarding the Model Performance Predictor
-print(error_analyzer.evaluate(X_test, y_test, output_format='text'))
+# print metrics regarding the Error Tree
+print(error_analyzer.evaluate(X_test, y_test))
 
-# plot the Model Performance Predictor Decision Tree
+# plot the Error Tree
 error_visualizer = ErrorVisualizer(error_analyzer)
 error_visualizer.plot_error_tree()
 
@@ -128,14 +128,14 @@ pipeline_model = make_pipeline(
 
 pipeline_model.fit(X_train, y_train)
 
-# fit a Model Performance Predictor on the model performances
+# fit a Error Tree on the model performances
 error_analyzer = ErrorAnalyzer(pipeline_model, feature_names=feature_names)
 error_analyzer.fit(X_test, y_test)
 
-# print metrics regarding the Model Performance Predictor
-print(error_analyzer.evaluate(X_test, y_test, output_format='text'))
+# print metrics regarding the Error Tree
+print(error_analyzer.evaluate(X_test, y_test))
 
-# plot the Model Performance Predictor Decision Tree
+# plot the Error Tree
 error_visualizer = ErrorVisualizer(error_analyzer)
 error_visualizer.plot_error_tree()
 

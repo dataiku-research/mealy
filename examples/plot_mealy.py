@@ -69,7 +69,7 @@ error_analyzer.fit(X_test, y_test)
 print(error_analyzer.evaluate(X_test, y_test, output_format='text'))
 
 ##############################################################################
-# Plot the Error Decision Tree.
+# Plot the Error Tree.
 
 error_visualizer = ErrorVisualizer(error_analyzer)
 tree_src = error_visualizer.plot_error_tree()

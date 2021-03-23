@@ -84,4 +84,4 @@ class ErrorTree(object):
 
         #y = self._error_train_y
         n_total_errors = np.sum(wrongly_predicted_samples) #y[y == ErrorAnalyzerConstants.WRONG_PREDICTION].shape[0]
-        self._total_error_fraction = wrongly_predicted_samples.astype(float) / n_total_errors
+        self._total_error_fraction = wrongly_predicted_samples / float(n_total_errors)

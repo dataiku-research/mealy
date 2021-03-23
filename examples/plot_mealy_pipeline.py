@@ -114,7 +114,7 @@ error_analyzer.fit(X_test, y_test)
 print(error_analyzer.evaluate(X_test, y_test, output_format='text'))
 
 ##############################################################################
-# Plot the Error Decision Tree.
+# Plot the Error Tree.
 
 error_visualizer = ErrorVisualizer(error_analyzer)
 tree_src = error_visualizer.plot_error_tree()
@@ -157,7 +157,7 @@ error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=leaf_id, top
 # Model Failures
 # ^^^^^^^^^^^^^^
 #
-# Let's focus on the nodes of the Error Decision Tree, in particular the leaf nodes
+# Let's focus on the nodes of the Error Tree, in particular the leaf nodes
 # of class 'Wrong prediction'. These leaves contain the majority of errors, each
 # leaf clustering a subpopulation of errors with different feature values. The largest
 # and purest failure nodes are highlighted when printing the error node summary, and
