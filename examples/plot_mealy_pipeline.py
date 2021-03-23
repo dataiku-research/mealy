@@ -6,9 +6,9 @@ Here we train a RandomForestClassifier to predict whether a person gains
 more or less than 50k per year. This is our primary model.
 Before training the primary model we preprocess the categorical and numeric
 features of the dataset by means of a scikit-learn Pipeline.
-Then we build a secondary model, called Model Performance Predictor (MPP),
+Then we build a secondary model, called Error Tree,
 to predict on what samples the primary model returns wrong or correct predictions.
-The MPP is a DecisionTree returning a binary outcome success/failure. The leaf nodes
+The Error Tree is a DecisionTree returning a binary outcome success/failure. The leaf nodes
 yielding failure outcome gather the samples mis-predicted by the primary
 model. Plotting the feature distributions of these samples and comparing
 to the whole data highlights the subpopulations where the model works poorly.
@@ -103,18 +103,18 @@ acc_score = model.score(X_test, y_test)
 print("Acc = %.2f" % acc_score)
 
 ##############################################################################
-# Fit a Model Performance Predictor on the model performances.
+# Fit an Error Tree on the model performances.
 
 error_analyzer = ErrorAnalyzer(model, feature_names=feature_names)
 error_analyzer.fit(X_test, y_test)
 
 ##############################################################################
-# Print metrics regarding the Model Performance Predictor.
+# Print metrics regarding the Error Tree.
 
 print(error_analyzer.evaluate(X_test, y_test, output_format='text'))
 
 ##############################################################################
-# Plot the Model Performance Predictor Decision Tree.
+# Plot the Error Tree.
 
 error_visualizer = ErrorVisualizer(error_analyzer)
 tree_src = error_visualizer.plot_error_tree()
@@ -144,20 +144,20 @@ error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=leaf_id, top
 # Discussion
 # ----------
 #
-# Model Performance Predictor Metrics
+# Error Tree Metrics
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
 # We are dealing with a binary classification task.
 # Here the primary predictions of "income less or more than 50k" have been categorized
 # in two classes: 'Correct prediction' and 'Wrong prediction' according to the difference
 # from the true class. The accuracy is then the number of Correct predictions over the total.
-# The MPP might not be representative of the behavior of the primary model as the true primary
-# accuracy and the one estimated by the MPP are not close.
+# The Error Tree might not be representative of the behavior of the primary model as the true primary
+# accuracy and the one estimated by the Error Tree are not close.
 #
 # Model Failures
 # ^^^^^^^^^^^^^^
 #
-# Let's focus on the nodes of the MPP DecisionTree, in particular the leaf nodes
+# Let's focus on the nodes of the Error Tree, in particular the leaf nodes
 # of class 'Wrong prediction'. These leaves contain the majority of errors, each
 # leaf clustering a subpopulation of errors with different feature values. The largest
 # and purest failure nodes are highlighted when printing the error node summary, and
