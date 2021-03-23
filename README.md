@@ -2,7 +2,7 @@
 
 ## Introduction
 
-mealy is a Python package to perform **M**odel **E**rror **A**na**LY**sis of scikit-learn models leveraging a Model Performance Predictor.
+mealy is a Python package to perform **M**odel **E**rror **A**na**LY**sis of scikit-learn models leveraging an Error Tree.
 
 The project is currently maintained by [Dataiku's](https://www.dataiku.com/) research team.
 
@@ -26,13 +26,13 @@ type of errors, as well as the problematic features correlated with the failures
 
 We call the model under investigation the _primary_ model.
 
-This approach relies on a Model Performance Predictor (MPP), a secondary model trained to predict whether the primary 
-model prediction is correct or wrong, i.e. a success or a failure. More precisely, the MPP is a binary DecisionTree classifier 
+This approach relies on an Error Tree, a secondary model trained to predict whether the primary 
+model prediction is correct or wrong, i.e. a success or a failure. More precisely, the Error Tree is a binary DecisionTree classifier 
 predicting whether the primary model will yield a Correct Prediction or a Wrong Prediction. 
 
-The MPP can be trained on any dataset meant to evaluate the primary model performances, thus containing ground truth labels. 
-In particular the provided primary test set is split into a secondary training set to train the MPP and a secondary test set 
-to compute the MPP metrics.
+The Error Tree can be trained on any dataset meant to evaluate the primary model performances, thus containing ground truth labels. 
+In particular the provided primary test set is split into a secondary training set to train the Error Tree and a secondary test set 
+to compute the Error Tree metrics.
 
 In classification tasks the model failure is a wrong predicted class, whereas in case of regression tasks the failure is 
 defined as a large deviation of the predicted value from the true one. In the latter case, when the absolute difference 
@@ -40,7 +40,7 @@ between the predicted and the true value is higher than a threshold ε, the mode
 The threshold ε is computed as the knee point of the Regression Error Characteristic (REC) curve, ensuring the absolute error 
 of primary predictions to be within tolerable limits. 
 
-The leaves of the MPP decision tree break down the test dataset into smaller segments with similar features and similar 
+The leaves of the Error Tree decision tree break down the test dataset into smaller segments with similar features and similar 
 model performances. Analyzing the sub-population in the error leaves, and comparing with the global population, provides 
 insights about critical features correlated with the model failures.
 
@@ -49,7 +49,7 @@ for the mis-predicted samples. This information can later be exploited to suppor
 * improve model design: removing a problematic feature, removing samples likely to be mislabeled, ensemble with a model trained 
 on a problematic subpopulation, ...
 * enhance data collection: gather more data regarding the most erroneous under-represented populations,
-* select critical samples for manual inspection thanks to the MPP and avoid primary predictions on them, generating model assertions. 
+* select critical samples for manual inspection thanks to the Error Tree and avoid primary predictions on them, generating model assertions. 
 
 The typical workflow in the iterative model design supported by error analysis is illustrated in the figure below.
 
@@ -68,14 +68,14 @@ from mealy.error_visualizer import ErrorVisualizer
 model = RandomForestClassifier()
 model.fit(X_train, y_train)
 
-# fit a Model Performance Predictor on the model performances
+# fit an Error Tree on the model performances
 error_analyzer = ErrorAnalyzer(model, feature_names=feature_names)
 error_analyzer.fit(X_test, y_test)
 
-# print metrics regarding the Model Performance Predictor
-print(error_analyzer.mpp_summary(X_test, y_test, output_dict=False))
+# print metrics regarding the Error Tree
+print(error_analyzer.evaluate(X_test, y_test))
 
-# plot the Model Performance Predictor Decision Tree
+# plot the Error Tree
 error_visualizer = ErrorVisualizer(error_analyzer)
 error_visualizer.plot_error_tree()
 
@@ -128,14 +128,14 @@ pipeline_model = make_pipeline(
 
 pipeline_model.fit(X_train, y_train)
 
-# fit a Model Performance Predictor on the model performances
+# fit a Error Tree on the model performances
 error_analyzer = ErrorAnalyzer(pipeline_model, feature_names=feature_names)
 error_analyzer.fit(X_test, y_test)
 
-# print metrics regarding the Model Performance Predictor
-print(error_analyzer.mpp_summary(X_test, y_test, output_dict=False))
+# print metrics regarding the Error Tree
+print(error_analyzer.evaluate(X_test, y_test))
 
-# plot the Model Performance Predictor Decision Tree
+# plot the Error Tree
 error_visualizer = ErrorVisualizer(error_analyzer)
 error_visualizer.plot_error_tree()
 
