@@ -61,7 +61,7 @@ class ErrorTree(object):
         return np.in1d(self._leaf_ids, error_node_ids)
 
     def _check_error_tree(self):
-        if sum(self.estimator_.tree_.feature > 0) == 0:
+        if self.estimator_.tree_.node_count == 1:
             logger.warning("The error tree has only 1 node, there will be problem when using this with ErrorVisualizer")
 
     def _compute_leaf_ids(self):
