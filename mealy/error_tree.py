@@ -82,6 +82,5 @@ class ErrorTree(object):
         self._quantized_impurity = np.digitize(self._impurity, purity_bins)
         self._difference = correctly_predicted_samples - wrongly_predicted_samples  # only negative numbers
 
-        #y = self._error_train_y
-        n_total_errors = np.sum(wrongly_predicted_samples) #y[y == ErrorAnalyzerConstants.WRONG_PREDICTION].shape[0]
+        n_total_errors = np.sum(wrongly_predicted_samples)
         self._total_error_fraction = wrongly_predicted_samples / float(n_total_errors)
