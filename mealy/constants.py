@@ -13,7 +13,7 @@ class ErrorAnalyzerConstants(object):
     MIN_NUM_ROWS = 100  # heuristic choice
     MAX_NUM_ROW = 100000  # heuristic choice
 
-    EDT_ACCURACY_TOLERANCE = 0.1
+    TREE_ACCURACY_TOLERANCE = 0.1
     CRITERION = 'entropy'
     NUMBER_EPSILON_VALUES = 50
 
@@ -21,9 +21,9 @@ class ErrorAnalyzerConstants(object):
 
     TOP_K_FEATURES = 3
 
-    EDT_ACCURACY = 'edt_accuracy_score'
-    EDT_FIDELITY = 'edt_fidelity_score'
-    EDT_BALANCED_ACCURACY = 'edt_balanced_accuracy_score'
+    TREE_ACCURACY = 'error_tree_accuracy_score'
+    TREE_FIDELITY = 'error_tree_fidelity_score'
+    TREE_BALANCED_ACCURACY = 'error_tree_balanced_accuracy_score'
     PRIMARY_MODEL_TRUE_ACCURACY = 'primary_model_true_accuracy'
     PRIMARY_MODEL_PREDICTED_ACCURACY = 'primary_model_predicted_accuracy'
     CONFIDENCE_DECISION = 'confidence_decision'
