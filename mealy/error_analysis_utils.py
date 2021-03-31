@@ -26,13 +26,11 @@ def get_epsilon(difference, mode='rec'):
     return epsilon
 
 def get_feature_list_from_column_transformer(ct_preprocessor):
-    all_feature = []
-    categorical_features = []
-    for i, (transformer_name, transformer, transformer_feature_names) in enumerate(ct_preprocessor.transformers_):
+    all_features, categorical_features = [], []
+    for transformer_name, transformer, transformer_feature_names in ct_preprocessor.transformers_:
         if transformer_name == 'remainder' and transformer == 'drop':
             continue
-        else:
-            all_feature.extend(transformer_feature_names)
+        all_features.extend(transformer_feature_names)
 
         # check for categorical features
         if isinstance(transformer, Pipeline):
@@ -42,10 +40,7 @@ def get_feature_list_from_column_transformer(ct_preprocessor):
                     break
         elif isinstance(transformer, ErrorAnalyzerConstants.VALID_CATEGORICAL_STEPS):
             categorical_features.extend(transformer_feature_names)
-        else:
-            continue
-
-    return all_feature, categorical_features
+    return all_features, categorical_features
 
 
 def check_lists_having_same_elements(list_A, list_B):
