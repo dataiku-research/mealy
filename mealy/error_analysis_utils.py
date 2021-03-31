@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from sklearn.pipeline import Pipeline
 import numpy as np
-import collections
+#import collections
 from mealy.constants import ErrorAnalyzerConstants
 from kneed import KneeLocator
 
@@ -49,8 +49,7 @@ def get_feature_list_from_column_transformer(ct_preprocessor):
 
 
 def check_lists_having_same_elements(list_A, list_B):
-    return collections.Counter(list_A) == collections.Counter(list_B)
-
+    return set(list_A) == set(list_B)
 
 def check_enough_data(df, min_len):
     """
