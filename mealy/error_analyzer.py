@@ -197,14 +197,13 @@ class ErrorAnalyzer(BaseEstimator):
 
         y = self._error_train_y
         n_total_errors = y[y == ErrorAnalyzerConstants.WRONG_PREDICTION].shape[0]
-        error_class_idx = np.where(self._error_tree.estimator_.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
-        correct_class_idx = 1 - error_class_idx
+        correct_class_idx = 1 - self._error_tree.error_class_idx
 
         leaves_summary = []
         path_to_node = None
         for leaf_id in leaf_nodes:
             values = self._error_tree.estimator_.tree_.value[leaf_id, :]
-            n_errors = int(np.ceil(values[0, error_class_idx]))
+            n_errors = int(np.ceil(values[0, self._error_tree.error_class_idx]))
             n_corrects = int(np.ceil(values[0, correct_class_idx]))
             local_error = float(n_errors) / (n_corrects + n_errors)
             total_error_fraction = float(n_errors) / n_total_errors

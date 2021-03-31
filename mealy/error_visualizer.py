@@ -83,7 +83,8 @@ class ErrorVisualizer(_BaseErrorVisualizer):
     def __init__(self, error_analyzer):
         super(ErrorVisualizer, self).__init__(error_analyzer)
 
-        self._error_clf = self._error_analyzer.error_tree.estimator_
+        self._error_tree = self._error_analyzer.error_tree
+        self._error_clf = self._error_tree.estimator_
         self._train_leaf_ids = self._error_clf.apply(self._error_analyzer._error_train_x)
         self._thresholds = self._error_analyzer._inverse_transform_thresholds()
         self._features = self._error_analyzer._inverse_transform_features()
@@ -124,8 +125,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
 
         y = self._error_analyzer._error_train_y
         n_total_errors = y[y == ErrorAnalyzerConstants.WRONG_PREDICTION].shape[0]
-        error_class_idx = np.where(self._error_clf.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
-        wrongly_predicted_samples = self._error_clf.tree_.value[:, 0, error_class_idx]
+        wrongly_predicted_samples = self._error_clf.tree_.value[:, 0, self._error_tree.error_class_idx]
 
         correct_class_idx = np.where(self._error_clf.classes_ == ErrorAnalyzerConstants.CORRECT_PREDICTION)[0][0]
         well_predicted_samples = self._error_clf.tree_.value[:, 0, correct_class_idx]
@@ -237,8 +237,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
 
         """
 
-        error_class_idx = np.where(self._error_clf.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
-        correct_class_idx = 1 - error_class_idx
+        correct_class_idx = 1 - self._error_tree.error_class_idx
 
         ranked_feature_ids = rank_features_by_error_correlation(self._error_clf.feature_importances_)
         if self._error_analyzer.pipeline_preprocessor is None:
@@ -260,7 +259,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
             feature_names = self._original_feature_names
 
         total_error_fraction_sample_ids = y == ErrorAnalyzerConstants.WRONG_PREDICTION
-        nr_wrong, nr_correct = self._error_clf.tree_.value[:, 0, error_class_idx], self._error_clf.tree_.value[:, 0, correct_class_idx]
+        nr_wrong, nr_correct = self._error_clf.tree_.value[:, 0, self._error_tree.error_class_idx], self._error_clf.tree_.value[:, 0, correct_class_idx]
 
         leaf_nodes = self._get_ranked_leaf_ids(leaf_selector, rank_leaves_by)
         for leaf in leaf_nodes:
