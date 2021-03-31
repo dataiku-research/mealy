@@ -16,6 +16,7 @@ class ErrorTree(object):
         self._quantized_impurity = None
         self._difference = None
         self._total_error_fraction = None
+        self.error_class_idx = np.where(self.estimator_.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
 
         self._check_error_tree()
 
@@ -56,8 +57,7 @@ class ErrorTree(object):
         return self._leaf_ids
 
     def get_error_leaves(self):
-        error_class_idx = np.where(self.estimator_.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
-        error_node_ids = np.where(self.estimator_.tree_.value[:, 0, :].argmax(axis=1) == error_class_idx)[0]
+        error_node_ids = np.where(self.estimator_.tree_.value[:, 0, :].argmax(axis=1) == self.error_class_idx)[0]
         return np.in1d(self._leaf_ids, error_node_ids)
 
     def _check_error_tree(self):
@@ -70,10 +70,9 @@ class ErrorTree(object):
 
     def _compute_ranking_arrays(self, n_purity_levels=ErrorAnalyzerConstants.NUMBER_PURITY_LEVELS):
         """ Compute ranking array """
-        error_class_idx = np.where(self.estimator_.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
-        correct_class_idx = 1 - error_class_idx
+        correct_class_idx = 1 - self.error_class_idx
 
-        wrongly_predicted_samples = self.estimator_.tree_.value[self.leaf_ids, 0, error_class_idx]
+        wrongly_predicted_samples = self.estimator_.tree_.value[self.leaf_ids, 0, self.error_class_idx]
         correctly_predicted_samples = self.estimator_.tree_.value[self.leaf_ids, 0, correct_class_idx]
 
         self._impurity = correctly_predicted_samples / (wrongly_predicted_samples + correctly_predicted_samples)
