@@ -1,29 +1,32 @@
 # -*- coding: utf-8 -*-
 from sklearn.pipeline import Pipeline
 import numpy as np
-#import collections
 from mealy.constants import ErrorAnalyzerConstants
 from kneed import KneeLocator
 
+
 def get_epsilon(difference, mode='rec'):
-    """ Compute epsilon to define errors in regression task """
-    assert (mode in ['std', 'rec'])
-    epsilon = None
+    """
+    Compute the threshold used to decide whether a prediction is wrong or correct (for regression tasks).
+
+    Args:
+           difference (1D-array): The absolute differences between the true target values and the predicted ones (by the primary model).
+
+           mode (string, default 'rec'): The method used to compute the threshold. Values can be 'rec' or 'std'.
+    Return:
+           epsilon (float): The value of the threshold used to decide whether the prediction for a regression task is wrong or correct
+    """
     if mode == 'std':
-        std_diff = np.std(difference)
-        mean_diff = np.mean(difference)
-        epsilon = mean_diff + std_diff
-    elif mode == 'rec':
-        n_points = ErrorAnalyzerConstants.NUMBER_EPSILON_VALUES
-        epsilon_range = np.linspace(min(difference), max(difference), num=n_points)
-        cdf_error = np.zeros_like(epsilon_range)
+        return np.std(difference) + np.mean(difference)
+    if mode == 'rec':
+        epsilon_range = np.linspace(min(difference), max(difference), num=ErrorAnalyzerConstants.NUMBER_EPSILON_VALUES)
+        cdf_error = []
         n_samples = difference.shape[0]
-        for i, epsilon in enumerate(epsilon_range):
-            correct = difference <= epsilon
-            cdf_error[i] = float(np.count_nonzero(correct)) / n_samples
-        kneedle = KneeLocator(epsilon_range, cdf_error)
-        epsilon = kneedle.knee
-    return epsilon
+        for epsilon in epsilon_range:
+            correct_predictions = difference <= epsilon
+            cdf_error.append(np.count_nonzero(correct_predictions) / float(n_samples))
+        return KneeLocator(epsilon_range, cdf_error).knee
+    raise ValueError("Wrong argument for the computation mode. Valid values are either 'rec' or 'std'")
 
 def get_feature_list_from_column_transformer(ct_preprocessor):
     all_features, categorical_features = [], []
