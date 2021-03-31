@@ -246,10 +246,10 @@ class ErrorAnalyzer(BaseEstimator):
                 and train a Error Analyzer Tree.
             y (numpy.ndarray or pandas.DataFrame): target data from a test set to evaluate the primary predictor and
                 train a Error Analyzer Tree.
-            output_format (string): whether to return a "dict" or a "text"
+            output_format (string): Return format used for the report. Valid values are 'dict' or 'text'.
 
         Return:
-            dict or str: metrics regarding the Error Analyzer Tree.
+            dict or str: dictionary or report storing different metrics regarding the Error Decision Tree.
         """
         prep_x, prep_y = self.pipeline_preprocessor.transform(X), np.array(y)
         y_true, _ = self._compute_primary_model_error(prep_x, prep_y)

@@ -23,7 +23,7 @@ def compute_primary_model_accuracy(y):
     return float(np.count_nonzero(y == ErrorAnalyzerConstants.CORRECT_PREDICTION)) / n_test_samples
 
 
-def fidelity_score(y_true, y_pred):
+def compute_fidelity_score(y_true, y_pred):
     difference_true_pred_accuracy = np.abs(compute_primary_model_accuracy(y_true) -
                                            compute_primary_model_accuracy(y_pred))
     fidelity = 1. - difference_true_pred_accuracy
@@ -32,7 +32,7 @@ def fidelity_score(y_true, y_pred):
 
 
 def fidelity_balanced_accuracy_score(y_true, y_pred):
-    return fidelity_score(y_true, y_pred) + balanced_accuracy_score(y_true, y_pred)
+    return compute_fidelity_score(y_true, y_pred) + balanced_accuracy_score(y_true, y_pred)
 
 
 def error_decision_tree_report(y_true, y_pred, output_format='text'):
@@ -43,10 +43,10 @@ def error_decision_tree_report(y_true, y_pred, output_format='text'):
             Expected values in [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].
         y_pred (numpy.ndarray): Estimated targets as returned by the error tree. Expected values in
             [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].
-        output_format (string): 'dict' or 'text'
+        output_format (string): Return format used for the report. Valid values are 'dict' or 'text'.
 
     Return:
-        dict or str: metrics regarding the Error Decision Tree.
+        dict or str: dictionary or report storing different metrics regarding the Error Decision Tree.
     """
 
     tree_accuracy_score = compute_accuracy_score(y_true, y_pred)
@@ -65,7 +65,7 @@ def error_decision_tree_report(y_true, y_pred, output_format='text'):
         report_dict[ErrorAnalyzerConstants.CONFIDENCE_DECISION] = confidence_decision
         return report_dict
 
-    elif output_format == 'text':
+    if output_format == 'text':
 
         report = 'The Error Decision Tree was trained with accuracy %.2f%% and balanced accuracy %.2f%%.' % (tree_accuracy_score * 100, tree_balanced_accuracy * 100)
         report += '\n'
@@ -86,7 +86,7 @@ def error_decision_tree_report(y_true, y_pred, output_format='text'):
             report += 'The error tree is considered representative of the primary model performances.'
             report += '\n'
 
-        print(report)
+        return report
 
     else:
         raise ValueError('Output format should either be "dict" or "text"')
