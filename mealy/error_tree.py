@@ -62,7 +62,7 @@ class ErrorTree(object):
 
     def _check_error_tree(self):
         if self.estimator_.tree_.node_count == 1:
-            logger.warning("The error tree has only 1 node, there will be problem when using this with ErrorVisualizer")
+            logger.warning("The error tree has only 1 node, there will be problem when using it with ErrorVisualizer")
 
     def _compute_leaf_ids(self):
         """ Compute indices of leaf nodes """
