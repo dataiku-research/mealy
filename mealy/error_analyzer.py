@@ -178,7 +178,7 @@ class ErrorAnalyzer(BaseEstimator):
         logger.info('Chosen parameters: {}'.format(gs_clf.best_params_))
 
     #TODO rewrite this method using the ranking arrays
-    def get_error_node_summary(self, leaf_selector=None, add_path_to_leaves=False, print_summary=False, rank_by='purity'):
+    def get_error_node_summary(self, leaf_selector=None, add_path_to_leaves=False, print_summary=False, rank_by='total_error_fraction'):
         """ Return summary information regarding leaf nodes.
 
         Args:
@@ -315,7 +315,7 @@ class ErrorAnalyzer(BaseEstimator):
         logger.info('The primary model has an error rate of {}'.format(round(error_rate, 3)))
         return error_y, error_rate
 
-    def _get_ranked_leaf_ids(self, leaf_selector=None, rank_by='purity'):
+    def _get_ranked_leaf_ids(self, leaf_selector=None, rank_by='total_error_fraction'):
         """ Select error nodes and rank them by importance.
 
         Args:
