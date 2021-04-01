@@ -17,6 +17,9 @@ class ErrorTree(object):
         self._difference = None
         self._total_error_fraction = None
         self.error_class_idx = np.where(self.estimator_.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
+        self.correct_class_idx = 1 - self.error_class_idx
+        self.wrongly_predicted_samples = self.estimator_.tree_.value[self.leaf_ids, 0, self.error_class_idx]
+        self.correctly_predicted_samples = self.estimator_.tree_.value[self.leaf_ids, 0, self.correct_class_idx]
 
         self._check_error_tree()
 
@@ -29,25 +32,27 @@ class ErrorTree(object):
     @property
     def impurity(self):
         if self._impurity is None:
-            self._compute_ranking_arrays()
+            self._impurity = self.correctly_predicted_samples / (self.wrongly_predicted_samples + self.correctly_predicted_samples)
         return self._impurity
 
     @property
     def quantized_impurity(self):
         if self._quantized_impurity is None:
-            self._compute_ranking_arrays()
+            purity_bins = np.linspace(0, 1., ErrorAnalyzerConstants.NUMBER_PURITY_LEVELS)
+            self._quantized_impurity = np.digitize(self.impurity, purity_bins)
         return self._quantized_impurity
 
     @property
     def difference(self):
         if self._difference is None:
-            self._compute_ranking_arrays()
+            self._difference = self.correctly_predicted_samples - self.wrongly_predicted_samples  # only negative numbers
         return self._difference
 
     @property
     def total_error_fraction(self):
         if self._total_error_fraction is None:
-            self._compute_ranking_arrays()
+            n_total_errors = np.sum(self.wrongly_predicted_samples)
+            self._total_error_fraction = self.wrongly_predicted_samples / float(n_total_errors)
         return self._total_error_fraction
 
     @property
@@ -67,19 +72,3 @@ class ErrorTree(object):
     def _compute_leaf_ids(self):
         """ Compute indices of leaf nodes """
         self._leaf_ids = np.where(self.estimator_.tree_.feature < 0)[0]
-
-    def _compute_ranking_arrays(self, n_purity_levels=ErrorAnalyzerConstants.NUMBER_PURITY_LEVELS):
-        """ Compute ranking array """
-        correct_class_idx = 1 - self.error_class_idx
-
-        wrongly_predicted_samples = self.estimator_.tree_.value[self.leaf_ids, 0, self.error_class_idx]
-        correctly_predicted_samples = self.estimator_.tree_.value[self.leaf_ids, 0, correct_class_idx]
-
-        self._impurity = correctly_predicted_samples / (wrongly_predicted_samples + correctly_predicted_samples)
-
-        purity_bins = np.linspace(0, 1., n_purity_levels)
-        self._quantized_impurity = np.digitize(self._impurity, purity_bins)
-        self._difference = correctly_predicted_samples - wrongly_predicted_samples  # only negative numbers
-
-        n_total_errors = np.sum(wrongly_predicted_samples)
-        self._total_error_fraction = wrongly_predicted_samples / float(n_total_errors)

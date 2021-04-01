@@ -178,7 +178,7 @@ class ErrorAnalyzer(BaseEstimator):
         logger.info('Chosen parameters: {}'.format(gs_clf.best_params_))
 
     #TODO rewrite this method using the ranking arrays
-    def get_error_node_summary(self, leaf_selector=None, add_path_to_leaves=False, print_summary=False):
+    def get_error_node_summary(self, leaf_selector=None, add_path_to_leaves=False, print_summary=False, rank_by='purity'):
         """ Return summary information regarding leaf nodes.
 
         Args:
@@ -193,7 +193,7 @@ class ErrorAnalyzer(BaseEstimator):
             dict: dictionary of metrics for each selected node of the Model Performance Predictor.
         """
 
-        leaf_nodes = self._get_ranked_leaf_ids(leaf_selector=leaf_selector)
+        leaf_nodes = self._get_ranked_leaf_ids(leaf_selector=leaf_selector, rank_by=rank_by)
 
         y = self._error_train_y
         n_total_errors = y[y == ErrorAnalyzerConstants.WRONG_PREDICTION].shape[0]
@@ -315,7 +315,7 @@ class ErrorAnalyzer(BaseEstimator):
         logger.info('The primary model has an error rate of {}'.format(round(error_rate, 3)))
         return error_y, error_rate
 
-    def _get_ranked_leaf_ids(self, leaf_selector=None, rank_by='total_error_fraction'):
+    def _get_ranked_leaf_ids(self, leaf_selector=None, rank_by='purity'):
         """ Select error nodes and rank them by importance.
 
         Args:
@@ -340,13 +340,12 @@ class ErrorAnalyzer(BaseEstimator):
         if rank_by == 'total_error_fraction':
             sorted_ids = np.argsort(-apply_leaf_selector(self._error_tree.total_error_fraction), )
         elif rank_by == 'purity':
-            sorted_ids = np.lexsort(
-                (apply_leaf_selector(self._error_tree.difference), apply_leaf_selector(self._error_tree.quantized_impurity)))
+            sorted_ids = np.lexsort((apply_leaf_selector(self._error_tree.difference), apply_leaf_selector(self._error_tree.quantized_impurity)))
         elif rank_by == 'class_difference':
             sorted_ids = np.lexsort((apply_leaf_selector(self._error_tree.impurity), apply_leaf_selector(self._error_tree.difference)))
         else:
             raise NotImplementedError(
-                "Input argument 'rank_by' is invalid. Should be 'total_error_fraction', 'purity' or 'class_difference'")
+                "Input argument for rank_by is invalid. Should be 'total_error_fraction', 'purity' or 'class_difference'")
         return selected_leaves.take(sorted_ids)
 
     #TODO leaf_selector is taking too many different types of data ?
@@ -412,7 +411,6 @@ class ErrorAnalyzer(BaseEstimator):
             cur_node_id = parent_id
 
         return path_to_node
-
 
     #TODO naming is not very clear ?
     def _inverse_transform_features(self):
