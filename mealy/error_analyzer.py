@@ -195,18 +195,16 @@ class ErrorAnalyzer(BaseEstimator):
 
         leaf_nodes = self._get_ranked_leaf_ids(leaf_selector=leaf_selector, rank_by=rank_by)
 
-        y = self._error_train_y
-        n_total_errors = y[y == ErrorAnalyzerConstants.WRONG_PREDICTION].shape[0]
-        correct_class_idx = 1 - self._error_tree.error_class_idx
+        n_total_errors = self._error_tree.estimator_.tree_.value[0,0,self._error_tree.error_class_idx]
 
         leaves_summary = []
         path_to_node = None
         for leaf_id in leaf_nodes:
-            values = self._error_tree.estimator_.tree_.value[leaf_id, :]
-            n_errors = int(np.ceil(values[0, self._error_tree.error_class_idx]))
-            n_corrects = int(np.ceil(values[0, correct_class_idx]))
-            local_error = float(n_errors) / (n_corrects + n_errors)
-            total_error_fraction = float(n_errors) / n_total_errors
+            n_errors = int(self._error_tree.estimator_.tree_.value[leaf_id, 0, self._error_tree.error_class_idx])
+            n_samples = self._error_tree.estimator_.tree_.n_node_samples[leaf_id]
+            local_error = n_errors / n_samples
+            total_error_fraction = n_errors / n_total_errors
+            n_corrects = n_samples - n_errors
 
             leaf_dict = {
                 "id": leaf_id,
@@ -289,29 +287,28 @@ class ErrorAnalyzer(BaseEstimator):
             Predictions of the primary model.
 
         Return:
-            error_y: array of string of len(y_trye)
+            error_y: array of string of len(y_true)
             Boolean value of whether or not the primary model got the prediction right.
 
             error_rate: float
             Accuracy of the primary model
         """
 
+        error_y = np.full_like(y_true, ErrorAnalyzerConstants.CORRECT_PREDICTION, dtype="O")
         if self._is_regression:
             difference = np.abs(y_true - y_pred)
-            self._epsilon = get_epsilon(difference, mode='rec')
-            error_array = np.array(difference > self._epsilon)
+            self._epsilon = get_epsilon(difference)
+            error_mask = difference > self._epsilon
         else:
-            error_array = np.array(y_true != y_pred)
+            error_mask = y_true != y_pred
 
-        target_mapping_dict = {True: ErrorAnalyzerConstants.WRONG_PREDICTION, False: ErrorAnalyzerConstants.CORRECT_PREDICTION}
-        error_y = np.array([target_mapping_dict[elem] for elem in error_array], dtype=object)
+        n_wrong_preds = np.count_nonzero(error_mask)
+        error_y[error_mask] = ErrorAnalyzerConstants.WRONG_PREDICTION
 
-        possible_outcomes = list(set(error_y.tolist()))
+        if n_wrong_preds == 0 or n_wrong_preds == len(error_y):
+            logger.warning('All predictions are {}. To build a proper ErrorAnalyzer decision tree we need both correct and incorrect predictions'.format(error_y[0]))
 
-        if len(possible_outcomes) == 1:
-            logger.warning('All predictions are {}. To build a proper ErrorAnalyzer decision tree we need both correct and incorrect predictions'.format(possible_outcomes[0]))
-
-        error_rate = np.sum(error_array, dtype=float)/len(error_array)
+        error_rate = n_wrong_preds / len(error_y)
         logger.info('The primary model has an error rate of {}'.format(round(error_rate, 3)))
         return error_y, error_rate
 
@@ -338,7 +335,7 @@ class ErrorAnalyzer(BaseEstimator):
         if selected_leaves.size == 0:
             return selected_leaves
         if rank_by == 'total_error_fraction':
-            sorted_ids = np.argsort(-apply_leaf_selector(self._error_tree.total_error_fraction), )
+            sorted_ids = np.argsort(-apply_leaf_selector(self._error_tree.total_error_fraction))
         elif rank_by == 'purity':
             sorted_ids = np.lexsort((apply_leaf_selector(self._error_tree.difference), apply_leaf_selector(self._error_tree.quantized_impurity)))
         elif rank_by == 'class_difference':
@@ -380,8 +377,8 @@ class ErrorAnalyzer(BaseEstimator):
     def _get_path_to_node(self, node_id):
         """ Return path to node as a list of split steps from the nodes of the sklearn Tree object """
         feature_names = self.pipeline_preprocessor.get_original_feature_names()
-        children_left = self._error_tree.estimator_.tree_.children_left
-        children_right = self._error_tree.estimator_.tree_.children_right
+        children_left = list(self._error_tree.estimator_.tree_.children_left)
+        children_right = list(self._error_tree.estimator_.tree_.children_right)
         threshold = self._inverse_transform_thresholds()
         feature = self._inverse_transform_features()
 
@@ -398,7 +395,7 @@ class ErrorAnalyzer(BaseEstimator):
             thresh = threshold[parent_id]
 
             is_categorical = self.pipeline_preprocessor.is_categorical(feat)
-            thresh = str(thresh if is_categorical else ("%.2f" % thresh))
+            thresh = str(thresh) if is_categorical else "{:.2f}".format(thresh)
 
             decision_rule = ''
             if cur_node_id in children_left:
@@ -449,10 +446,11 @@ class ErrorAnalyzer(BaseEstimator):
                 thresholds of the Error Analyzer Tree, possibly with preprocessing undone.
         """
 
-        feats_idx = self._error_tree.estimator_.tree_.feature[self._error_tree.estimator_.tree_.feature > 0]
-        thresholds = self._error_tree.estimator_.tree_.threshold.copy().astype('O')
-        thresh = thresholds[self._error_tree.estimator_.tree_.feature > 0]
-        n_rows = np.count_nonzero(self._error_tree.estimator_.tree_.feature[self._error_tree.estimator_.tree_.feature > 0])
+        used_feature_mask = self._error_tree.estimator_.tree_.feature > 0
+        feats_idx = self._error_tree.estimator_.tree_.feature[used_feature_mask]
+        thresholds = self._error_tree.estimator_.tree_.threshold.astype('O')
+        thresh = thresholds[used_feature_mask]
+        n_rows = len(feats_idx)
         n_cols = self._error_train_x.shape[1]
         dummy_x = np.zeros((n_rows, n_cols))
 
@@ -466,5 +464,5 @@ class ErrorAnalyzer(BaseEstimator):
 
         undo_dummy_x = self.pipeline_preprocessor.inverse_transform(dummy_x)
         descaled_thresh = [undo_dummy_x[i, j] for i, j in indices]
-        thresholds[self._error_tree.estimator_.tree_.feature > 0] = descaled_thresh
+        thresholds[used_feature_mask] = descaled_thresh
         return thresholds
