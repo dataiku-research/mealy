@@ -74,7 +74,7 @@ class _BaseErrorVisualizer(object):
 
 class ErrorVisualizer(_BaseErrorVisualizer):
     """
-    ErrorVisualizer provides visual utilities to analyze the Model Performance Predictor in ErrorAnalyzer
+    ErrorVisualizer provides visual utilities to analyze the Error Tree in ErrorAnalyzer
 
     Args:
         error_analyzer (ErrorAnalyzer): fitted ErrorAnalyzer representing the performance of a primary model.
@@ -103,7 +103,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
             size (tuple): size of the output plot.
 
         Return:
-            graphviz.Source: graph of the Model Performance Predictor decision tree.
+            graphviz.Source: graph of the Error Analyzer Tree.
 
         """
         digraph_tree = export_graphviz(self._error_clf,
@@ -206,7 +206,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
 
         """Return plot of error node feature distribution and compare to global baseline.
 
-        The top-k features are sorted by importance in the Model Performance Predictor.
+        The top-k features are sorted by importance in the ErrorAnalyzer.
         The most important are more correlated with the errors. When no specific node is selected,
         the leaf nodes are ranked by an importance criterium and presented in relevance order.
 

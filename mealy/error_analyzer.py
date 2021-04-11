@@ -190,7 +190,7 @@ class ErrorAnalyzer(BaseEstimator):
             print_summary (bool): print summary for the selected nodes.
 
         Return:
-            dict: dictionary of metrics for each selected node of the Model Performance Predictor.
+            dict: dictionary of metrics for each selected node of the Error Analyzer Tree.
         """
 
         leaf_nodes = self._get_ranked_leaf_ids(leaf_selector=leaf_selector, rank_by=rank_by)
@@ -236,7 +236,7 @@ class ErrorAnalyzer(BaseEstimator):
     def evaluate(self, X, y, output_format='text'):
         """
         Evaluate performance of ErrorAnalyzer on new the given test data and labels.
-        Print ErrorAnalyzer summary metrics regarding the Error Analyzer Tree.
+        Print ErrorAnalyzer summary metrics regarding the Error Tree.
 
         Args:
             X (numpy.ndarray or pandas.DataFrame): feature data from a test set to evaluate the primary predictor
@@ -415,7 +415,7 @@ class ErrorAnalyzer(BaseEstimator):
         """ Undo preprocessing of feature values.
 
         If the predictor comes with a Pipeline preprocessor, map the features indices of the Error Analysis
-        Decision Tree back to their indices in the original unpreprocessed space of features.
+        Tree back to their indices in the original unpreprocessed space of features.
         Otherwise simply return the feature indices of the decision tree. The feature indices of a decision tree
         indicate what features are used to split the training set at each node.
         See https://scikit-learn.org/stable/auto_examples/tree/plot_unveil_tree_structure.html.
@@ -444,7 +444,7 @@ class ErrorAnalyzer(BaseEstimator):
 
         Return:
             numpy.ndarray:
-                thresholds of the Error Analyzer Tree, possibly with preprocessing undone.
+                thresholds of the Error Tree, possibly with preprocessing undone.
         """
 
         used_feature_mask = self._error_tree.estimator_.tree_.feature > 0
