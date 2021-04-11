@@ -386,10 +386,11 @@ class ErrorAnalyzer(BaseEstimator):
         path_to_node = collections.deque()
         while cur_node_id > 0:
 
-            if cur_node_id in children_left:
-                parent_id = list(children_left).index(cur_node_id)
+            node_is_left_child = cur_node_id in children_left
+            if node_is_left_child:
+                parent_id = children_left.index(cur_node_id)
             else:
-                parent_id = list(children_right).index(cur_node_id)
+                parent_id = children_right.index(cur_node_id)
 
             feat = feature[parent_id]
             thresh = threshold[parent_id]
@@ -398,7 +399,7 @@ class ErrorAnalyzer(BaseEstimator):
             thresh = str(thresh) if is_categorical else "{:.2f}".format(thresh)
 
             decision_rule = ''
-            if cur_node_id in children_left:
+            if node_is_left_child:
                 decision_rule += ' <= ' if not is_categorical else ' != '
             else:
                 decision_rule += " > " if not is_categorical else ' == '
