@@ -16,10 +16,10 @@ class ErrorTree(object):
         self._quantized_impurity = None
         self._difference = None
         self._total_error_fraction = None
-        self.error_class_idx = np.where(self.estimator_.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
-        self.correct_class_idx = 1 - self.error_class_idx
-        self.wrongly_predicted_samples = self.estimator_.tree_.value[self.leaf_ids, 0, self.error_class_idx]
-        self.correctly_predicted_samples = self.estimator_.tree_.value[self.leaf_ids, 0, self.correct_class_idx]
+        self._error_class_idx = None
+        self.correct_class_idx = None
+        self._wrongly_predicted_leaves = None
+        self._correctly_predicted_leaves = None
 
         self._check_error_tree()
 
@@ -32,7 +32,7 @@ class ErrorTree(object):
     @property
     def impurity(self):
         if self._impurity is None:
-            self._impurity = self.correctly_predicted_samples / (self.wrongly_predicted_samples + self.correctly_predicted_samples)
+            self._impurity = self.correctly_predicted_leaves / (self.wrongly_predicted_leaves + self.correctly_predicted_leaves)
         return self._impurity
 
     @property
@@ -45,15 +45,33 @@ class ErrorTree(object):
     @property
     def difference(self):
         if self._difference is None:
-            self._difference = self.correctly_predicted_samples - self.wrongly_predicted_samples  # only negative numbers
+            self._difference = self.correctly_predicted_leaves - self.wrongly_predicted_leaves  # only negative numbers
         return self._difference
 
     @property
     def total_error_fraction(self):
         if self._total_error_fraction is None:
-            n_total_errors = np.sum(self.wrongly_predicted_samples)
-            self._total_error_fraction = self.wrongly_predicted_samples / float(n_total_errors)
+            n_total_errors = np.sum(self.wrongly_predicted_leaves)
+            self._total_error_fraction = self.wrongly_predicted_leaves / float(n_total_errors)
         return self._total_error_fraction
+
+    @property
+    def error_class_idx(self):
+        if self._error_class_idx is None:
+            self._error_class_idx = np.where(self.estimator_.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
+        return self._error_class_idx
+
+    @property
+    def wrongly_predicted_leaves(self):
+        if self._wrongly_predicted_leaves is None:
+            self._wrongly_predicted_leaves = self.estimator_.tree_.value[self.leaf_ids, 0, self.error_class_idx]
+        return self._wrongly_predicted_leaves
+
+    @property
+    def correctly_predicted_leaves(self):
+        if self._correctly_predicted_leaves is None:
+            self._correctly_predicted_leaves = self.estimator_.tree_.value[self.leaf_ids, 0, 1 - self.error_class_idx]
+        return self._correctly_predicted_leaves
 
     @property
     def leaf_ids(self):
