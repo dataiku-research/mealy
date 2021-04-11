@@ -76,7 +76,7 @@ class ErrorTree(object):
     @property
     def leaf_ids(self):
         if self._leaf_ids is None:
-            self._compute_leaf_ids()
+            self._leaf_ids = np.where(self.estimator_.tree_.feature < 0)[0]
         return self._leaf_ids
 
     def get_error_leaves(self):
@@ -86,7 +86,3 @@ class ErrorTree(object):
     def _check_error_tree(self):
         if self.estimator_.tree_.node_count == 1:
             logger.warning("The error tree has only 1 node, there will be problem when using it with ErrorVisualizer")
-
-    def _compute_leaf_ids(self):
-        """ Compute indices of leaf nodes """
-        self._leaf_ids = np.where(self.estimator_.tree_.feature < 0)[0]
