@@ -5,7 +5,7 @@ from mealy.constants import ErrorAnalyzerConstants
 from kneed import KneeLocator
 
 
-def get_epsilon(difference, mode='rec'):
+def get_epsilon(difference):
     """
     Compute the threshold used to decide whether a prediction is wrong or correct (for regression tasks).
 
@@ -16,17 +16,13 @@ def get_epsilon(difference, mode='rec'):
     Return:
            epsilon (float): The value of the threshold used to decide whether the prediction for a regression task is wrong or correct
     """
-    if mode == 'std':
-        return np.std(difference) + np.mean(difference)
-    if mode == 'rec':
-        epsilon_range = np.linspace(min(difference), max(difference), num=ErrorAnalyzerConstants.NUMBER_EPSILON_VALUES)
-        cdf_error = []
-        n_samples = difference.shape[0]
-        for epsilon in epsilon_range:
-            correct_predictions = difference <= epsilon
-            cdf_error.append(np.count_nonzero(correct_predictions) / float(n_samples))
-        return KneeLocator(epsilon_range, cdf_error).knee
-    raise ValueError("Wrong argument for the computation mode. Valid values are either 'rec' or 'std'")
+    epsilon_range = np.linspace(min(difference), max(difference), num=ErrorAnalyzerConstants.NUMBER_EPSILON_VALUES)
+    cdf_error = []
+    n_samples = difference.shape[0]
+    for epsilon in epsilon_range:
+        correct_predictions = difference <= epsilon
+        cdf_error.append(np.count_nonzero(correct_predictions) / float(n_samples))
+    return KneeLocator(epsilon_range, cdf_error).knee
 
 def get_feature_list_from_column_transformer(ct_preprocessor):
     all_features, categorical_features = [], []
