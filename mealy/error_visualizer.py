@@ -8,11 +8,6 @@ from mealy.error_analysis_utils import rank_features_by_error_correlation
 from mealy.constants import ErrorAnalyzerConstants
 from mealy.error_analyzer import ErrorAnalyzer
 
-import logging
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='mealy | %(levelname)s - %(message)s')
-
 plt.rc('font', family="sans-serif")
 SMALL_SIZE, MEDIUM_SIZE, BIGGER_SIZE = 8, 10, 12
 plt.rc('axes', titlesize=BIGGER_SIZE, labelsize=MEDIUM_SIZE)
@@ -125,11 +120,6 @@ class ErrorVisualizer(_BaseErrorVisualizer):
 
         y = self._error_analyzer._error_train_y
         n_total_errors = y[y == ErrorAnalyzerConstants.WRONG_PREDICTION].shape[0]
-        wrongly_predicted_samples = self._error_clf.tree_.value[:, 0, self._error_tree.error_class_idx]
-
-        correct_class_idx = np.where(self._error_clf.classes_ == ErrorAnalyzerConstants.CORRECT_PREDICTION)[0][0]
-        well_predicted_samples = self._error_clf.tree_.value[:, 0, correct_class_idx]
-
         nodes = pydot_graph.get_node_list()
 
         for node in nodes:
