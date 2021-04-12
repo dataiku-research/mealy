@@ -178,7 +178,7 @@ class ErrorAnalyzer(BaseEstimator):
         logger.info('Chosen parameters: {}'.format(gs_clf.best_params_))
 
     #TODO rewrite this method using the ranking arrays
-    def get_error_node_summary(self, leaf_selector=None, add_path_to_leaves=False, output_format='dict', rank_by='total_error_fraction'):
+    def get_error_leaf_summary(self, leaf_selector=None, add_path_to_leaves=False, output_format='dict', rank_by='total_error_fraction'):
         """ Return summary information regarding leaves.
 
         Args:
