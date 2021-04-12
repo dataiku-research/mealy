@@ -178,25 +178,29 @@ class ErrorAnalyzer(BaseEstimator):
         logger.info('Chosen parameters: {}'.format(gs_clf.best_params_))
 
     #TODO rewrite this method using the ranking arrays
-    def get_error_node_summary(self, leaf_selector=None, add_path_to_leaves=False, print_summary=False, rank_by='total_error_fraction'):
+    def get_error_node_summary(self, leaf_selector=None, add_path_to_leaves=False, output_format='dict', rank_by='total_error_fraction'):
         """ Return summary information regarding leaf nodes.
 
         Args:
-            leaf_selector (None, int or array-like): the leaves whose information will be returned
+            leaf_selector (None, int or array-like): The leaves whose information will be returned
                 * int: Only return information of the leaf with the corresponding id
                 * array-like: Only return information of the leaves corresponding to these ids
                 * None (default): Return information of all the leaves
-            add_path_to_leaves (bool): add information of the feature path across the tree till the selected node.
-            print_summary (bool): print summary for the selected nodes.
+            add_path_to_leaves (bool): Whether to add information of the path across the tree till the selected node. Defaults to False.
+            output_format (string): Return format used for the report. Valid values are 'dict' or 'str'. Defaults to 'dict'.
+            rank_by (str): Ranking criterion for the leaf nodes. Valid values are:
+                * 'total_error_fraction' (default): rank by the fraction of total error in the node
+                * 'purity': rank by the purity (ratio of wrongly predicted samples over the total number of node samples)
+                * 'class_difference': rank by the difference of number of wrongly and correctly predicted samples
+                in a node.
 
         Return:
-            dict: dictionary of metrics for each selected node of the Error Analyzer Tree.
+            dict or str: list of reports (as dictionary or string) with different information on each selected leaf.
         """
 
         leaf_nodes = self._get_ranked_leaf_ids(leaf_selector=leaf_selector, rank_by=rank_by)
 
         leaves_summary = []
-        path_to_node = None
         for leaf_id in leaf_nodes:
             n_errors = int(self._error_tree.estimator_.tree_.value[leaf_id, 0, self._error_tree.error_class_idx])
             n_samples = self._error_tree.estimator_.tree_.n_node_samples[leaf_id]
@@ -204,34 +208,34 @@ class ErrorAnalyzer(BaseEstimator):
             total_error_fraction = n_errors / self._error_tree.n_total_errors
             n_corrects = n_samples - n_errors
 
-            leaf_dict = {
-                "id": leaf_id,
-                "n_corrects": n_corrects,
-                "n_errors": n_errors,
-                "local_error": local_error,
-                "total_error_fraction": total_error_fraction
-            }
+            if output_format == 'dict':
+                leaf_dict = {
+                    "id": leaf_id,
+                    "n_corrects": n_corrects,
+                    "n_errors": n_errors,
+                    "local_error": local_error,
+                    "total_error_fraction": total_error_fraction
+                }
+                if add_path_to_leaves:
+                    leaf_dict["path_to_leaf"] = self._get_path_to_node(leaf_id)
+                leaves_summary.append(leaf_dict)
 
-            leaves_summary.append(leaf_dict)
-
-            if add_path_to_leaves:
-                path_to_node = self._get_path_to_node(leaf_id)
-                leaf_dict["path_to_leaf"] = path_to_node
-
-            if print_summary:
-                print("LEAF %d:" % leaf_id)
-                print("     Correct predictions: %d | Wrong predictions: %d | "
-                      "Local error (purity): %.2f | Fraction of total error: %.2f" %
-                      (n_corrects, n_errors, local_error, total_error_fraction))
+            elif output_format == 'str':
+                leaf_summary = 'LEAF %d:\n' % leaf_id
+                leaf_summary += '     Correct predictions: %d | Wrong predictions: %d | Local error (purity): %.2f | Fraction of total error: %.2f\n' %
+                    (n_corrects, n_errors, local_error, total_error_fraction)
 
                 if add_path_to_leaves:
-                    print('     Path to leaf:')
-                    for (step_idx, step) in enumerate(path_to_node):
-                        print('     ' + '   ' * step_idx + step)
+                    leaf_summary += '     Path to leaf:\n')
+                    for (step_idx, step) in enumerate(self._get_path_to_node(leaf_id)):
+                        leaf_summary += '     ' + '   ' * step_idx + step  + '\n'
+
+            else:
+                raise ValueError("Output format should either be 'dict' or 'str'")
 
         return leaves_summary
 
-    def evaluate(self, X, y, output_format='text'):
+    def evaluate(self, X, y, output_format='str'):
         """
         Evaluate performance of ErrorAnalyzer on new the given test data and labels.
         Print ErrorAnalyzer summary metrics regarding the Error Tree.
@@ -241,10 +245,10 @@ class ErrorAnalyzer(BaseEstimator):
                 and train a Error Analyzer Tree.
             y (numpy.ndarray or pandas.DataFrame): target data from a test set to evaluate the primary predictor and
                 train a Error Analyzer Tree.
-            output_format (string): Return format used for the report. Valid values are 'dict' or 'text'.
+            output_format (string): Return format used for the report. Valid values are 'dict' or 'str'. Defaults to 'str'.
 
         Return:
-            dict or str: dictionary or report storing different metrics regarding the Error Decision Tree.
+            dict or str: dictionary or string report storing different metrics regarding the Error Decision Tree.
         """
         prep_x, prep_y = self.pipeline_preprocessor.transform(X), np.array(y)
         y_true, _ = self._compute_primary_model_error(prep_x, prep_y)

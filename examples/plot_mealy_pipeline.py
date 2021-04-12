@@ -111,7 +111,7 @@ error_analyzer.fit(X_test, y_test)
 ##############################################################################
 # Print metrics regarding the Error Tree.
 
-print(error_analyzer.evaluate(X_test, y_test, output_format='text'))
+print(error_analyzer.evaluate(X_test, y_test, output_format='str'))
 
 ##############################################################################
 # Plot the Error Tree.

@@ -35,18 +35,18 @@ def fidelity_balanced_accuracy_score(y_true, y_pred):
     return compute_fidelity_score(y_true, y_pred) + balanced_accuracy_score(y_true, y_pred)
 
 
-def error_decision_tree_report(y_true, y_pred, output_format='text'):
-    """Build a text report showing the main Error Decision Tree metrics.
+def error_decision_tree_report(y_true, y_pred, output_format='str'):
+    """Return a report showing the main Error Decision Tree metrics.
 
     Args:
         y_true (numpy.ndarray): Ground truth values of wrong/correct predictions of the error tree primary model.
             Expected values in [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].
         y_pred (numpy.ndarray): Estimated targets as returned by the error tree. Expected values in
             [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].
-        output_format (string): Return format used for the report. Valid values are 'dict' or 'text'.
+        output_format (string): Return format used for the report. Valid values are 'dict' or 'str'.
 
     Return:
-        dict or str: dictionary or report storing different metrics regarding the Error Decision Tree.
+        dict or str: dictionary or string report storing different metrics regarding the Error Decision Tree.
     """
 
     tree_accuracy_score = compute_accuracy_score(y_true, y_pred)
@@ -65,7 +65,7 @@ def error_decision_tree_report(y_true, y_pred, output_format='text'):
         report_dict[ErrorAnalyzerConstants.CONFIDENCE_DECISION] = confidence_decision
         return report_dict
 
-    if output_format == 'text':
+    if output_format == 'str':
 
         report = 'The Error Decision Tree was trained with accuracy %.2f%% and balanced accuracy %.2f%%.' % (tree_accuracy_score * 100, tree_balanced_accuracy * 100)
         report += '\n'
@@ -89,4 +89,4 @@ def error_decision_tree_report(y_true, y_pred, output_format='text'):
         return report
 
     else:
-        raise ValueError('Output format should either be "dict" or "text"')
+        raise ValueError("Output format should either be 'dict' or 'str'")
