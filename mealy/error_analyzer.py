@@ -35,9 +35,9 @@ class ErrorAnalyzer(BaseEstimator):
         random_state (int): random seed.
 
     Attributes:
-        total_error_fraction (numpy.ndarray): percentage of incorrectly predicted samples in leaf nodes over the total number of
+        total_error_fraction (numpy.ndarray): percentage of incorrectly predicted samples in leaves over the total number of
             errors (used for ranking the nodes).
-        leaf_ids (numpy.ndarray): list of all leaf nodes indices.
+        leaf_ids (numpy.ndarray): list of all leaves indices.
         _error_tree (DecisionTreeClassifier): the estimator used to train the Error Analyzer Tree
     """
 
@@ -179,7 +179,7 @@ class ErrorAnalyzer(BaseEstimator):
 
     #TODO rewrite this method using the ranking arrays
     def get_error_node_summary(self, leaf_selector=None, add_path_to_leaves=False, output_format='dict', rank_by='total_error_fraction'):
-        """ Return summary information regarding leaf nodes.
+        """ Return summary information regarding leaves.
 
         Args:
             leaf_selector (None, int or array-like): The leaves whose information will be returned
@@ -188,7 +188,7 @@ class ErrorAnalyzer(BaseEstimator):
                 * None (default): Return information of all the leaves
             add_path_to_leaves (bool): Whether to add information of the path across the tree till the selected node. Defaults to False.
             output_format (string): Return format used for the report. Valid values are 'dict' or 'str'. Defaults to 'dict'.
-            rank_by (str): Ranking criterion for the leaf nodes. Valid values are:
+            rank_by (str): Ranking criterion for the leaves. Valid values are:
                 * 'total_error_fraction' (default): rank by the fraction of total error in the node
                 * 'purity': rank by the purity (ratio of wrongly predicted samples over the total number of node samples)
                 * 'class_difference': rank by the difference of number of wrongly and correctly predicted samples
@@ -322,14 +322,14 @@ class ErrorAnalyzer(BaseEstimator):
                 * int: Only return information of the leaf with the corresponding id
                 * array-like: Only return information of the leaves corresponding to these ids
                 * None (default): Return information of all the leaves
-            rank_by (str): ranking criterion for the leaf nodes. Valid values are:
+            rank_by (str): ranking criterion for the leaves. Valid values are:
                 * 'total_error_fraction': rank by the fraction of total error in the node
                 * 'purity': rank by the purity (ratio of wrongly predicted samples over the total number of node samples)
                 * 'class_difference': rank by the difference of number of wrongly and correctly predicted samples
                 in a node.
 
         Return:
-            list or numpy.ndarray: list of selected leaf nodes indices.
+            list or numpy.ndarray: list of selected leaves indices.
 
         """
         apply_leaf_selector = self._get_leaf_selector(leaf_selector)

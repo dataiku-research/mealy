@@ -6,7 +6,7 @@ Here we train a RandomForestRegressor to predict the price of the houses
 in Boston. This is our primary model. Then we build a secondary model,
 called Error Tree, to predict on what samples
 the primary model returns wrong or correct predictions. The Error tree is a
-DecisionTree returning a binary outcome success/failure. The leaf nodes
+DecisionTree returning a binary outcome success/failure. The leaves
 yielding failure outcome gather the samples mis-predicted by the primary
 model. Plotting the feature distributions of these samples and comparing
 to the whole data highlights the subpopulations where the model works poorly.
@@ -115,7 +115,7 @@ error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=leaf_id, top
 # Model Failures
 # ^^^^^^^^^^^^^^
 #
-# Let's focus on the nodes of the Error Tree DecisionTree, in particular the leaf nodes
+# Let's focus on the nodes of the Error Tree DecisionTree, in particular the leaves
 # of class 'Wrong prediction'. These leaves contain the majority of errors, each
 # leaf clustering a subpopulation of errors with different feature values. The largest
 # and purest failure nodes are highlighted when printing the error node summary, and

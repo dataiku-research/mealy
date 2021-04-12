@@ -197,7 +197,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
 
         The top-k features are sorted by importance in the ErrorAnalyzer.
         The most important are more correlated with the errors. When no specific node is selected,
-        the leaf nodes are ranked by an importance criterium and presented in relevance order.
+        the leaves are ranked by an importance criterium and presented in relevance order.
 
         Args:
 
@@ -214,7 +214,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
             show_class (bool): show the proportion of Wrongly and Correctly predicted samples in the feature
                 distributions.
 
-            rank_leaves_by (str): ranking criterion for the leaf nodes. Valid values are:
+            rank_leaves_by (str): ranking criterion for the leaves. Valid values are:
                 * 'total_error_fraction': rank by the fraction of total error in the node
                 * 'purity': rank by the purity (ratio of wrongly predicted samples over the total number of node samples)
                 * 'class_difference': rank by the difference of number of wrongly and correctly predicted samples
