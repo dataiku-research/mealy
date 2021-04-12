@@ -26,7 +26,7 @@ def test_with_only_scikit_model():
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-    rf = RandomForestClassifier()
+    rf = RandomForestClassifier(n_estimators=10)
     rf.fit(X_train, y_train)
     error_tree = ErrorAnalyzer(rf, feature_names=numeric_features)
     error_tree.fit(X_test, y_test)
@@ -83,7 +83,7 @@ def test_with_scikit_pipeline():
             ('cat', categorical_transformer, categorical_features)
         ])
     rf = Pipeline(steps=[('preprocessor', preprocessor),
-                         ('classifier', RandomForestClassifier())])
+                         ('classifier', RandomForestClassifier(n_estimators=10))])
 
     rf.fit(X_train, y_train)
     error_tree = ErrorAnalyzer(rf)

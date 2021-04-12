@@ -92,7 +92,7 @@ preprocessor = ColumnTransformer(
         ('cat', categorical_transformer, categorical_features)])
 
 model = Pipeline(steps=[('preprocessor', preprocessor),
-                        ('classifier', RandomForestClassifier())])
+                        ('classifier', RandomForestClassifier(n_estimators=10))])
 
 ##############################################################################
 # Train preprocessing Pipeline and RandomForestClassifier.

@@ -67,7 +67,7 @@ from mealy.error_analyzer import ErrorAnalyzer
 from mealy.error_visualizer import ErrorVisualizer
 
 # train any scikit-learn model
-model = RandomForestClassifier()
+model = RandomForestClassifier(n_estimators=10)
 model.fit(X_train, y_train)
 
 # fit an Error Tree on the model performances
@@ -123,7 +123,7 @@ preprocess = make_column_transformer(
 
 pipeline_model = make_pipeline(
     preprocess,
-    RandomForestClassifier())
+    RandomForestClassifier(n_estimators=10))
 
 # train a pipeline model
 
