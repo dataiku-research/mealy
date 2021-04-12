@@ -119,7 +119,6 @@ class ErrorVisualizer(_BaseErrorVisualizer):
         features = self._features
 
         y = self._error_analyzer._error_train_y
-        n_total_errors = y[y == ErrorAnalyzerConstants.WRONG_PREDICTION].shape[0]
         nodes = pydot_graph.get_node_list()
 
         for node in nodes:
@@ -127,7 +126,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                 node_label = node.get_label().strip('"')
                 idx = int(node_label.split('node #')[1].split('\\n')[0])
                 n_wrong_preds = self._error_clf.tree_.value[idx, 0, self._error_tree.error_class_idx]
-                total_error_fraction = n_wrong_preds / n_total_errors
+                total_error_fraction = n_wrong_preds / self._error_tree.n_total_errors
                 local_error = n_wrong_preds / self._error_clf.tree_.n_node_samples[idx]
                 if ' <= ' in node_label:
                     lte_split = node_label.split(' <= ')
@@ -292,7 +291,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                             ErrorAnalyzerConstants.CORRECT_PREDICTION: normalized_hist_correct
                         }
                     else:
-                        root_prediction = ErrorAnalyzerConstants.CORRECT_PREDICTION if nr_wrong[0] < self._error_clf.tree_.n_node_samples[0, 0, self._error_tree.error_class_idx] / 2 else ErrorAnalyzerConstants.WRONG_PREDICTION
+                        root_prediction = ErrorAnalyzerConstants.CORRECT_PREDICTION if nr_wrong[0] < self._error_tree.n_total_errors / 2 else ErrorAnalyzerConstants.WRONG_PREDICTION
                         root_hist_data = {root_prediction: histogram_func(feature_column)}
 
                 if show_class:

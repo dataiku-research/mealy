@@ -51,8 +51,7 @@ class ErrorTree(object):
     @property
     def total_error_fraction(self):
         if self._total_error_fraction is None:
-            n_total_errors = np.sum(self.wrongly_predicted_leaves)
-            self._total_error_fraction = self.wrongly_predicted_leaves / float(n_total_errors)
+            self._total_error_fraction = self.wrongly_predicted_leaves / self.n_total_errors
         return self._total_error_fraction
 
     @property
@@ -60,6 +59,10 @@ class ErrorTree(object):
         if self._error_class_idx is None:
             self._error_class_idx = np.where(self.estimator_.classes_ == ErrorAnalyzerConstants.WRONG_PREDICTION)[0][0]
         return self._error_class_idx
+
+    @property
+    def n_total_errors(self):
+        return self.estimator_.tree_.value[0, 0, self.error_class_idx]
 
     @property
     def wrongly_predicted_leaves(self):

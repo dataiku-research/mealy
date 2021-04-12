@@ -195,15 +195,13 @@ class ErrorAnalyzer(BaseEstimator):
 
         leaf_nodes = self._get_ranked_leaf_ids(leaf_selector=leaf_selector, rank_by=rank_by)
 
-        n_total_errors = self._error_tree.estimator_.tree_.value[0,0,self._error_tree.error_class_idx]
-
         leaves_summary = []
         path_to_node = None
         for leaf_id in leaf_nodes:
             n_errors = int(self._error_tree.estimator_.tree_.value[leaf_id, 0, self._error_tree.error_class_idx])
             n_samples = self._error_tree.estimator_.tree_.n_node_samples[leaf_id]
             local_error = n_errors / n_samples
-            total_error_fraction = n_errors / n_total_errors
+            total_error_fraction = n_errors / self._error_tree.n_total_errors
             n_corrects = n_samples - n_errors
 
             leaf_dict = {
