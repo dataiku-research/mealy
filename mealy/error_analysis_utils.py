@@ -12,7 +12,6 @@ def get_epsilon(difference):
     Args:
            difference (1D-array): The absolute differences between the true target values and the predicted ones (by the primary model).
 
-           mode (string, default 'rec'): The method used to compute the threshold. Values can be 'rec' or 'std'.
     Return:
            epsilon (float): The value of the threshold used to decide whether the prediction for a regression task is wrong or correct
     """
