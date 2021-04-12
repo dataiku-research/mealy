@@ -79,10 +79,6 @@ class ErrorTree(object):
             self._leaf_ids = np.where(self.estimator_.tree_.feature < 0)[0]
         return self._leaf_ids
 
-    def get_error_leaves(self):
-        error_node_ids = np.where(self.estimator_.tree_.value[:, 0, :].argmax(axis=1) == self.error_class_idx)[0]
-        return np.in1d(self._leaf_ids, error_node_ids)
-
     def _check_error_tree(self):
         if self.estimator_.tree_.node_count == 1:
             logger.warning("The error tree has only 1 node, there will be problem when using it with ErrorVisualizer")
