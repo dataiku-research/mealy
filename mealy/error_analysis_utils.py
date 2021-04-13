@@ -1,18 +1,34 @@
 # -*- coding: utf-8 -*-
 from sklearn.pipeline import Pipeline
 import numpy as np
-import collections
 from mealy.constants import ErrorAnalyzerConstants
+from kneed import KneeLocator
 
+
+def get_epsilon(difference):
+    """
+    Compute the threshold used to decide whether a prediction is wrong or correct (for regression tasks).
+
+    Args:
+           difference (1D-array): The absolute differences between the true target values and the predicted ones (by the primary model).
+
+    Return:
+           epsilon (float): The value of the threshold used to decide whether the prediction for a regression task is wrong or correct
+    """
+    epsilon_range = np.linspace(min(difference), max(difference), num=ErrorAnalyzerConstants.NUMBER_EPSILON_VALUES)
+    cdf_error = []
+    n_samples = difference.shape[0]
+    for epsilon in epsilon_range:
+        correct_predictions = difference <= epsilon
+        cdf_error.append(np.count_nonzero(correct_predictions) / float(n_samples))
+    return KneeLocator(epsilon_range, cdf_error).knee
 
 def get_feature_list_from_column_transformer(ct_preprocessor):
-    all_feature = []
-    categorical_features = []
-    for i, (transformer_name, transformer, transformer_feature_names) in enumerate(ct_preprocessor.transformers_):
+    all_features, categorical_features = [], []
+    for transformer_name, transformer, transformer_feature_names in ct_preprocessor.transformers_:
         if transformer_name == 'remainder' and transformer == 'drop':
             continue
-        else:
-            all_feature.extend(transformer_feature_names)
+        all_features.extend(transformer_feature_names)
 
         # check for categorical features
         if isinstance(transformer, Pipeline):
@@ -22,15 +38,11 @@ def get_feature_list_from_column_transformer(ct_preprocessor):
                     break
         elif isinstance(transformer, ErrorAnalyzerConstants.VALID_CATEGORICAL_STEPS):
             categorical_features.extend(transformer_feature_names)
-        else:
-            continue
-
-    return all_feature, categorical_features
+    return all_features, categorical_features
 
 
 def check_lists_having_same_elements(list_A, list_B):
-    return collections.Counter(list_A) == collections.Counter(list_B)
-
+    return set(list_A) == set(list_B)
 
 def check_enough_data(df, min_len):
     """
@@ -46,7 +58,4 @@ def check_enough_data(df, min_len):
 
 
 def rank_features_by_error_correlation(feature_importances):
-    sorted_feature_indices = np.argsort(- feature_importances)
-    cut = len(np.where(feature_importances != 0)[0])
-    sorted_feature_indices = sorted_feature_indices[:cut]
-    return sorted_feature_indices
+    return np.argsort(- feature_importances)

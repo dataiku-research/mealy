@@ -9,7 +9,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 
 from mealy import ErrorAnalyzer
-from mealy.metrics import compute_mpp_accuracy, balanced_accuracy_score, compute_primary_model_accuracy, compute_confidence_decision
+from mealy.metrics import compute_accuracy_score, balanced_accuracy_score, compute_primary_model_accuracy, compute_confidence_decision
 
 default_seed = 10
 np.random.seed(default_seed)
@@ -26,32 +26,32 @@ def test_with_only_scikit_model():
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-    rf = RandomForestClassifier()
+    rf = RandomForestClassifier(n_estimators=10)
     rf.fit(X_train, y_train)
-    mpp = ErrorAnalyzer(rf, feature_names=numeric_features, param_grid={'max_depth': [5, 10, None], 'min_samples_leaf': [10, 20]})
-    mpp.fit(X_test, y_test)
+    error_tree = ErrorAnalyzer(rf, feature_names=numeric_features)
+    error_tree.fit(X_test, y_test)
 
-    prep_x, y_true = mpp._compute_primary_model_error(X_test, y_test, max_nr_rows=100000)
-    y_pred = mpp.model_performance_predictor.predict(prep_x)
+    y_true, _ = error_tree._compute_primary_model_error(X_test.values, y_test)
+    y_pred = error_tree._error_tree.estimator_.predict(X_test.values)
 
-    mpp_accuracy_score = compute_mpp_accuracy(y_true, y_pred)
-    mpp_balanced_accuracy = balanced_accuracy_score(y_true, y_pred)
+    error_tree_accuracy_score = compute_accuracy_score(y_true, y_pred)
+    error_tree_balanced_accuracy = balanced_accuracy_score(y_true, y_pred)
     primary_model_predicted_accuracy = compute_primary_model_accuracy(y_pred)
     primary_model_true_accuracy = compute_primary_model_accuracy(y_true)
     fidelity, confidence_decision = compute_confidence_decision(primary_model_true_accuracy, primary_model_predicted_accuracy)
 
     metric_to_check = {
-        'mpp_accuracy_score': mpp_accuracy_score,
-        'mpp_balanced_accuracy': mpp_balanced_accuracy,
+        'error_tree_accuracy_score': error_tree_accuracy_score,
+        'error_tree_balanced_accuracy': error_tree_balanced_accuracy,
         'primary_model_predicted_accuracy': primary_model_predicted_accuracy,
         'primary_model_true_accuracy': primary_model_true_accuracy,
         'fidelity': fidelity
     }
 
     metric_reference = {
-        'mpp_accuracy_score': 0.8651926915399969,
-        'mpp_balanced_accuracy': 0.7003443854497639,
-        'primary_model_predicted_accuracy': 0.8836173806233687,
+        'error_tree_accuracy_score': 0.8651926915399969,
+        'error_tree_balanced_accuracy': 0.7003443854497639,
+        'primary_model_predicted_accuracy': 1,
         'primary_model_true_accuracy': 0.8255796100107478,
         'fidelity': 0.9419622293873791,
     }
@@ -83,36 +83,36 @@ def test_with_scikit_pipeline():
             ('cat', categorical_transformer, categorical_features)
         ])
     rf = Pipeline(steps=[('preprocessor', preprocessor),
-                         ('classifier', RandomForestClassifier())])
+                         ('classifier', RandomForestClassifier(n_estimators=10))])
 
     rf.fit(X_train, y_train)
-    mpp = ErrorAnalyzer(rf, param_grid={'max_depth': [5, 10, None], 'min_samples_leaf': [10, 20]})
-    mpp.fit(X_test, y_test)
+    error_tree = ErrorAnalyzer(rf)
+    error_tree.fit(X_test, y_test)
 
-    X_test_prep, y_test_prep = mpp.pipeline_preprocessor.transform(X_test), np.array(y_test)
+    X_test_prep, y_test_prep = error_tree.pipeline_preprocessor.transform(X_test), np.array(y_test)
 
-    prep_x, y_true = mpp._compute_primary_model_error(X_test_prep, y_test_prep, max_nr_rows=100000)
-    y_pred = mpp.model_performance_predictor.predict(prep_x)
+    y_true, _ = error_tree._compute_primary_model_error(X_test_prep, y_test_prep)
+    y_pred = error_tree._error_tree.estimator_.predict(X_test_prep)
 
-    mpp_accuracy_score = compute_mpp_accuracy(y_true, y_pred)
-    mpp_balanced_accuracy = balanced_accuracy_score(y_true, y_pred)
+    error_tree_accuracy_score = compute_accuracy_score(y_true, y_pred)
+    error_tree_balanced_accuracy = balanced_accuracy_score(y_true, y_pred)
     primary_model_predicted_accuracy = compute_primary_model_accuracy(y_pred)
     primary_model_true_accuracy = compute_primary_model_accuracy(y_true)
     fidelity, confidence_decision = compute_confidence_decision(primary_model_true_accuracy,
                                                                 primary_model_predicted_accuracy)
 
     metric_to_check = {
-        'mpp_accuracy_score': mpp_accuracy_score,
-        'mpp_balanced_accuracy': mpp_balanced_accuracy,
+        'error_tree_accuracy_score': error_tree_accuracy_score,
+        'error_tree_balanced_accuracy': error_tree_balanced_accuracy,
         'primary_model_predicted_accuracy': primary_model_predicted_accuracy,
         'primary_model_true_accuracy': primary_model_true_accuracy,
         'fidelity': fidelity
     }
 
     metric_reference = {
-        'mpp_accuracy_score': 0.8952863503761708,
-        'mpp_balanced_accuracy': 0.7209989546416461,
-        'primary_model_predicted_accuracy': 0.9011208352525718,
+        'error_tree_accuracy_score': 0.8952863503761708,
+        'error_tree_balanced_accuracy': 0.7209989546416461,
+        'primary_model_predicted_accuracy': 1,
         'primary_model_true_accuracy': 0.8602794411177644,
         'fidelity': 0.9591586058651926
     }

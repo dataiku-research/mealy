@@ -4,9 +4,9 @@ Model Error Analysis for the Boston houses dataset
 
 Here we train a RandomForestRegressor to predict the price of the houses
 in Boston. This is our primary model. Then we build a secondary model,
-called Model Performance Predictor (MPP), to predict on what samples
-the primary model returns wrong or correct predictions. The MPP is a
-DecisionTree returning a binary outcome success/failure. The leaf nodes
+called Error Tree, to predict on what samples
+the primary model returns wrong or correct predictions. The Error tree is a
+DecisionTree returning a binary outcome success/failure. The leaves
 yielding failure outcome gather the samples mis-predicted by the primary
 model. Plotting the feature distributions of these samples and comparing
 to the whole data highlights the subpopulations where the model works poorly.
@@ -58,18 +58,18 @@ r2_score = model.score(X_test, y_test)
 print("R2 = %.2f" % r2_score)
 
 ##############################################################################
-# Fit a Model Performance Predictor on the model performances.
+# Fit an Error Tree on the model performances.
 
 error_analyzer = ErrorAnalyzer(model, feature_names=feature_names)
 error_analyzer.fit(X_test, y_test)
 
 ##############################################################################
-# Print metrics regarding the Model Performance Predictor.
+# Print metrics regarding the Error Tree.
 
-print(error_analyzer.mpp_summary(X_test, y_test, output_dict=False))
+print(error_analyzer.evaluate(X_test, y_test, output_format='str'))
 
 ##############################################################################
-# Plot the Model Performance Predictor Decision Tree.
+# Plot the Error Tree.
 
 error_visualizer = ErrorVisualizer(error_analyzer)
 tree_src = error_visualizer.plot_error_tree()
@@ -87,39 +87,39 @@ plt.axis('off')
 ##############################################################################
 # Print the details regarding the decision tree nodes containing the majority of errors.
 
-error_analyzer.error_node_summary(leaf_selector="all_errors", add_path_to_leaves=True, print_summary=True);
+error_analyzer.get_error_leaf_summary(leaf_selector=None, add_path_to_leaves=True, print_summary=True);
 
 ##############################################################################
 # Plot the feature distributions of samples in the leaf containing the majority of errors.
 # Rank features by correlation to error.
-leaf_id = error_analyzer.get_ranked_leaf_ids('all_errors')[0]
+leaf_id = error_analyzer._get_ranked_leaf_ids()[0]
 error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=leaf_id, top_k_features=3)
 
 ##############################################################################
 # Discussion
 # ----------
 #
-# Model Performance Predictor Metrics
+# Error Tree Metrics
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
 # We are dealing with a regression task, but the metrics highlight the accuracy
-# of the primary model and its estimate given by the Model Performance Predictor.
+# of the primary model and its estimate given by the Error Tree.
 # Here the primary predictions of price have been categorized in two classes:
 # 'Correct prediction' and 'Wrong prediction' by thresholding the deviation of
 # the prediction from the true value. Close enough predictions are Correct prediction,
 # the others are Wrong prediction. For more details, have a look at the documentation.
 # The accuracy is then the number of Correct predictions over the total.
-# The MPP is representative of the behavior of the primary model as the true primary
-# accuracy and the one estimated by the MPP are close.
+# The Error Tree is representative of the behavior of the primary model as the true primary
+# accuracy and the one estimated by the Error Tree are close.
 #
 # Model Failures
 # ^^^^^^^^^^^^^^
 #
-# Let's focus on the nodes of the MPP DecisionTree, in particular the leaf nodes
+# Let's focus on the nodes of the Error Tree DecisionTree, in particular the leaves
 # of class 'Wrong prediction'. These leaves contain the majority of errors, each
 # leaf clustering a subpopulation of errors with different feature values. The largest
 # and purest failure nodes are highlighted when printing the error node summary, and
-# also when plotting the feature distributions in the node (``leaf_selector="all_errors"``).
+# also when plotting the feature distributions in the node (``leaf_selector=None``).
 # From the feature distributions, sorted by correlation with the error, we can see that
 # the majority of problems occur for extreme values of features ``LSTAT`` and ``AGE``.
 # In the next iteration of model design, the primary model needs to be improved for these
