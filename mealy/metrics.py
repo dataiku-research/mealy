@@ -45,7 +45,7 @@ def error_decision_tree_report(y_true, y_pred, output_format='str'):
             [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].
         output_format (string): Return format used for the report. Valid values are 'dict' or 'str'.
 
-    Return:
+    Returns:
         dict or str: dictionary or string report storing different metrics regarding the Error Decision Tree.
     """
 

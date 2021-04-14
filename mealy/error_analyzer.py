@@ -197,7 +197,7 @@ class ErrorAnalyzer(BaseEstimator):
                 * 'class_difference': rank by the difference of number of wrongly and correctly predicted samples
                 in a node.
 
-        Return:
+        Returns:
             dict or str: List of reports (as dictionary or string) with different information on each selected leaf.
         """
 
@@ -249,7 +249,7 @@ class ErrorAnalyzer(BaseEstimator):
                 train a Error Analyzer Tree.
             output_format (string): Return format used for the report. Valid values are 'dict' or 'str'. Defaults to 'str'.
 
-        Return:
+        Returns:
             dict or str: Dictionary or string report storing different metrics regarding the Error Decision Tree.
         """
         prep_x, prep_y = self.pipeline_preprocessor.transform(X), np.array(y)

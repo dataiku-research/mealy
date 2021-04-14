@@ -20,7 +20,7 @@ class ErrorTree(object):
     Attributes:
         estimator_ (sklearn.tree.DecisionTreeClassifier): The estimator used to train the Error Tree.
         impurity (numpy.ndarray): Impurity of leaves.
-        quantized_impurity (numpy.ndarray): Impurity of leaves quantized into mealy.constants.NUMBER_PURITY_LEVELS
+        quantized_impurity (numpy.ndarray): Impurity of leaves quantized into ErrorAnalyzerConstants.NUMBER_PURITY_LEVELS
             levels.
         difference (numpy.ndarray): Difference of number of wrongly and correctly predicted samples in leaves.
         total_error_fraction (numpy.ndarray): Percentage of incorrectly predicted samples in leaves over the total
