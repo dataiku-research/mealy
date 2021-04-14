@@ -190,7 +190,7 @@ class ErrorAnalyzer(BaseEstimator):
                 * array-like: Only return information of the leaves corresponding to these ids
                 * None (default): Return information of all the leaves
             add_path_to_leaves (bool): Whether to add information of the path across the tree till the selected node. Defaults to False.
-            output_format (string): Return format used for the report. Valid values are 'dict' or 'str'. Defaults to 'dict'.
+            output_format (str): Return format used for the report. Valid values are 'dict' or 'str'. Defaults to 'dict'.
             rank_by (str): Ranking criterion for the leaves. Valid values are:
                 * 'total_error_fraction' (default): rank by the fraction of total error in the node
                 * 'purity': rank by the purity (ratio of wrongly predicted samples over the total number of node samples)
@@ -247,7 +247,7 @@ class ErrorAnalyzer(BaseEstimator):
                 and train a Error Analyzer Tree.
             y (numpy.ndarray or pandas.DataFrame): Target data from a test set to evaluate the primary predictor and
                 train a Error Analyzer Tree.
-            output_format (string): Return format used for the report. Valid values are 'dict' or 'str'. Defaults to 'str'.
+            output_format (str): Return format used for the report. Valid values are 'dict' or 'str'. Defaults to 'str'.
 
         Returns:
             dict or str: Dictionary or string report storing different metrics regarding the Error Decision Tree.

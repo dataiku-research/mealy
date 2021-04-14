@@ -13,8 +13,8 @@ def get_epsilon(difference):
             (by the primary model).
 
     Returns:
-        epsilon (float): The value of the threshold used to decide whether the prediction for a regression task
-            is wrong or correct
+        float: The value of the threshold used to decide whether the prediction for a regression task
+        is wrong or correct.
     """
     epsilon_range = np.linspace(min(difference), max(difference), num=ErrorAnalyzerConstants.NUMBER_EPSILON_VALUES)
     cdf_error = []

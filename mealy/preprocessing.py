@@ -125,7 +125,7 @@ class FeatureNameTransformer(object):
             index (int): Feature index.
             name (str): Feature name.
 
-        Returns: index of output feature(s) generated after preprocessing of the input feature
+        Returns: index of output feature(s) generated after preprocessing of the input feature.
         """
         if index is not None:
             return self.original2preprocessed[index]
@@ -148,8 +148,8 @@ class FeatureNameTransformer(object):
 
         Returns:
             int or str: index (resp. name) of the unprocessed feature corresponding to the input preprocessed feature
-                index (resp.name). If both index and name are provided, the index is retained and an output index is
-                returned.
+            index (resp.name). If both index and name are provided, the index is retained and an output index is
+            returned.
         """
         if index is not None:
             return self.preprocessed2original[index]
@@ -169,7 +169,7 @@ class FeatureNameTransformer(object):
 
         Returns:
             bool: True if the input feature is categorical, else False. If both index and name are provided, the index
-                is retained.
+            is retained.
         """
         if index is not None:
             name = self.original_feature_names[index]
@@ -226,7 +226,6 @@ class PipelinePreprocessor(FeatureNameTransformer):
 
         Returns:
             numpy.ndarray: Feature values without preprocessing.
-
         """
         def _inverse_single_step(single_step, step_output):
             inverse_transform_function_available = getattr(single_step, "inverse_transform", None)
