@@ -132,7 +132,7 @@ plt.axis('off')
 ##############################################################################
 # Print the details regarding the decision tree nodes containing the majority of errors.
 
-error_analyzer.get_error_leaf_summary(leaf_selector=None, add_path_to_leaves=True, print_summary=True);
+error_analyzer.get_error_leaf_summary(leaf_selector=None, add_path_to_leaves=True);
 
 ##############################################################################
 # Plot the feature distributions of samples in the leaf containing the majority of errors.
