@@ -42,7 +42,7 @@ class ErrorAnalyzer(BaseEstimator):
         param_grid (dict): The sklearn.tree.DecisionTreeClassifier hyper-parameters values for grid search.
         random_state (int): Random seed.
         preprocessed_feature_names (list): List of preprocessed feature names.
-        error_tree (sklearn.tree.DecisionTreeClassifier): The estimator used to train the Error Analyzer Tree.
+        error_tree (ErrorTree): the Error Tree.
     """
 
     def __init__(self, primary_model,
