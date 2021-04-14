@@ -204,66 +204,110 @@ as target. The nodes of the decision tree are different segments of errors to be
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>primary_model</strong> (<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator" title="(in scikit-learn v0.24)"><em>sklearn.base.BaseEstimator</em></a><em> or </em><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v0.24)"><em>sklearn.pipeline.Pipeline</em></a>) – a sklearn model to analyze. Either an estimator
+<li><p><strong>primary_model</strong> (<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator" title="(in scikit-learn v0.24)"><em>sklearn.base.BaseEstimator</em></a><em> or </em><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v0.24)"><em>sklearn.pipeline.Pipeline</em></a>) – A sklearn model to analyze. Either an estimator
 or a Pipeline containing a ColumnTransformer with the preprocessing steps and an estimator as last step.</p></li>
-<li><p><strong>feature_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – list of feature names, default=None.</p></li>
-<li><p><strong>max_num_row</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – maximum number of rows to process.</p></li>
-<li><p><strong>param_grid</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – sklearn.tree.DecisionTree hyper-parameters values for grid search.</p></li>
-<li><p><strong>random_state</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – random seed.</p></li>
+<li><p><strong>feature_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – List of feature names, default=None.</p></li>
+<li><p><strong>max_num_row</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Maximum number of rows to process.</p></li>
+<li><p><strong>param_grid</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – The sklearn.tree.DecisionTree hyper-parameters values for grid search.</p></li>
+<li><p><strong>random_state</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Random seed.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py attribute">
-<dt id="mealy.error_analyzer.ErrorAnalyzer.total_error_fraction">
-<code class="sig-name descname"><span class="pre">total_error_fraction</span></code><a class="headerlink" href="#mealy.error_analyzer.ErrorAnalyzer.total_error_fraction" title="Permalink to this definition">¶</a></dt>
-<dd><p>percentage of incorrectly predicted samples in leaf nodes over the total number of
-errors (used for ranking the nodes).</p>
+<dt id="mealy.error_analyzer.ErrorAnalyzer.primary_model">
+<code class="sig-name descname"><span class="pre">primary_model</span></code><a class="headerlink" href="#mealy.error_analyzer.ErrorAnalyzer.primary_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>A sklearn model to analyze. Either an estimator
+or a Pipeline containing a ColumnTransformer with the preprocessing steps and an estimator as last step.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator" title="(in scikit-learn v0.24)">sklearn.base.BaseEstimator</a> or <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="(in scikit-learn v0.24)">sklearn.pipeline.Pipeline</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="mealy.error_analyzer.ErrorAnalyzer.leaf_ids">
-<code class="sig-name descname"><span class="pre">leaf_ids</span></code><a class="headerlink" href="#mealy.error_analyzer.ErrorAnalyzer.leaf_ids" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of all leaf nodes indices.</p>
+<dt id="mealy.error_analyzer.ErrorAnalyzer.feature_names">
+<code class="sig-name descname"><span class="pre">feature_names</span></code><a class="headerlink" href="#mealy.error_analyzer.ErrorAnalyzer.feature_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of feature names.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="mealy.error_analyzer.ErrorAnalyzer._error_tree">
-<code class="sig-name descname"><span class="pre">_error_tree</span></code><a class="headerlink" href="#mealy.error_analyzer.ErrorAnalyzer._error_tree" title="Permalink to this definition">¶</a></dt>
-<dd><p>the estimator used to train the Error Analyzer Tree</p>
+<dt id="mealy.error_analyzer.ErrorAnalyzer.max_num_row">
+<code class="sig-name descname"><span class="pre">max_num_row</span></code><a class="headerlink" href="#mealy.error_analyzer.ErrorAnalyzer.max_num_row" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maximum number of rows to process.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>DecisionTreeClassifier</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="mealy.error_analyzer.ErrorAnalyzer.param_grid">
+<code class="sig-name descname"><span class="pre">param_grid</span></code><a class="headerlink" href="#mealy.error_analyzer.ErrorAnalyzer.param_grid" title="Permalink to this definition">¶</a></dt>
+<dd><p>The sklearn.tree.DecisionTreeClassifier hyper-parameters values for grid search.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="mealy.error_analyzer.ErrorAnalyzer.random_state">
+<code class="sig-name descname"><span class="pre">random_state</span></code><a class="headerlink" href="#mealy.error_analyzer.ErrorAnalyzer.random_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Random seed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="mealy.error_analyzer.ErrorAnalyzer.preprocessed_feature_names">
+<code class="sig-name descname"><span class="pre">preprocessed_feature_names</span></code><a class="headerlink" href="#mealy.error_analyzer.ErrorAnalyzer.preprocessed_feature_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of preprocessed feature names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="mealy.error_analyzer.ErrorAnalyzer.error_tree">
+<code class="sig-name descname"><span class="pre">error_tree</span></code><a class="headerlink" href="#mealy.error_analyzer.ErrorAnalyzer.error_tree" title="Permalink to this definition">¶</a></dt>
+<dd><p>the Error Tree.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>ErrorTree</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="mealy.error_analyzer.ErrorAnalyzer.evaluate">
-<code class="sig-name descname"><span class="pre">evaluate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'text'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/error_analyzer.html#ErrorAnalyzer.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.error_analyzer.ErrorAnalyzer.evaluate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Evaluate performance of ErrorAnalyzer on new the given test data and labels.
-Print ErrorAnalyzer summary metrics regarding the Error Analyzer Tree.</p>
+<code class="sig-name descname"><span class="pre">evaluate</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'str'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/error_analyzer.html#ErrorAnalyzer.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.error_analyzer.ErrorAnalyzer.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate performance of ErrorAnalyzer on new the given test data and labels.</p>
+<p>Print ErrorAnalyzer summary metrics regarding the Error Tree.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>X</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.3)"><em>pandas.DataFrame</em></a>) – feature data from a test set to evaluate the primary predictor
+<li><p><strong>X</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.4)"><em>pandas.DataFrame</em></a>) – Feature data from a test set to evaluate the primary predictor
 and train a Error Analyzer Tree.</p></li>
-<li><p><strong>y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.3)"><em>pandas.DataFrame</em></a>) – target data from a test set to evaluate the primary predictor and
+<li><p><strong>y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.4)"><em>pandas.DataFrame</em></a>) – Target data from a test set to evaluate the primary predictor and
 train a Error Analyzer Tree.</p></li>
-<li><p><strong>output_format</strong> (<em>string</em>) – whether to return a “dict” or a “text”</p></li>
+<li><p><strong>output_format</strong> (<em>string</em>) – Return format used for the report. Valid values are ‘dict’ or ‘str’. Defaults to ‘str’.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>metrics regarding the Error Analyzer Tree.</p>
+<dd class="field-even"><p>Dictionary or string report storing different metrics regarding the Error Decision Tree.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
@@ -280,9 +324,9 @@ predicted or wrongly predicted (errors) by a primary model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>X</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.3)"><em>pandas.DataFrame</em></a>) – feature data from a test set to evaluate the primary predictor and
+<li><p><strong>X</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.4)"><em>pandas.DataFrame</em></a>) – Feature data from a test set to evaluate the primary predictor and
 train a Error Analyzer Tree.</p></li>
-<li><p><strong>y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.3)"><em>pandas.DataFrame</em></a>) – target data from a test set to evaluate the primary predictor and
+<li><p><strong>y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.4)"><em>pandas.DataFrame</em></a>) – Target data from a test set to evaluate the primary predictor and
 train a Error Analyzer Tree.</p></li>
 </ul>
 </dd>
@@ -290,25 +334,30 @@ train a Error Analyzer Tree.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="mealy.error_analyzer.ErrorAnalyzer.get_error_node_summary">
-<code class="sig-name descname"><span class="pre">get_error_node_summary</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">leaf_selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_path_to_leaves</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_summary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/error_analyzer.html#ErrorAnalyzer.get_error_node_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.error_analyzer.ErrorAnalyzer.get_error_node_summary" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return summary information regarding leaf nodes.</p>
+<dt id="mealy.error_analyzer.ErrorAnalyzer.get_error_leaf_summary">
+<code class="sig-name descname"><span class="pre">get_error_leaf_summary</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">leaf_selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_path_to_leaves</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dict'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank_by</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'total_error_fraction'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/error_analyzer.html#ErrorAnalyzer.get_error_leaf_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.error_analyzer.ErrorAnalyzer.get_error_leaf_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return summary information regarding leaves.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>leaf_selector</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><em>array-like</em>) – the leaves whose information will be returned
+<li><p><strong>leaf_selector</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><em>array-like</em>) – The leaves whose information will be returned
 * int: Only return information of the leaf with the corresponding id
 * array-like: Only return information of the leaves corresponding to these ids
 * None (default): Return information of all the leaves</p></li>
-<li><p><strong>add_path_to_leaves</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – add information of the feature path across the tree till the selected node.</p></li>
-<li><p><strong>print_summary</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – print summary for the selected nodes.</p></li>
+<li><p><strong>add_path_to_leaves</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Whether to add information of the path across the tree till the selected node. Defaults to False.</p></li>
+<li><p><strong>output_format</strong> (<em>string</em>) – Return format used for the report. Valid values are ‘dict’ or ‘str’. Defaults to ‘dict’.</p></li>
+<li><p><strong>rank_by</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Ranking criterion for the leaves. Valid values are:
+* ‘total_error_fraction’ (default): rank by the fraction of total error in the node
+* ‘purity’: rank by the purity (ratio of wrongly predicted samples over the total number of node samples)
+* ‘class_difference’: rank by the difference of number of wrongly and correctly predicted samples
+in a node.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>dictionary of metrics for each selected node of the Model Performance Predictor.</p>
+<dd class="field-even"><p>List of reports (as dictionary or string) with different information on each selected leaf.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>

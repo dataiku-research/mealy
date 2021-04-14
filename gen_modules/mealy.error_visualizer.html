@@ -197,7 +197,7 @@
 <dl class="py class">
 <dt id="mealy.error_visualizer.ErrorVisualizer">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mealy.error_visualizer.</span></code><code class="sig-name descname"><span class="pre">ErrorVisualizer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error_analyzer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/error_visualizer.html#ErrorVisualizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.error_visualizer.ErrorVisualizer" title="Permalink to this definition">¶</a></dt>
-<dd><p>ErrorVisualizer provides visual utilities to analyze the Model Performance Predictor in ErrorAnalyzer</p>
+<dd><p>ErrorVisualizer provides visual utilities to analyze the Error Tree in ErrorAnalyzer.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>error_analyzer</strong> (<a class="reference internal" href="mealy.error_analyzer.html#mealy.error_analyzer.ErrorAnalyzer" title="mealy.error_analyzer.ErrorAnalyzer"><em>ErrorAnalyzer</em></a>) – fitted ErrorAnalyzer representing the performance of a primary model.</p>
@@ -212,7 +212,7 @@
 <dd class="field-odd"><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a>) – size of the output plot.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>graph of the Model Performance Predictor decision tree.</p>
+<dd class="field-even"><p>graph of the Error Analyzer Tree.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>graphviz.Source</p>
@@ -224,9 +224,9 @@
 <dt id="mealy.error_visualizer.ErrorVisualizer.plot_feature_distributions_on_leaves">
 <code class="sig-name descname"><span class="pre">plot_feature_distributions_on_leaves</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">leaf_selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_k_features</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_global</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank_leaves_by</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'total_error_fraction'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nr_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(15,</span> <span class="pre">10)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/error_visualizer.html#ErrorVisualizer.plot_feature_distributions_on_leaves"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.error_visualizer.ErrorVisualizer.plot_feature_distributions_on_leaves" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return plot of error node feature distribution and compare to global baseline.</p>
-<p>The top-k features are sorted by importance in the Model Performance Predictor.
+<p>The top-k features are sorted by importance in the ErrorAnalyzer.
 The most important are more correlated with the errors. When no specific node is selected,
-the leaf nodes are ranked by an importance criterium and presented in relevance order.</p>
+the leaves are ranked by an importance criterium and presented in relevance order.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -239,7 +239,7 @@ the leaf nodes are ranked by an importance criterium and presented in relevance 
 (global baseline).</p></li>
 <li><p><strong>show_class</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – show the proportion of Wrongly and Correctly predicted samples in the feature
 distributions.</p></li>
-<li><p><strong>rank_leaves_by</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – ranking criterion for the leaf nodes. Valid values are:
+<li><p><strong>rank_leaves_by</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – ranking criterion for the leaves. Valid values are:
 * ‘total_error_fraction’: rank by the fraction of total error in the node
 * ‘purity’: rank by the purity (ratio of wrongly predicted samples over the total number of node samples)
 * ‘class_difference’: rank by the difference of number of wrongly and correctly predicted samples

@@ -193,19 +193,19 @@
 
 
 <div class="viewcode-block" id="FeatureNameTransformer"><a class="viewcode-back" href="../../gen_modules/mealy.preprocessing.html#mealy.preprocessing.FeatureNameTransformer">[docs]</a><span class="k">class</span> <span class="nc">FeatureNameTransformer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Transformer of feature names and indices.</span>
+    <span class="sd">&quot;&quot;&quot;Transformer of feature names and indices.</span>
 
-<span class="sd">        A FeatureNameTransformer parses an input Pipeline preprocessor and generate</span>
-<span class="sd">        a mapping between the input unprocessed feature names/indices and the output</span>
-<span class="sd">        preprocessed feature names/indices.</span>
+<span class="sd">    A FeatureNameTransformer parses an input Pipeline preprocessor and generate</span>
+<span class="sd">    a mapping between the input unprocessed feature names/indices and the output</span>
+<span class="sd">    preprocessed feature names/indices.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            ct_preprocessor (sklearn.compose.ColumnTransformer): preprocessor</span>
-<span class="sd">            orig_feats (list): list of original unpreprocessed feature names, default=None.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        ct_preprocessor (sklearn.compose.ColumnTransformer): Preprocessor.</span>
+<span class="sd">        original_features (list): List of original unpreprocessed feature names, default=None.</span>
 
-<span class="sd">        Attributes:</span>
-<span class="sd">            original_feature_names (list): list of original unpreprocessed feature names.</span>
-<span class="sd">            preprocessed_feature_names (list): list of preprocessed feature names</span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        original_feature_names (list): List of original unpreprocessed feature names.</span>
+<span class="sd">        preprocessed_feature_names (list): List of preprocessed feature names.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ct_preprocessor</span><span class="p">,</span> <span class="n">original_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -231,18 +231,19 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Generating the feature id mapping dict&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_create_feature_mapping</span><span class="p">(</span><span class="n">ct_preprocessor</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_original_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_feature_names</span>
+<div class="viewcode-block" id="FeatureNameTransformer.get_original_feature_names"><a class="viewcode-back" href="../../gen_modules/mealy.preprocessing.html#mealy.preprocessing.FeatureNameTransformer.get_original_feature_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_original_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the list of original unpreprocessed feature names.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_feature_names</span></div>
 
-    <span class="k">def</span> <span class="nf">get_preprocessed_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed_feature_names</span>
+<div class="viewcode-block" id="FeatureNameTransformer.get_preprocessed_feature_names"><a class="viewcode-back" href="../../gen_modules/mealy.preprocessing.html#mealy.preprocessing.FeatureNameTransformer.get_preprocessed_feature_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_preprocessed_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the list of preprocessed feature names.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed_feature_names</span></div>
 
     <span class="k">def</span> <span class="nf">_create_feature_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ct_preprocessor</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Update the dicts of input &lt;-&gt; output feature id mapping: self.original2preprocessed and self.preprocessed2original</span>
+        <span class="sd">&quot;&quot;&quot;Update the dicts of input &lt;-&gt; output feature id mapping: original2preprocessed and preprocessed2original.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            ct_preprocessor: a ColumnTransformer object</span>
+<span class="sd">            ct_preprocessor (sklearn.compose.ColumnTransformer): a ColumnTransformer object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">transformer_name</span><span class="p">,</span> <span class="n">transformer</span><span class="p">,</span> <span class="n">transformer_feature_names</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ct_preprocessor</span><span class="o">.</span><span class="n">transformers_</span><span class="p">):</span>
             <span class="n">orig_feats_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">original_feature_names</span><span class="p">,</span> <span class="n">transformer_feature_names</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
@@ -297,12 +298,15 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">len_preproc</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">part_out_feature_names</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FeatureNameTransformer.transform_feature_id"><a class="viewcode-back" href="../../gen_modules/mealy.preprocessing.html#mealy.preprocessing.FeatureNameTransformer.transform_feature_id">[docs]</a>    <span class="k">def</span> <span class="nf">transform_feature_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Args:</span>
-<span class="sd">            index: int</span>
-<span class="sd">            name: str</span>
+        <span class="sd">&quot;&quot;&quot;Get the preprocessed feature names corresponding to an original feature.</span>
 
-<span class="sd">        Returns: index of output feature(s) generated by the requested feature</span>
+<span class="sd">        The input feature can be specified either by index or name.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            index (int): Feature index.</span>
+<span class="sd">            name (str): Feature name.</span>
+
+<span class="sd">        Returns: index of output feature(s) generated after preprocessing of the input feature</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original2preprocessed</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
@@ -320,10 +324,10 @@
 <span class="sd">        back into the original unprocessed feature name or index.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            index (int): feature index.</span>
-<span class="sd">            name (str): feature name.</span>
+<span class="sd">            index (int): Feature index.</span>
+<span class="sd">            name (str): Feature name.</span>
 
-<span class="sd">        Return:</span>
+<span class="sd">        Returns:</span>
 <span class="sd">            int or str: index (resp. name) of the unprocessed feature corresponding to the input preprocessed feature</span>
 <span class="sd">                index (resp.name). If both index and name are provided, the index is retained and an output index is</span>
 <span class="sd">                returned.</span>
@@ -341,10 +345,10 @@
         <span class="sd">&quot;&quot;&quot;Check whether an unprocessed feature at a given index or with a given name is categorical.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            index (int): feature index.</span>
-<span class="sd">            name (str): feature name.</span>
+<span class="sd">            index (int): Feature index.</span>
+<span class="sd">            name (str): Feature name.</span>
 
-<span class="sd">        Return:</span>
+<span class="sd">        Returns:</span>
 <span class="sd">            bool: True if the input feature is categorical, else False. If both index and name are provided, the index</span>
 <span class="sd">                is retained.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -358,20 +362,15 @@
 
 
 <div class="viewcode-block" id="PipelinePreprocessor"><a class="viewcode-back" href="../../gen_modules/mealy.preprocessing.html#mealy.preprocessing.PipelinePreprocessor">[docs]</a><span class="k">class</span> <span class="nc">PipelinePreprocessor</span><span class="p">(</span><span class="n">FeatureNameTransformer</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Transformer of feature values from the original values to preprocessed ones.</span>
+    <span class="sd">&quot;&quot;&quot;Transformer of feature values from the original values to preprocessed ones.</span>
 
-<span class="sd">        A PipelinePreprocessor parses an input Pipeline preprocessor and generate</span>
-<span class="sd">        a mapping between the input unprocessed feature values and the output</span>
-<span class="sd">        preprocessed feature values.</span>
+<span class="sd">    A PipelinePreprocessor parses an input Pipeline preprocessor and generate</span>
+<span class="sd">    a mapping between the input unprocessed feature values and the output</span>
+<span class="sd">    preprocessed feature values.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            ct_preprocessor (sklearn.compose.ColumnTransformer): preprocessing steps</span>
-<span class="sd">            orig_feats (list): list of original unpreprocessed feature names, default=None.</span>
-
-<span class="sd">        Attributes:</span>
-<span class="sd">            fn_transformer (FeatureNameTransformer): transformer managing the mapping between original and</span>
-<span class="sd">                preprocessed feature names.</span>
-
+<span class="sd">    Args:</span>
+<span class="sd">        ct_preprocessor (sklearn.compose.ColumnTransformer): Preprocessing steps</span>
+<span class="sd">        original_features (list): List of original unpreprocessed feature names, default=None.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ct_preprocessor</span><span class="p">,</span> <span class="n">original_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -381,10 +380,10 @@
         <span class="sd">&quot;&quot;&quot;Transform the input feature values according to the preprocessing pipeline.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            x (numpy.ndarray or pandas.DataFrame): input feature values.</span>
+<span class="sd">            x (numpy.ndarray or pandas.DataFrame): Input feature values.</span>
 
-<span class="sd">        Return:</span>
-<span class="sd">            numpy.ndarray: transformed feature values</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy.ndarray: Transformed feature values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ct_preprocessor</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
 
@@ -404,10 +403,10 @@
         <span class="sd">&quot;&quot;&quot;Invert the preprocessing pipeline and inverse transform feature values.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            preprocessed_x (numpy.ndarray): preprocessed feature values.</span>
+<span class="sd">            preprocessed_x (numpy.ndarray): Preprocessed feature values.</span>
 
-<span class="sd">        Return:</span>
-<span class="sd">            numpy.ndarray: feature values without preprocessing</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy.ndarray: Feature values without preprocessing.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">def</span> <span class="nf">_inverse_single_step</span><span class="p">(</span><span class="n">single_step</span><span class="p">,</span> <span class="n">step_output</span><span class="p">):</span>
@@ -455,12 +454,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">model_performance_predictor_features</span> <span class="o">=</span> <span class="n">model_performance_predictor_features</span>
 
 <div class="viewcode-block" id="DummyPipelinePreprocessor.transform"><a class="viewcode-back" href="../../gen_modules/mealy.preprocessing.html#mealy.preprocessing.DummyPipelinePreprocessor.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Identity transformation of the input.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            x: dataframe or ndarray</span>
+<span class="sd">            x (numpy.ndarray or pandas.DataFrame): Input feature values.</span>
+
 <span class="sd">        Returns:</span>
-<span class="sd">            ndarray</span>
+<span class="sd">            numpy.ndarray: Transformed feature values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">values</span>

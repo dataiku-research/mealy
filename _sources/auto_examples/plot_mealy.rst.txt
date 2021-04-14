@@ -25,7 +25,7 @@ Here we train a RandomForestRegressor to predict the price of the houses
 in Boston. This is our primary model. Then we build a secondary model,
 called Error Tree, to predict on what samples
 the primary model returns wrong or correct predictions. The Error tree is a
-DecisionTree returning a binary outcome success/failure. The leaf nodes
+DecisionTree returning a binary outcome success/failure. The leaves
 yielding failure outcome gather the samples mis-predicted by the primary
 model. Plotting the feature distributions of these samples and comparing
 to the whole data highlights the subpopulations where the model works poorly.
@@ -149,7 +149,7 @@ Print metrics regarding the Error Tree.
 .. code-block:: python3
 
 
-    print(error_analyzer.evaluate(X_test, y_test, output_format='text'))
+    print(error_analyzer.evaluate(X_test, y_test, output_format='str'))
 
 
 
@@ -161,20 +161,19 @@ Print metrics regarding the Error Tree.
 
  .. code-block:: none
 
-    The Error Decision Tree (EDT) was trained with accuracy 98.43% and balanced accuracy 94.74%.
+    The Error Decision Tree was trained with accuracy 98.43% and balanced accuracy 94.74%.
     The Decision Tree estimated the primary models accuracy to 86.61%.
     The true accuracy of the primary model is 85.04.%
-    The Fidelity of the EDT is 98.43%.
-    The EDT is considered representative of the primary model performances.
+    The Fidelity of the error tree is 98.43%.
+    The error tree is considered representative of the primary model performances.
 
-    None
 
 
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 72-73
 
-Plot the Error Decision Tree.
+Plot the Error Tree.
 
 .. GENERATED FROM PYTHON SOURCE LINES 73-87
 
@@ -214,101 +213,11 @@ Print the details regarding the decision tree nodes containing the majority of e
 .. code-block:: python3
 
 
-    error_analyzer.get_error_node_summary(leaf_selector=None, add_path_to_leaves=True, print_summary=True);
+    error_analyzer.get_error_leaf_summary(leaf_selector=None, add_path_to_leaves=True);
 
 
 
 
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    LEAF 12:
-         Correct predictions: 0 | Wrong predictions: 10 | Local error (purity): 1.00 | Fraction of total error: 0.53
-         Path to leaf:
-         AGE > 82.15
-            LSTAT <= 8.96
-               RM <= 8.21
-    LEAF 14:
-         Correct predictions: 0 | Wrong predictions: 2 | Local error (purity): 1.00 | Fraction of total error: 0.11
-         Path to leaf:
-         AGE > 82.15
-            LSTAT <= 8.96
-               RM > 8.21
-                  AGE <= 89.20
-    LEAF 3:
-         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Fraction of total error: 0.05
-         Path to leaf:
-         AGE <= 82.15
-            LSTAT <= 25.53
-               TAX <= 204.50
-    LEAF 6:
-         Correct predictions: 1 | Wrong predictions: 1 | Local error (purity): 0.50 | Fraction of total error: 0.05
-         Path to leaf:
-         AGE <= 82.15
-            LSTAT <= 25.53
-               TAX > 204.50
-                  PTRATIO <= 15.35
-                     AGE <= 23.90
-    LEAF 9:
-         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Fraction of total error: 0.05
-         Path to leaf:
-         AGE <= 82.15
-            LSTAT > 25.53
-    LEAF 17:
-         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Fraction of total error: 0.05
-         Path to leaf:
-         AGE > 82.15
-            LSTAT > 8.96
-               DIS <= 1.32
-    LEAF 19:
-         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Fraction of total error: 0.05
-         Path to leaf:
-         AGE > 82.15
-            LSTAT > 8.96
-               DIS > 1.32
-                  TAX <= 213.00
-    LEAF 21:
-         Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Fraction of total error: 0.05
-         Path to leaf:
-         AGE > 82.15
-            LSTAT > 8.96
-               DIS > 1.32
-                  TAX > 213.00
-                     RM <= 4.12
-    LEAF 22:
-         Correct predictions: 38 | Wrong predictions: 1 | Local error (purity): 0.03 | Fraction of total error: 0.05
-         Path to leaf:
-         AGE > 82.15
-            LSTAT > 8.96
-               DIS > 1.32
-                  TAX > 213.00
-                     RM > 4.12
-    LEAF 7:
-         Correct predictions: 6 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
-         Path to leaf:
-         AGE <= 82.15
-            LSTAT <= 25.53
-               TAX > 204.50
-                  PTRATIO <= 15.35
-                     AGE > 23.90
-    LEAF 8:
-         Correct predictions: 61 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
-         Path to leaf:
-         AGE <= 82.15
-            LSTAT <= 25.53
-               TAX > 204.50
-                  PTRATIO > 15.35
-    LEAF 15:
-         Correct predictions: 2 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
-         Path to leaf:
-         AGE > 82.15
-            LSTAT <= 8.96
-               RM > 8.21
-                  AGE > 89.20
 
 
 
@@ -365,7 +274,7 @@ accuracy and the one estimated by the Error Tree are close.
 Model Failures
 ^^^^^^^^^^^^^^
 
-Let's focus on the nodes of the Error Tree DecisionTree, in particular the leaf nodes
+Let's focus on the nodes of the Error Tree DecisionTree, in particular the leaves
 of class 'Wrong prediction'. These leaves contain the majority of errors, each
 leaf clustering a subpopulation of errors with different feature values. The largest
 and purest failure nodes are highlighted when printing the error node summary, and
@@ -379,7 +288,7 @@ subpopulations.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.115 seconds)
+   **Total running time of the script:** ( 0 minutes  2.128 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_mealy.py:

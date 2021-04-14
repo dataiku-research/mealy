@@ -8,7 +8,7 @@ Before training the primary model we preprocess the categorical and numeric
 features of the dataset by means of a scikit-learn Pipeline.
 Then we build a secondary model, called Error Tree,
 to predict on what samples the primary model returns wrong or correct predictions.
-The Error Tree is a DecisionTree returning a binary outcome success/failure. The leaf nodes
+The Error Tree is a DecisionTree returning a binary outcome success/failure. The leaves
 yielding failure outcome gather the samples mis-predicted by the primary
 model. Plotting the feature distributions of these samples and comparing
 to the whole data highlights the subpopulations where the model works poorly.
@@ -92,7 +92,7 @@ preprocessor = ColumnTransformer(
         ('cat', categorical_transformer, categorical_features)])
 
 model = Pipeline(steps=[('preprocessor', preprocessor),
-                        ('classifier', RandomForestClassifier())])
+                        ('classifier', RandomForestClassifier(n_estimators=10))])
 
 ##############################################################################
 # Train preprocessing Pipeline and RandomForestClassifier.
@@ -111,10 +111,10 @@ error_analyzer.fit(X_test, y_test)
 ##############################################################################
 # Print metrics regarding the Error Tree.
 
-print(error_analyzer.evaluate(X_test, y_test, output_format='text'))
+print(error_analyzer.evaluate(X_test, y_test, output_format='str'))
 
 ##############################################################################
-# Plot the Error Decision Tree.
+# Plot the Error Tree.
 
 error_visualizer = ErrorVisualizer(error_analyzer)
 tree_src = error_visualizer.plot_error_tree()
@@ -132,7 +132,7 @@ plt.axis('off')
 ##############################################################################
 # Print the details regarding the decision tree nodes containing the majority of errors.
 
-error_analyzer.get_error_node_summary(leaf_selector=None, add_path_to_leaves=True, print_summary=True);
+error_analyzer.get_error_leaf_summary(leaf_selector=None, add_path_to_leaves=True);
 
 ##############################################################################
 # Plot the feature distributions of samples in the leaf containing the majority of errors.
@@ -157,7 +157,7 @@ error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=leaf_id, top
 # Model Failures
 # ^^^^^^^^^^^^^^
 #
-# Let's focus on the nodes of the Error Decision Tree, in particular the leaf nodes
+# Let's focus on the nodes of the Error Tree, in particular the leaves
 # of class 'Wrong prediction'. These leaves contain the majority of errors, each
 # leaf clustering a subpopulation of errors with different feature values. The largest
 # and purest failure nodes are highlighted when printing the error node summary, and

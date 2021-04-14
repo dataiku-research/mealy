@@ -182,38 +182,46 @@
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">from</span> <span class="nn">mealy.constants</span> <span class="kn">import</span> <span class="n">ErrorAnalyzerConstants</span>
 <span class="kn">from</span> <span class="nn">kneed</span> <span class="kn">import</span> <span class="n">KneeLocator</span>
 
-<div class="viewcode-block" id="get_epsilon"><a class="viewcode-back" href="../../gen_modules/mealy.error_analysis_utils.html#mealy.error_analysis_utils.get_epsilon">[docs]</a><span class="k">def</span> <span class="nf">get_epsilon</span><span class="p">(</span><span class="n">difference</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;rec&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Compute epsilon to define errors in regression task &quot;&quot;&quot;</span>
-    <span class="k">assert</span> <span class="p">(</span><span class="n">mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">,</span> <span class="s1">&#39;rec&#39;</span><span class="p">])</span>
-    <span class="n">epsilon</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;std&#39;</span><span class="p">:</span>
-        <span class="n">std_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">difference</span><span class="p">)</span>
-        <span class="n">mean_diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">difference</span><span class="p">)</span>
-        <span class="n">epsilon</span> <span class="o">=</span> <span class="n">mean_diff</span> <span class="o">+</span> <span class="n">std_diff</span>
-    <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;rec&#39;</span><span class="p">:</span>
-        <span class="n">n_points</span> <span class="o">=</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">NUMBER_EPSILON_VALUES</span>
-        <span class="n">epsilon_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">difference</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">difference</span><span class="p">),</span> <span class="n">num</span><span class="o">=</span><span class="n">n_points</span><span class="p">)</span>
-        <span class="n">cdf_error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">epsilon_range</span><span class="p">)</span>
-        <span class="n">n_samples</span> <span class="o">=</span> <span class="n">difference</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">epsilon</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">epsilon_range</span><span class="p">):</span>
-            <span class="n">correct</span> <span class="o">=</span> <span class="n">difference</span> <span class="o">&lt;=</span> <span class="n">epsilon</span>
-            <span class="n">cdf_error</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">correct</span><span class="p">))</span> <span class="o">/</span> <span class="n">n_samples</span>
-        <span class="n">kneedle</span> <span class="o">=</span> <span class="n">KneeLocator</span><span class="p">(</span><span class="n">epsilon_range</span><span class="p">,</span> <span class="n">cdf_error</span><span class="p">)</span>
-        <span class="n">epsilon</span> <span class="o">=</span> <span class="n">kneedle</span><span class="o">.</span><span class="n">knee</span>
-    <span class="k">return</span> <span class="n">epsilon</span></div>
+
+<div class="viewcode-block" id="get_epsilon"><a class="viewcode-back" href="../../gen_modules/mealy.error_analysis_utils.html#mealy.error_analysis_utils.get_epsilon">[docs]</a><span class="k">def</span> <span class="nf">get_epsilon</span><span class="p">(</span><span class="n">difference</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the threshold used to decide whether a prediction is wrong or correct (for regression tasks).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        difference (numpy.ndarray): The absolute differences between the true target values and the predicted ones</span>
+<span class="sd">            (by the primary model).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        epsilon (float): The value of the threshold used to decide whether the prediction for a regression task</span>
+<span class="sd">            is wrong or correct</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">epsilon_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">difference</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">difference</span><span class="p">),</span> <span class="n">num</span><span class="o">=</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">NUMBER_EPSILON_VALUES</span><span class="p">)</span>
+    <span class="n">cdf_error</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="n">difference</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">epsilon</span> <span class="ow">in</span> <span class="n">epsilon_range</span><span class="p">:</span>
+        <span class="n">correct_predictions</span> <span class="o">=</span> <span class="n">difference</span> <span class="o">&lt;=</span> <span class="n">epsilon</span>
+        <span class="n">cdf_error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">correct_predictions</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">n_samples</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">KneeLocator</span><span class="p">(</span><span class="n">epsilon_range</span><span class="p">,</span> <span class="n">cdf_error</span><span class="p">)</span><span class="o">.</span><span class="n">knee</span></div>
+
 
 <div class="viewcode-block" id="get_feature_list_from_column_transformer"><a class="viewcode-back" href="../../gen_modules/mealy.error_analysis_utils.html#mealy.error_analysis_utils.get_feature_list_from_column_transformer">[docs]</a><span class="k">def</span> <span class="nf">get_feature_list_from_column_transformer</span><span class="p">(</span><span class="n">ct_preprocessor</span><span class="p">):</span>
-    <span class="n">all_feature</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">categorical_features</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">transformer_name</span><span class="p">,</span> <span class="n">transformer</span><span class="p">,</span> <span class="n">transformer_feature_names</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ct_preprocessor</span><span class="o">.</span><span class="n">transformers_</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get list of feature names and categorical feature names from a ColumnTransformer preprocessor.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ct_preprocessor (sklearn.compose.ColumnTransformer): ColumnTransformer containing separate feature</span>
+<span class="sd">            preprocessing steps.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        all_features (list): list of feature names.</span>
+<span class="sd">        categorical_features (list): list of categorical feature names.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">all_features</span><span class="p">,</span> <span class="n">categorical_features</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">transformer_name</span><span class="p">,</span> <span class="n">transformer</span><span class="p">,</span> <span class="n">transformer_feature_names</span> <span class="ow">in</span> <span class="n">ct_preprocessor</span><span class="o">.</span><span class="n">transformers_</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">transformer_name</span> <span class="o">==</span> <span class="s1">&#39;remainder&#39;</span> <span class="ow">and</span> <span class="n">transformer</span> <span class="o">==</span> <span class="s1">&#39;drop&#39;</span><span class="p">:</span>
             <span class="k">continue</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">all_feature</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">transformer_feature_names</span><span class="p">)</span>
+        <span class="n">all_features</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">transformer_feature_names</span><span class="p">)</span>
 
         <span class="c1"># check for categorical features</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformer</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">):</span>
@@ -223,30 +231,34 @@
                     <span class="k">break</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformer</span><span class="p">,</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">VALID_CATEGORICAL_STEPS</span><span class="p">):</span>
             <span class="n">categorical_features</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">transformer_feature_names</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">continue</span>
-
-    <span class="k">return</span> <span class="n">all_feature</span><span class="p">,</span> <span class="n">categorical_features</span></div>
+    <span class="k">return</span> <span class="n">all_features</span><span class="p">,</span> <span class="n">categorical_features</span></div>
 
 
 <div class="viewcode-block" id="check_lists_having_same_elements"><a class="viewcode-back" href="../../gen_modules/mealy.error_analysis_utils.html#mealy.error_analysis_utils.check_lists_having_same_elements">[docs]</a><span class="k">def</span> <span class="nf">check_lists_having_same_elements</span><span class="p">(</span><span class="n">list_A</span><span class="p">,</span> <span class="n">list_B</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">collections</span><span class="o">.</span><span class="n">Counter</span><span class="p">(</span><span class="n">list_A</span><span class="p">)</span> <span class="o">==</span> <span class="n">collections</span><span class="o">.</span><span class="n">Counter</span><span class="p">(</span><span class="n">list_B</span><span class="p">)</span></div>
+    <span class="sd">&quot;&quot;&quot;Check two lists have the same unique elements.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">list_A</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">list_B</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="check_enough_data"><a class="viewcode-back" href="../../gen_modules/mealy.error_analysis_utils.html#mealy.error_analysis_utils.check_enough_data">[docs]</a><span class="k">def</span> <span class="nf">check_enough_data</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">min_len</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compare length of dataframe to minimum lenght of the test data.</span>
+    <span class="sd">&quot;&quot;&quot;Compare length of dataframe to minimum length of the test data.</span>
+
 <span class="sd">    Used in the relevance of the measure.</span>
 
-<span class="sd">    :param df: Input dataframe</span>
-<span class="sd">    :param min_len:</span>
-<span class="sd">    :return:</span>
+<span class="sd">    Args:</span>
+<span class="sd">        df (pandas.DataFrame): Input dataframe</span>
+<span class="sd">        min_len (int): Minimum number of rows required.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">      ValueError: If df does not have the required minimum number of rows.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">min_len</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The original dataset is too small (</span><span class="si">{}</span><span class="s1"> rows) to have stable result, it needs to have at least </span><span class="si">{}</span><span class="s1"> rows&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">min_len</span><span class="p">))</span></div>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s1">&#39;The original dataset is too small (</span><span class="si">{}</span><span class="s1"> rows) to have stable result, it needs to have at least </span><span class="si">{}</span><span class="s1"> rows&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">min_len</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="rank_features_by_error_correlation"><a class="viewcode-back" href="../../gen_modules/mealy.error_analysis_utils.html#mealy.error_analysis_utils.rank_features_by_error_correlation">[docs]</a><span class="k">def</span> <span class="nf">rank_features_by_error_correlation</span><span class="p">(</span><span class="n">feature_importances</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Rank features by feature importance according to the error model.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span> <span class="n">feature_importances</span><span class="p">)</span></div>
 </pre></div>
 

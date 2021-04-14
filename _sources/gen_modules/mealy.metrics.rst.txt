@@ -30,6 +30,14 @@ mealy.metrics
 
 	       <div class="sphx-glr-clear"></div>
 
+   .. autofunction:: compute_fidelity_score
+
+   .. include:: backreferences/mealy.metrics.compute_fidelity_score.examples
+
+   .. raw:: html
+
+	       <div class="sphx-glr-clear"></div>
+
    .. autofunction:: compute_primary_model_accuracy
 
    .. include:: backreferences/mealy.metrics.compute_primary_model_accuracy.examples
@@ -49,14 +57,6 @@ mealy.metrics
    .. autofunction:: fidelity_balanced_accuracy_score
 
    .. include:: backreferences/mealy.metrics.fidelity_balanced_accuracy_score.examples
-
-   .. raw:: html
-
-	       <div class="sphx-glr-clear"></div>
-
-   .. autofunction:: fidelity_score
-
-   .. include:: backreferences/mealy.metrics.fidelity_score.examples
 
    .. raw:: html
 

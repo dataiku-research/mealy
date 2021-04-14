@@ -202,7 +202,7 @@ to download the full example code</p>
 in Boston. This is our primary model. Then we build a secondary model,
 called Error Tree, to predict on what samples
 the primary model returns wrong or correct predictions. The Error tree is a
-DecisionTree returning a binary outcome success/failure. The leaf nodes
+DecisionTree returning a binary outcome success/failure. The leaves
 yielding failure outcome gather the samples mis-predicted by the primary
 model. Plotting the feature distributions of these samples and comparing
 to the whole data highlights the subpopulations where the model works poorly.</p>
@@ -254,20 +254,18 @@ to the whole data highlights the subpopulations where the model works poorly.</p
 </pre></div>
 </div>
 <p>Print metrics regarding the Error Tree.</p>
-<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">error_analyzer</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_test</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y_test</span></a><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;text&#39;</span><span class="p">))</span>
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">error_analyzer</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_test</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y_test</span></a><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;str&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>The Error Decision Tree (EDT) was trained with accuracy 98.43% and balanced accuracy 94.74%.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>The Error Decision Tree was trained with accuracy 98.43% and balanced accuracy 94.74%.
 The Decision Tree estimated the primary models accuracy to 86.61%.
 The true accuracy of the primary model is 85.04.%
-The Fidelity of the EDT is 98.43%.
-The EDT is considered representative of the primary model performances.
-
-None
+The Fidelity of the error tree is 98.43%.
+The error tree is considered representative of the primary model performances.
 </pre></div>
 </div>
-<p>Plot the Error Decision Tree.</p>
+<p>Plot the Error Tree.</p>
 <div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">error_visualizer</span> <span class="o">=</span> <span class="n">ErrorVisualizer</span><span class="p">(</span><span class="n">error_analyzer</span><span class="p">)</span>
 <span class="n">tree_src</span> <span class="o">=</span> <span class="n">error_visualizer</span><span class="o">.</span><span class="n">plot_error_tree</span><span class="p">()</span>
 
@@ -284,93 +282,7 @@ None
 </div>
 <img alt="plot mealy" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_mealy_001.png" />
 <p>Print the details regarding the decision tree nodes containing the majority of errors.</p>
-<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">error_analyzer</span><span class="o">.</span><span class="n">get_error_node_summary</span><span class="p">(</span><span class="n">leaf_selector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_path_to_leaves</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">print_summary</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
-</pre></div>
-</div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>LEAF 12:
-     Correct predictions: 0 | Wrong predictions: 10 | Local error (purity): 1.00 | Fraction of total error: 0.53
-     Path to leaf:
-     AGE &gt; 82.15
-        LSTAT &lt;= 8.96
-           RM &lt;= 8.21
-LEAF 14:
-     Correct predictions: 0 | Wrong predictions: 2 | Local error (purity): 1.00 | Fraction of total error: 0.11
-     Path to leaf:
-     AGE &gt; 82.15
-        LSTAT &lt;= 8.96
-           RM &gt; 8.21
-              AGE &lt;= 89.20
-LEAF 3:
-     Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Fraction of total error: 0.05
-     Path to leaf:
-     AGE &lt;= 82.15
-        LSTAT &lt;= 25.53
-           TAX &lt;= 204.50
-LEAF 6:
-     Correct predictions: 1 | Wrong predictions: 1 | Local error (purity): 0.50 | Fraction of total error: 0.05
-     Path to leaf:
-     AGE &lt;= 82.15
-        LSTAT &lt;= 25.53
-           TAX &gt; 204.50
-              PTRATIO &lt;= 15.35
-                 AGE &lt;= 23.90
-LEAF 9:
-     Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Fraction of total error: 0.05
-     Path to leaf:
-     AGE &lt;= 82.15
-        LSTAT &gt; 25.53
-LEAF 17:
-     Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Fraction of total error: 0.05
-     Path to leaf:
-     AGE &gt; 82.15
-        LSTAT &gt; 8.96
-           DIS &lt;= 1.32
-LEAF 19:
-     Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Fraction of total error: 0.05
-     Path to leaf:
-     AGE &gt; 82.15
-        LSTAT &gt; 8.96
-           DIS &gt; 1.32
-              TAX &lt;= 213.00
-LEAF 21:
-     Correct predictions: 0 | Wrong predictions: 1 | Local error (purity): 1.00 | Fraction of total error: 0.05
-     Path to leaf:
-     AGE &gt; 82.15
-        LSTAT &gt; 8.96
-           DIS &gt; 1.32
-              TAX &gt; 213.00
-                 RM &lt;= 4.12
-LEAF 22:
-     Correct predictions: 38 | Wrong predictions: 1 | Local error (purity): 0.03 | Fraction of total error: 0.05
-     Path to leaf:
-     AGE &gt; 82.15
-        LSTAT &gt; 8.96
-           DIS &gt; 1.32
-              TAX &gt; 213.00
-                 RM &gt; 4.12
-LEAF 7:
-     Correct predictions: 6 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
-     Path to leaf:
-     AGE &lt;= 82.15
-        LSTAT &lt;= 25.53
-           TAX &gt; 204.50
-              PTRATIO &lt;= 15.35
-                 AGE &gt; 23.90
-LEAF 8:
-     Correct predictions: 61 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
-     Path to leaf:
-     AGE &lt;= 82.15
-        LSTAT &lt;= 25.53
-           TAX &gt; 204.50
-              PTRATIO &gt; 15.35
-LEAF 15:
-     Correct predictions: 2 | Wrong predictions: 0 | Local error (purity): 0.00 | Fraction of total error: 0.00
-     Path to leaf:
-     AGE &gt; 82.15
-        LSTAT &lt;= 8.96
-           RM &gt; 8.21
-              AGE &gt; 89.20
+<div class="highlight-python3 notranslate"><div class="highlight"><pre><span></span><span class="n">error_analyzer</span><span class="o">.</span><span class="n">get_error_leaf_summary</span><span class="p">(</span><span class="n">leaf_selector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_path_to_leaves</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>Plot the feature distributions of samples in the leaf containing the majority of errors.
@@ -400,7 +312,7 @@ accuracy and the one estimated by the Error Tree are close.</p>
 </div>
 <div class="section" id="model-failures">
 <h3>Model Failures<a class="headerlink" href="#model-failures" title="Permalink to this headline">¶</a></h3>
-<p>Let’s focus on the nodes of the Error Tree DecisionTree, in particular the leaf nodes
+<p>Let’s focus on the nodes of the Error Tree DecisionTree, in particular the leaves
 of class ‘Wrong prediction’. These leaves contain the majority of errors, each
 leaf clustering a subpopulation of errors with different feature values. The largest
 and purest failure nodes are highlighted when printing the error node summary, and
@@ -409,7 +321,7 @@ From the feature distributions, sorted by correlation with the error, we can see
 the majority of problems occur for extreme values of features <code class="docutils literal notranslate"><span class="pre">LSTAT</span></code> and <code class="docutils literal notranslate"><span class="pre">AGE</span></code>.
 In the next iteration of model design, the primary model needs to be improved for these
 subpopulations.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.115 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.128 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-mealy-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/99e5016bbed373b00ea6e87a23746e81/plot_mealy.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_mealy.py</span></code></a></p>

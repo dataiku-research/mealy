@@ -61,7 +61,7 @@ is the **Fidelity** (`1-|actual_acc - estimated_acc|`). The chosen threshold for
 below which the Error Tree predicted model accuracy is considered too different from the true model accuracy.
 
 As the Error Tree is simply a tree, it can be visualized and further analyzed by looking at its nodes,
-especially the leaf nodes. The color of a node represents whether the majority of samples falling in the node are
+especially the leaves. The color of a node represents whether the majority of samples falling in the node are
 Correct Prediction (blue) or Wrong Prediction (red).
 
 In particular the blue leaves represent the subpopulation of the dataset that the primary model managed to predict correctly.

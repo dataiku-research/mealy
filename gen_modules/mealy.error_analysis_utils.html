@@ -196,17 +196,17 @@
 <dl class="py function">
 <dt id="mealy.error_analysis_utils.check_enough_data">
 <code class="sig-prename descclassname"><span class="pre">mealy.error_analysis_utils.</span></code><code class="sig-name descname"><span class="pre">check_enough_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_len</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/error_analysis_utils.html#check_enough_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.error_analysis_utils.check_enough_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compare length of dataframe to minimum lenght of the test data.
-Used in the relevance of the measure.</p>
+<dd><p>Compare length of dataframe to minimum length of the test data.</p>
+<p>Used in the relevance of the measure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>df</strong> – Input dataframe</p></li>
-<li><p><strong>min_len</strong> – </p></li>
+<li><p><strong>df</strong> (<a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.4)"><em>pandas.DataFrame</em></a>) – Input dataframe</p></li>
+<li><p><strong>min_len</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Minimum number of rows required.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><strong>ValueError</strong></a> – If df does not have the required minimum number of rows.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -214,23 +214,55 @@ Used in the relevance of the measure.</p>
 <div class="sphx-glr-clear"></div><dl class="py function">
 <dt id="mealy.error_analysis_utils.check_lists_having_same_elements">
 <code class="sig-prename descclassname"><span class="pre">mealy.error_analysis_utils.</span></code><code class="sig-name descname"><span class="pre">check_lists_having_same_elements</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_B</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/error_analysis_utils.html#check_lists_having_same_elements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.error_analysis_utils.check_lists_having_same_elements" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Check two lists have the same unique elements.</p>
+</dd></dl>
 
 <div class="sphx-glr-clear"></div><dl class="py function">
 <dt id="mealy.error_analysis_utils.get_epsilon">
-<code class="sig-prename descclassname"><span class="pre">mealy.error_analysis_utils.</span></code><code class="sig-name descname"><span class="pre">get_epsilon</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">difference</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rec'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/error_analysis_utils.html#get_epsilon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.error_analysis_utils.get_epsilon" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute epsilon to define errors in regression task</p>
+<code class="sig-prename descclassname"><span class="pre">mealy.error_analysis_utils.</span></code><code class="sig-name descname"><span class="pre">get_epsilon</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">difference</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/error_analysis_utils.html#get_epsilon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.error_analysis_utils.get_epsilon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the threshold used to decide whether a prediction is wrong or correct (for regression tasks).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>difference</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a>) – The absolute differences between the true target values and the predicted ones
+(by the primary model).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The value of the threshold used to decide whether the prediction for a regression task</dt><dd><p>is wrong or correct</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>epsilon (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a>)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <div class="sphx-glr-clear"></div><dl class="py function">
 <dt id="mealy.error_analysis_utils.get_feature_list_from_column_transformer">
 <code class="sig-prename descclassname"><span class="pre">mealy.error_analysis_utils.</span></code><code class="sig-name descname"><span class="pre">get_feature_list_from_column_transformer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ct_preprocessor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/error_analysis_utils.html#get_feature_list_from_column_transformer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.error_analysis_utils.get_feature_list_from_column_transformer" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get list of feature names and categorical feature names from a ColumnTransformer preprocessor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ct_preprocessor</strong> (<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html#sklearn.compose.ColumnTransformer" title="(in scikit-learn v0.24)"><em>sklearn.compose.ColumnTransformer</em></a>) – ColumnTransformer containing separate feature
+preprocessing steps.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>list of feature names.
+categorical_features (list): list of categorical feature names.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>all_features (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>)</p>
+</dd>
+</dl>
+</dd></dl>
 
 <div class="sphx-glr-clear"></div><dl class="py function">
 <dt id="mealy.error_analysis_utils.rank_features_by_error_correlation">
 <code class="sig-prename descclassname"><span class="pre">mealy.error_analysis_utils.</span></code><code class="sig-name descname"><span class="pre">rank_features_by_error_correlation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feature_importances</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/error_analysis_utils.html#rank_features_by_error_correlation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.error_analysis_utils.rank_features_by_error_correlation" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Rank features by feature importance according to the error model.</p>
+</dd></dl>
 
 <div class="sphx-glr-clear"></div></div>
 </div>
