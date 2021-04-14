@@ -17,7 +17,6 @@ class ErrorTree(object):
         self._difference = None
         self._total_error_fraction = None
         self._error_class_idx = None
-        self.correct_class_idx = None
         self._wrongly_predicted_leaves = None
         self._correctly_predicted_leaves = None
 
