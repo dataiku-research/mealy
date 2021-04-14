@@ -194,8 +194,8 @@
 <span class="sd">            (by the primary model).</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        epsilon (float): The value of the threshold used to decide whether the prediction for a regression task</span>
-<span class="sd">            is wrong or correct</span>
+<span class="sd">        float: The value of the threshold used to decide whether the prediction for a regression task</span>
+<span class="sd">        is wrong or correct.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">epsilon_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">difference</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">difference</span><span class="p">),</span> <span class="n">num</span><span class="o">=</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">NUMBER_EPSILON_VALUES</span><span class="p">)</span>
     <span class="n">cdf_error</span> <span class="o">=</span> <span class="p">[]</span>

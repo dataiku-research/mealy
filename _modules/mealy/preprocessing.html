@@ -306,7 +306,7 @@
 <span class="sd">            index (int): Feature index.</span>
 <span class="sd">            name (str): Feature name.</span>
 
-<span class="sd">        Returns: index of output feature(s) generated after preprocessing of the input feature</span>
+<span class="sd">        Returns: index of output feature(s) generated after preprocessing of the input feature.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original2preprocessed</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
@@ -329,8 +329,8 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            int or str: index (resp. name) of the unprocessed feature corresponding to the input preprocessed feature</span>
-<span class="sd">                index (resp.name). If both index and name are provided, the index is retained and an output index is</span>
-<span class="sd">                returned.</span>
+<span class="sd">            index (resp.name). If both index and name are provided, the index is retained and an output index is</span>
+<span class="sd">            returned.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed2original</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
@@ -350,7 +350,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True if the input feature is categorical, else False. If both index and name are provided, the index</span>
-<span class="sd">                is retained.</span>
+<span class="sd">            is retained.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_feature_names</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
@@ -407,7 +407,6 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            numpy.ndarray: Feature values without preprocessing.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">def</span> <span class="nf">_inverse_single_step</span><span class="p">(</span><span class="n">single_step</span><span class="p">,</span> <span class="n">step_output</span><span class="p">):</span>
             <span class="n">inverse_transform_function_available</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">single_step</span><span class="p">,</span> <span class="s2">&quot;inverse_transform&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>

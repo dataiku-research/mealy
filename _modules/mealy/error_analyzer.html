@@ -371,7 +371,7 @@
 <span class="sd">                * array-like: Only return information of the leaves corresponding to these ids</span>
 <span class="sd">                * None (default): Return information of all the leaves</span>
 <span class="sd">            add_path_to_leaves (bool): Whether to add information of the path across the tree till the selected node. Defaults to False.</span>
-<span class="sd">            output_format (string): Return format used for the report. Valid values are &#39;dict&#39; or &#39;str&#39;. Defaults to &#39;dict&#39;.</span>
+<span class="sd">            output_format (str): Return format used for the report. Valid values are &#39;dict&#39; or &#39;str&#39;. Defaults to &#39;dict&#39;.</span>
 <span class="sd">            rank_by (str): Ranking criterion for the leaves. Valid values are:</span>
 <span class="sd">                * &#39;total_error_fraction&#39; (default): rank by the fraction of total error in the node</span>
 <span class="sd">                * &#39;purity&#39;: rank by the purity (ratio of wrongly predicted samples over the total number of node samples)</span>
@@ -428,7 +428,7 @@
 <span class="sd">                and train a Error Analyzer Tree.</span>
 <span class="sd">            y (numpy.ndarray or pandas.DataFrame): Target data from a test set to evaluate the primary predictor and</span>
 <span class="sd">                train a Error Analyzer Tree.</span>
-<span class="sd">            output_format (string): Return format used for the report. Valid values are &#39;dict&#39; or &#39;str&#39;. Defaults to &#39;str&#39;.</span>
+<span class="sd">            output_format (str): Return format used for the report. Valid values are &#39;dict&#39; or &#39;str&#39;. Defaults to &#39;str&#39;.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict or str: Dictionary or string report storing different metrics regarding the Error Decision Tree.</span>
