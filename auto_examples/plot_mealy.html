@@ -258,7 +258,7 @@ to the whole data highlights the subpopulations where the model works poorly.</p
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>The Error Decision Tree was trained with accuracy 98.43% and balanced accuracy 94.74%.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>The Error Tree was trained with accuracy 98.43% and balanced accuracy 94.74%.
 The Decision Tree estimated the primary models accuracy to 86.61%.
 The true accuracy of the primary model is 85.04.%
 The Fidelity of the error tree is 98.43%.
@@ -291,7 +291,7 @@ Rank features by correlation to error.</p>
 <span class="n">error_visualizer</span><span class="o">.</span><span class="n">plot_feature_distributions_on_leaves</span><span class="p">(</span><span class="n">leaf_selector</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.int64" title="numpy.int64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">leaf_id</span></a><span class="p">,</span> <span class="n">top_k_features</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="Distribution of CRIM in leaf 12" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_mealy_002.png" />
+<img alt="Distribution of LSTAT in leaf 12" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_mealy_002.png" />
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Leaf 12 (Wrong prediction: 1.000, Correct prediction: 0.000)
 </pre></div>
@@ -321,7 +321,7 @@ From the feature distributions, sorted by correlation with the error, we can see
 the majority of problems occur for extreme values of features <code class="docutils literal notranslate"><span class="pre">LSTAT</span></code> and <code class="docutils literal notranslate"><span class="pre">AGE</span></code>.
 In the next iteration of model design, the primary model needs to be improved for these
 subpopulations.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.175 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.129 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-mealy-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/99e5016bbed373b00ea6e87a23746e81/plot_mealy.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_mealy.py</span></code></a></p>

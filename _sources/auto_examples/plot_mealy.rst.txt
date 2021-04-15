@@ -161,7 +161,7 @@ Print metrics regarding the Error Tree.
 
  .. code-block:: none
 
-    The Error Decision Tree was trained with accuracy 98.43% and balanced accuracy 94.74%.
+    The Error Tree was trained with accuracy 98.43% and balanced accuracy 94.74%.
     The Decision Tree estimated the primary models accuracy to 86.61%.
     The true accuracy of the primary model is 85.04.%
     The Fidelity of the error tree is 98.43%.
@@ -238,7 +238,7 @@ Rank features by correlation to error.
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_mealy_002.png
-    :alt: Distribution of CRIM in leaf 12
+    :alt: Distribution of LSTAT in leaf 12
     :class: sphx-glr-single-img
 
 
@@ -288,7 +288,7 @@ subpopulations.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.175 seconds)
+   **Total running time of the script:** ( 0 minutes  2.129 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_mealy.py:

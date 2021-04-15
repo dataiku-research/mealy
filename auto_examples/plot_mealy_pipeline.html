@@ -310,7 +310,7 @@ investigate.</p>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>The Error Decision Tree was trained with accuracy 84.85% and balanced accuracy 51.29%.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>The Error Tree was trained with accuracy 84.85% and balanced accuracy 51.29%.
 The Decision Tree estimated the primary models accuracy to 99.16%.
 The true accuracy of the primary model is 84.77.%
 The Fidelity of the error tree is 85.61%.
@@ -344,7 +344,7 @@ Rank features by correlation to error.</p>
 <span class="n">error_visualizer</span><span class="o">.</span><span class="n">plot_feature_distributions_on_leaves</span><span class="p">(</span><span class="n">leaf_selector</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.int64" title="numpy.int64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">leaf_id</span></a><span class="p">,</span> <span class="n">top_k_features</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="Distribution of age in leaf 107" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_mealy_pipeline_002.png" />
+<img alt="Distribution of marital-status: in leaf 107" class="sphx-glr-single-img" src="../_images/sphx_glr_plot_mealy_pipeline_002.png" />
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Leaf 107 (Wrong prediction: 0.347, Correct prediction: 0.653)
 </pre></div>
@@ -371,7 +371,7 @@ From the feature distributions, sorted by correlation with the error, we can see
 the majority of problems occur for married people.
 In the next iteration of model design, the primary model needs to be improved for these
 subpopulations.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  10.177 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  9.978 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-mealy-pipeline-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/77ec589434957aa59127aa0c91613871/plot_mealy_pipeline.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_mealy_pipeline.py</span></code></a></p>
