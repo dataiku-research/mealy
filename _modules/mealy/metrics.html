@@ -186,6 +186,19 @@
 
 
 <div class="viewcode-block" id="compute_confidence_decision"><a class="viewcode-back" href="../../gen_modules/mealy.metrics.html#mealy.metrics.compute_confidence_decision">[docs]</a><span class="k">def</span> <span class="nf">compute_confidence_decision</span><span class="p">(</span><span class="n">primary_model_true_accuracy</span><span class="p">,</span> <span class="n">primary_model_predicted_accuracy</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return fidelity of the Error Tree and decision regarding its reliability.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        primary_model_true_accuracy (numpy.ndarray): Ground truth values of wrong/correct predictions of the error tree</span>
+<span class="sd">            primary model. Expected values in [ErrorAnalyzerConstants.WRONG_PREDICTION,</span>
+<span class="sd">                ErrorAnalyzerConstants.CORRECT_PREDICTION].</span>
+<span class="sd">        primary_model_predicted_accuracy (numpy.ndarray): Estimated targets as returned by the error tree. Expected</span>
+<span class="sd">            values in [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        fidelity (float): Fidelity score, measuring how well the Error Tree represents the original model errors.</span>
+<span class="sd">        decision (bool): Decision regarding whether to trust the Error Tree.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">difference_true_pred_accuracy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">primary_model_true_accuracy</span> <span class="o">-</span> <span class="n">primary_model_predicted_accuracy</span><span class="p">)</span>
     <span class="n">decision</span> <span class="o">=</span> <span class="n">difference_true_pred_accuracy</span> <span class="o">&lt;=</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">TREE_ACCURACY_TOLERANCE</span>
 
@@ -196,15 +209,36 @@
 
 
 <div class="viewcode-block" id="compute_accuracy_score"><a class="viewcode-back" href="../../gen_modules/mealy.metrics.html#mealy.metrics.compute_accuracy_score">[docs]</a><span class="k">def</span> <span class="nf">compute_accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the accuracy of predictions with respect to true values.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="compute_primary_model_accuracy"><a class="viewcode-back" href="../../gen_modules/mealy.metrics.html#mealy.metrics.compute_primary_model_accuracy">[docs]</a><span class="k">def</span> <span class="nf">compute_primary_model_accuracy</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return fidelity of the Error Tree and decision regarding its reliability.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        y (numpy.ndarray): Array indicating whether the model is correct for each sample. Expected values in</span>
+<span class="sd">            [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Estimated accuracy of the primary model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">n_test_samples</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">y</span> <span class="o">==</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">CORRECT_PREDICTION</span><span class="p">))</span> <span class="o">/</span> <span class="n">n_test_samples</span></div>
 
 
 <div class="viewcode-block" id="compute_fidelity_score"><a class="viewcode-back" href="../../gen_modules/mealy.metrics.html#mealy.metrics.compute_fidelity_score">[docs]</a><span class="k">def</span> <span class="nf">compute_fidelity_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return fidelity of the Error Tree and decision regarding its reliability.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        y_true (numpy.ndarray): Ground truth values of wrong/correct predictions of the error tree primary model.</span>
+<span class="sd">            Expected values in [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].</span>
+<span class="sd">        y_pred (numpy.ndarray): Estimated targets as returned by the error tree. Expected values in</span>
+<span class="sd">            [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        fidelity (float): Fidelity score, measuring how well the Error Tree represents the original model errors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">difference_true_pred_accuracy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">compute_primary_model_accuracy</span><span class="p">(</span><span class="n">y_true</span><span class="p">)</span> <span class="o">-</span>
                                            <span class="n">compute_primary_model_accuracy</span><span class="p">(</span><span class="n">y_pred</span><span class="p">))</span>
     <span class="n">fidelity</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">-</span> <span class="n">difference_true_pred_accuracy</span>
@@ -213,11 +247,22 @@
 
 
 <div class="viewcode-block" id="fidelity_balanced_accuracy_score"><a class="viewcode-back" href="../../gen_modules/mealy.metrics.html#mealy.metrics.fidelity_balanced_accuracy_score">[docs]</a><span class="k">def</span> <span class="nf">fidelity_balanced_accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a custom metrics, as the sum of the fidelity and the balanced accuracy of the Error Tree.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        y_true (numpy.ndarray): Ground truth values of wrong/correct predictions of the error tree primary model.</span>
+<span class="sd">            Expected values in [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].</span>
+<span class="sd">        y_pred (numpy.ndarray): Estimated targets as returned by the error tree. Expected values in</span>
+<span class="sd">            [ErrorAnalyzerConstants.WRONG_PREDICTION, ErrorAnalyzerConstants.CORRECT_PREDICTION].</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict or str: Dictionary or string report storing different metrics regarding the Error Tree.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">compute_fidelity_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span> <span class="o">+</span> <span class="n">balanced_accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="error_decision_tree_report"><a class="viewcode-back" href="../../gen_modules/mealy.metrics.html#mealy.metrics.error_decision_tree_report">[docs]</a><span class="k">def</span> <span class="nf">error_decision_tree_report</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;str&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return a report showing the main Error Decision Tree metrics.</span>
+    <span class="sd">&quot;&quot;&quot;Return a report showing the main Error Tree metrics.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        y_true (numpy.ndarray): Ground truth values of wrong/correct predictions of the error tree primary model.</span>
@@ -227,7 +272,7 @@
 <span class="sd">        output_format (str): Return format used for the report. Valid values are &#39;dict&#39; or &#39;str&#39;.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        dict or str: dictionary or string report storing different metrics regarding the Error Decision Tree.</span>
+<span class="sd">        dict or str: Dictionary or string report storing different metrics regarding the Error Tree.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">tree_accuracy_score</span> <span class="o">=</span> <span class="n">compute_accuracy_score</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
@@ -248,7 +293,7 @@
 
     <span class="k">if</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s1">&#39;str&#39;</span><span class="p">:</span>
 
-        <span class="n">report</span> <span class="o">=</span> <span class="s1">&#39;The Error Decision Tree was trained with accuracy </span><span class="si">%.2f%%</span><span class="s1"> and balanced accuracy </span><span class="si">%.2f%%</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tree_accuracy_score</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="n">tree_balanced_accuracy</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">report</span> <span class="o">=</span> <span class="s1">&#39;The Error Tree was trained with accuracy </span><span class="si">%.2f%%</span><span class="s1"> and balanced accuracy </span><span class="si">%.2f%%</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tree_accuracy_score</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="n">tree_balanced_accuracy</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
         <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="n">report</span> <span class="o">+=</span> <span class="s1">&#39;The Decision Tree estimated the primary model&#39;&#39;s accuracy to </span><span class="si">%.2f%%</span><span class="s1">.&#39;</span> <span class="o">%</span> \
                   <span class="p">(</span><span class="n">primary_model_predicted_accuracy</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>

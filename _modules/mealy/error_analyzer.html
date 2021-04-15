@@ -431,7 +431,7 @@
 <span class="sd">            output_format (str): Return format used for the report. Valid values are &#39;dict&#39; or &#39;str&#39;. Defaults to &#39;str&#39;.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            dict or str: Dictionary or string report storing different metrics regarding the Error Decision Tree.</span>
+<span class="sd">            dict or str: Dictionary or string report storing different metrics regarding the Error Tree.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">prep_x</span><span class="p">,</span> <span class="n">prep_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
         <span class="n">y_true</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_primary_model_error</span><span class="p">(</span><span class="n">prep_x</span><span class="p">,</span> <span class="n">prep_y</span><span class="p">)</span>
