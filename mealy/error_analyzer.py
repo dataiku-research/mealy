@@ -250,7 +250,7 @@ class ErrorAnalyzer(BaseEstimator):
             output_format (str): Return format used for the report. Valid values are 'dict' or 'str'. Defaults to 'str'.
 
         Returns:
-            dict or str: Dictionary or string report storing different metrics regarding the Error Decision Tree.
+            dict or str: Dictionary or string report storing different metrics regarding the Error Tree.
         """
         prep_x, prep_y = self.pipeline_preprocessor.transform(X), np.array(y)
         y_true, _ = self._compute_primary_model_error(prep_x, prep_y)
