@@ -238,7 +238,8 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                                   in
                                   ranked_feature_ids]
             # remove duplicates without changing the order
-            ranked_feature_ids = list(dict.fromkeys(ranked_feature_ids))
+            seen = set()
+            ranked_feature_ids = [idx for idx in ranked_feature_ids if not (idx in seen or seen.add(idx))]
             if top_k_features > 0:
                 ranked_feature_ids = ranked_feature_ids[:top_k_features]
 
