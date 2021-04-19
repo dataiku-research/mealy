@@ -34,9 +34,6 @@ class ErrorAnalyzer(BaseEstimator):
         random_state (int): random seed.
 
     Attributes:
-        total_error_fraction (numpy.ndarray): percentage of incorrectly predicted samples in leaves over the total number of
-            errors (used for ranking the nodes).
-        leaf_ids (numpy.ndarray): list of all leaves indices.
         _error_tree (DecisionTreeClassifier): the estimator used to train the Error Analyzer Tree
     """
 
@@ -45,7 +42,6 @@ class ErrorAnalyzer(BaseEstimator):
                 param_grid=None,
                 random_state=65537):
 
-        self.feature_names = feature_names
         self.param_grid = param_grid
         self.random_state = random_state
 
@@ -70,14 +66,6 @@ class ErrorAnalyzer(BaseEstimator):
         self._error_train_x = None
         self._error_train_y = None
         self._epsilon = None
-
-    @property
-    def feature_names(self):
-        return self._feature_names
-
-    @feature_names.setter
-    def feature_names(self, value):
-        self._feature_names = value
 
     @property
     def primary_model(self):
