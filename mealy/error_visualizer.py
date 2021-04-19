@@ -4,7 +4,6 @@ import graphviz as gv
 import pydotplus
 from sklearn.tree import export_graphviz
 import matplotlib.pyplot as plt
-from mealy.error_analysis_utils import rank_features_by_error_correlation
 from mealy.constants import ErrorAnalyzerConstants
 from mealy.error_analyzer import ErrorAnalyzer
 
@@ -229,14 +228,14 @@ class ErrorVisualizer(_BaseErrorVisualizer):
         """
 
         if self._error_analyzer.pipeline_preprocessor is None:
-            ranked_feature_ids = rank_features_by_error_correlation(self._error_clf.feature_importances_)
+            ranked_feature_ids = np.argsort(- self._error_clf.feature_importances_)
             if top_k_features != 0:
                 ranked_feature_ids = ranked_feature_ids[:top_k_features]
 
             x, y = self._error_analyzer._error_train_x[:, ranked_feature_ids], self._error_analyzer._error_train_y
             feature_names = self._error_analyzer.preprocessed_feature_names
         else:
-            ranked_transformed_feature_ids = rank_features_by_error_correlation(self._error_clf.feature_importances_)
+            ranked_transformed_feature_ids = np.argsort(- self._error_clf.feature_importances_)
             ranked_feature_ids, seen = [], set()
             max_nr_features = top_k_features if top_k_features > 0 else len(self._original_feature_names) + k
             for idx in ranked_transformed_feature_ids:

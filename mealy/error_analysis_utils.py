@@ -74,8 +74,3 @@ def check_enough_data(df, min_len):
         raise ValueError(
             'The original dataset is too small ({} rows) to have stable result, it needs to have at least {} rows'.format(
                 df.shape[0], min_len))
-
-
-def rank_features_by_error_correlation(feature_importances):
-    """Rank features by feature importance according to the error model."""
-    return np.argsort(- feature_importances)
