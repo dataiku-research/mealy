@@ -225,20 +225,22 @@ class ErrorVisualizer(_BaseErrorVisualizer):
 
         """
 
-        ranked_feature_ids = rank_features_by_error_correlation(self._error_clf.feature_importances_)
         if self._error_analyzer.pipeline_preprocessor is None:
+            ranked_feature_ids = rank_features_by_error_correlation(self._error_clf.feature_importances_)
             if top_k_features > 0:
                 ranked_feature_ids = ranked_feature_ids[:top_k_features]
 
             x, y = self._error_analyzer._error_train_x[:, ranked_feature_ids], self._error_analyzer._error_train_y
             feature_names = self._error_analyzer.preprocessed_feature_names
         else:
-            ranked_feature_ids = [self._error_analyzer.pipeline_preprocessor.inverse_transform_feature_id(idx) for idx
-                                  in
-                                  ranked_feature_ids]
-            # remove duplicates without changing the order
-            seen = set()
-            ranked_feature_ids = [idx for idx in ranked_feature_ids if not (idx in seen or seen.add(idx))]
+            ranked_transformed_feature_ids = rank_features_by_error_correlation(self._error_clf.feature_importances_)
+            ranked_feature_ids, seen = [], set()
+            for idx in ranked_transformed_feature_ids:
+                inverse_transformed_feature_id = self._error_analyzer.pipeline_preprocessor.inverse_transform_feature_id(idx)
+                if not in seen:
+                    seen.add(inverse_transformed_feature_id)
+                    ranked_feature_ids.append(inverse_transformed_feature_id)
+
             if top_k_features > 0:
                 ranked_feature_ids = ranked_feature_ids[:top_k_features]
 
