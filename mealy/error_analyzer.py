@@ -75,8 +75,6 @@ class ErrorAnalyzer(BaseEstimator):
         self._error_train_y = None
         self._epsilon = None
 
-        self._error_train_leaf_id = None
-
     @property
     def feature_names(self):
         return self._feature_names
