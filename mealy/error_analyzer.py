@@ -68,14 +68,6 @@ class ErrorAnalyzer(BaseEstimator):
         self.epsilon = None
 
     @property
-    def primary_model(self):
-        return self._primary_model
-
-    @primary_model.setter
-    def primary_model(self, value):
-        self._primary_model = value
-
-    @property
     def param_grid(self):
         return self._param_grid
 
