@@ -30,7 +30,6 @@ class ErrorAnalyzer(BaseEstimator):
         primary_model (sklearn.base.BaseEstimator or sklearn.pipeline.Pipeline): a sklearn model to analyze. Either an estimator
             or a Pipeline containing a ColumnTransformer with the preprocessing steps and an estimator as last step.
         feature_names (list): list of feature names, default=None.
-        max_num_row (int): maximum number of rows to process.
         param_grid (dict): sklearn.tree.DecisionTree hyper-parameters values for grid search.
         random_state (int): random seed.
 
@@ -43,12 +42,10 @@ class ErrorAnalyzer(BaseEstimator):
 
     def __init__(self, primary_model,
                 feature_names=None,
-                max_num_row=ErrorAnalyzerConstants.MAX_NUM_ROW,
                 param_grid=None,
                 random_state=65537):
 
         self.feature_names = feature_names
-        self.max_num_row = max_num_row
         self.param_grid = param_grid
         self.random_state = random_state
 
@@ -89,14 +86,6 @@ class ErrorAnalyzer(BaseEstimator):
     @primary_model.setter
     def primary_model(self, value):
         self._primary_model = value
-
-    @property
-    def max_num_row(self):
-        return self._max_num_row
-
-    @max_num_row.setter
-    def max_num_row(self, value):
-        self._max_num_row = value
 
     @property
     def param_grid(self):

@@ -12,7 +12,6 @@ class ErrorAnalyzerConstants(object):
     TEST_SIZE = 0.2
 
     MIN_NUM_ROWS = 100  # heuristic choice
-    MAX_NUM_ROW = 100000  # heuristic choice
 
     TREE_ACCURACY_TOLERANCE = 0.1
     CRITERION = 'entropy'
