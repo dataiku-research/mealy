@@ -70,7 +70,6 @@ class ErrorAnalyzer(BaseEstimator):
             raise ValueError('ErrorAnalyzer needs as input either a scikit Estimator or a scikit Pipeline.')
 
         self._error_tree = None
-        self._is_regression = is_regressor(self._primary_model)
         self._error_train_x = None
         self._error_train_y = None
         self._epsilon = None
@@ -118,6 +117,12 @@ class ErrorAnalyzer(BaseEstimator):
     @property
     def error_tree(self):
         return self._error_tree
+
+    @property
+    def epsilon(self):
+        if self._epsilon is None:
+            self._epsilon = get_epsilon(difference) 
+        return self._epsilon
 
     @property
     def preprocessed_feature_names(self):
@@ -290,10 +295,9 @@ class ErrorAnalyzer(BaseEstimator):
         """
 
         error_y = np.full_like(y_true, ErrorAnalyzerConstants.CORRECT_PREDICTION, dtype="O")
-        if self._is_regression:
+        if is_regressor(self._primary_model):
             difference = np.abs(y_true - y_pred)
-            self._epsilon = get_epsilon(difference)
-            error_mask = difference > self._epsilon
+            error_mask = difference > self.epsilon
         else:
             error_mask = y_true != y_pred
 
