@@ -13,6 +13,8 @@ from mealy.constants import ErrorAnalyzerConstants
 from mealy.metrics import error_decision_tree_report, fidelity_balanced_accuracy_score
 from mealy.preprocessing import PipelinePreprocessor, DummyPipelinePreprocessor
 from mealy.error_tree import ErrorTree
+from sklearn.exceptions import NotFittedError
+
 import logging
 
 logger = logging.getLogger(__name__)
