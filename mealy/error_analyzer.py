@@ -65,7 +65,7 @@ class ErrorAnalyzer(BaseEstimator):
         self._error_tree = None
         self._error_train_x = None
         self._error_train_y = None
-        self._epsilon = None
+        self.epsilon = None
 
     @property
     def primary_model(self):
@@ -94,12 +94,6 @@ class ErrorAnalyzer(BaseEstimator):
     @property
     def error_tree(self):
         return self._error_tree
-
-    @property
-    def epsilon(self):
-        if self._epsilon is None:
-            self._epsilon = get_epsilon(difference) 
-        return self._epsilon
 
     @property
     def preprocessed_feature_names(self):
@@ -212,8 +206,8 @@ class ErrorAnalyzer(BaseEstimator):
 
     def evaluate(self, X, y, output_format='str'):
         """
-        Evaluate performance of ErrorAnalyzer on new the given test data and labels.
-        Print ErrorAnalyzer summary metrics regarding the Error Tree.
+        Evaluate performance of ErrorAnalyzer on the given test data and labels.
+        Return ErrorAnalyzer summary metrics regarding the Error Tree.
 
         Args:
             X (numpy.ndarray or pandas.DataFrame): feature data from a test set to evaluate the primary predictor
@@ -225,6 +219,8 @@ class ErrorAnalyzer(BaseEstimator):
         Return:
             dict or str: dictionary or string report storing different metrics regarding the Error Decision Tree.
         """
+        if self._error_tree is None:
+            raise NotFittedError("The error tree is not fitted yet. Call 'fit' method with appropriate arguments before using this estimator.")
         prep_x, prep_y = self.pipeline_preprocessor.transform(X), np.array(y)
         y_true, _ = self._compute_primary_model_error(prep_x, prep_y)
         y_pred = self._error_tree.estimator_.predict(prep_x)
@@ -274,6 +270,9 @@ class ErrorAnalyzer(BaseEstimator):
         error_y = np.full_like(y_true, ErrorAnalyzerConstants.CORRECT_PREDICTION, dtype="O")
         if is_regressor(self._primary_model):
             difference = np.abs(y_true - y_pred)
+            if self.epsilon is None:
+                # only compute epsilon when fitting the model (not while evaluating)
+                self.epsilon = get_epsilon(difference)
             error_mask = difference > self.epsilon
         else:
             error_mask = y_true != y_pred
