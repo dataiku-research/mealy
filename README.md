@@ -81,10 +81,11 @@ print(error_analyzer.evaluate(X_test, y_test))
 error_visualizer = ErrorVisualizer(error_analyzer)
 error_visualizer.plot_error_tree()
 
-# print the details regarding the decision tree nodes containing the majority of errors
-error_analyzer.get_error_leaf_summary(leaf_selector=None, add_path_to_leaves=True, print_summary=True);
-# plot the feature distributions of samples in the nodes containing the majority of errors
-# rank features by correlation to error
+# return the details on the decision tree "error leaves" (leaves that contain a majority of errors)
+error_analyzer.get_error_leaf_summary(leaf_selector=None, add_path_to_leaves=True);
+
+# plot the feature distributions of samples in the "error leaves"
+# features are ranked by their correlation to error
 error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=None, top_k_features=3)
 
 ```
@@ -126,7 +127,6 @@ pipeline_model = make_pipeline(
     RandomForestClassifier(n_estimators=10))
 
 # train a pipeline model
-
 pipeline_model.fit(X_train, y_train)
 
 # fit an Error Tree on the model performances
@@ -140,10 +140,11 @@ print(error_analyzer.evaluate(X_test, y_test))
 error_visualizer = ErrorVisualizer(error_analyzer)
 error_visualizer.plot_error_tree()
 
-# print the details regarding the decision tree nodes containing the majority of errors
-error_analyzer.get_error_leaf_summary(leaf_selector=None, add_path_to_leaves=True, print_summary=True);
-# plot the feature distributions of samples in the nodes containing the majority of errors
-# rank features by correlation to error
+# return the details regarding the decision tree "error leaves" (leaves that contain a majority of errors)
+error_analyzer.get_error_leaf_summary(leaf_selector=None, add_path_to_leaves=True);
+
+# plot the feature distributions of samples in the "error leaves"
+# features are ranked by their correlation to error
 error_visualizer.plot_feature_distributions_on_leaves(leaf_selector=None, top_k_features=3)
 
 ```
