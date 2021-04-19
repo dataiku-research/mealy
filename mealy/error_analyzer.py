@@ -42,10 +42,10 @@ class ErrorAnalyzer(BaseEstimator):
     """
 
     def __init__(self, primary_model,
-                 feature_names=None,
-                 max_num_row=ErrorAnalyzerConstants.MAX_NUM_ROW,
-                 param_grid=ErrorAnalyzerConstants.PARAMETERS_GRID,
-                 random_state=65537):
+                feature_names=None,
+                max_num_row=ErrorAnalyzerConstants.MAX_NUM_ROW,
+                param_grid=None,
+                random_state=65537):
 
         self.feature_names = feature_names
         self.max_num_row = max_num_row
@@ -157,13 +157,13 @@ class ErrorAnalyzer(BaseEstimator):
         # entropy/mutual information is used to split nodes in Microsoft Pandora system
         dt_clf = tree.DecisionTreeClassifier(criterion=ErrorAnalyzerConstants.CRITERION,
                                              random_state=self._random_state)
-
-        # for the min_sample_leaf, the min value should be 0.01
-        min_samples_leaf_max = min(error_rate, 0.01)
-        param_grid = {
-            'max_depth': [3, 5, 7],
-            'min_samples_leaf': np.linspace(min_samples_leaf_max/5, min_samples_leaf_max, 5)
-        }
+        param_grid = self.param_grid
+        if param_grid is None:
+            min_samples_leaf_max = min(error_rate, ErrorAnalyzerConstants.MIN_SAMPLES_LEAF_LOWEST_UPPER_BOUND)
+            param_grid = {
+                'max_depth': ErrorAnalyzerConstants.MAX_DEPTH,
+                'min_samples_leaf': np.linspace(min_samples_leaf_max/5, min_samples_leaf_max, 5)
+            }
 
         logger.info('Grid search the Error Tree with the following grid: {}'.format(param_grid))
         gs_clf = GridSearchCV(dt_clf,
