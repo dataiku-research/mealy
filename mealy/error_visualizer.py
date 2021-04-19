@@ -231,7 +231,6 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                 ranked_feature_ids = ranked_feature_ids[:top_k_features]
 
             x, y = self._error_analyzer._error_train_x[:, ranked_feature_ids], self._error_analyzer._error_train_y
-            min_values, max_values = x.min(axis=0), x.max(axis=0)
             feature_names = self._error_analyzer.preprocessed_feature_names
         else:
             ranked_feature_ids = [self._error_analyzer.pipeline_preprocessor.inverse_transform_feature_id(idx) for idx
@@ -245,9 +244,9 @@ class ErrorVisualizer(_BaseErrorVisualizer):
 
             x, y = self._error_analyzer.pipeline_preprocessor.inverse_transform(self._error_analyzer._error_train_x)[:, ranked_feature_ids], self._error_analyzer._error_train_y
             # TODO to do what ?
-            min_values, max_values = x.min(axis=0), x.max(axis=0)
             feature_names = self._original_feature_names
 
+        min_values, max_values = x.min(axis=0), x.max(axis=0)
         total_error_fraction_sample_ids = y == ErrorAnalyzerConstants.WRONG_PREDICTION
         nr_wrong = self._error_clf.tree_.value[:, 0, self._error_tree.error_class_idx]
 
