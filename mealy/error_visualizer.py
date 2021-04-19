@@ -237,7 +237,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
         else:
             ranked_transformed_feature_ids = np.argsort(- self._error_clf.feature_importances_)
             ranked_feature_ids, seen = [], set()
-            max_nr_features = top_k_features if top_k_features > 0 else len(self._original_feature_names) + k
+            max_nr_features = top_k_features if top_k_features > 0 else len(self._original_feature_names) + top_k_features
             for idx in ranked_transformed_feature_ids:
                 inverse_transformed_feature_id = self._error_analyzer.pipeline_preprocessor.inverse_transform_feature_id(idx)
                 if not in seen:
