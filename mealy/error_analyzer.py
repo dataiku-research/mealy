@@ -111,10 +111,6 @@ class ErrorAnalyzer(BaseEstimator):
     def random_state(self):
         return self._random_state
 
-    @property
-    def regression_error_tolerance(self):
-        return self._epsilon
-
     @random_state.setter
     def random_state(self, value):
         self._random_state = value
