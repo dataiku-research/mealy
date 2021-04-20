@@ -6,3 +6,4 @@ mealy/__pycache__/
 build/
 dist/
 mealy.egg-info/
+cov_html/
