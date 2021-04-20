@@ -185,13 +185,15 @@ class ErrorAnalyzer(BaseEstimator):
                 leaves_summary.append(leaf_dict)
 
             elif output_format == 'str':
-                leaves_summary = 'LEAF %d:\n' % leaf_id
-                leaves_summary += '     Correct predictions: %d | Wrong predictions: %d | Local error (purity): %.2f | Fraction of total error: %.2f\n' % (n_corrects, n_errors, local_error, total_error_fraction)
+                leaf_summary = 'LEAF %d:\n' % leaf_id
+                leaf_summary += '     Correct predictions: %d | Wrong predictions: %d | Local error (purity): %.2f | Fraction of total error: %.2f\n' % (n_corrects, n_errors, local_error, total_error_fraction)
 
                 if add_path_to_leaves:
-                    leaves_summary += '     Path to leaf:\n'
+                    leaf_summary += '     Path to leaf:\n'
                     for (step_idx, step) in enumerate(self._get_path_to_node(leaf_id)):
-                        leaves_summary += '     ' + '   ' * step_idx + step  + '\n'
+                        leaf_summary += '     ' + '   ' * step_idx + step  + '\n'
+
+                leaves_summary.append(leaf_summary)
 
             else:
                 raise ValueError("Output format should either be 'dict' or 'str'")
