@@ -27,34 +27,64 @@ class FeatureNameTransformer(object):
             preprocessed_feature_names (list): list of preprocessed feature names
 
     """
-    def __init__(self, ct_preprocessor, original_features=None):
-        self.ct_preprocessor = ct_preprocessor
-        self.original_feature_names = None
-        self.categorical_features = []
-        self.original2preprocessed = dict()
-        self.preprocessed2original = dict()
-        self.preprocessed_feature_names = list()
-        self.len_preproc = 0
-
-        logger.info('Retrieving the list of features used in the pipeline')
-        original_features_from_ct, self.categorical_features = get_feature_list_from_column_transformer(self.ct_preprocessor)
-        if original_features is None:
-            self.original_feature_names = original_features_from_ct
-        else:
-            # If user explicitly gives a list of input features, we compare it with the list derived from the ColumnTransformer
-            if check_lists_having_same_elements(original_features, original_features_from_ct) is True:
-                self.original_feature_names = original_features
-            else:
-                raise ValueError('The list of features given by user does not correspond to the list of features handled by the Pipeline.')
-
-        logger.info('Generating the feature id mapping dict')
-        self._create_feature_mapping(ct_preprocessor)
+    def __init__(self, original_features, preprocessed_features):
+        self.original_feature_names = original_features
+        self.preprocessed_feature_names = preprocessed_features
 
     def get_original_feature_names(self):
         return self.original_feature_names
 
     def get_preprocessed_feature_names(self):
         return self.preprocessed_feature_names
+
+    def is_categorical(self, index=None, name=None):
+        raise NotImplementedError
+
+    def inverse_transform_feature_id(self, index=None, name=None):
+        raise NotImplementedError
+
+    def inverse_transform(self, x):
+        raise NotImplementedError
+
+    def transform(self, x):
+        raise NotImplementedError
+
+
+class PipelinePreprocessor(FeatureNameTransformer):
+    """Transformer of feature values from the original values to preprocessed ones.
+
+        A PipelinePreprocessor parses an input Pipeline preprocessor and generate
+        a mapping between the input unprocessed feature values and the output
+        preprocessed feature values.
+
+        Args:
+            ct_preprocessor (sklearn.compose.ColumnTransformer): preprocessing steps
+            orig_feats (list): list of original unpreprocessed feature names, default=None.
+
+        Attributes:
+            fn_transformer (FeatureNameTransformer): transformer managing the mapping between original and
+                preprocessed feature names.
+
+    """
+
+    def __init__(self, ct_preprocessor, original_features=None):
+        self.ct_preprocessor = ct_preprocessor
+        self.original2preprocessed = {}
+        self.preprocessed2original = {}
+        self.len_preproc = 0
+
+        logger.info('Retrieving the list of features used in the pipeline')
+        original_features_from_ct, self.categorical_features = get_feature_list_from_column_transformer(self.ct_preprocessor)
+        if original_features is None:
+            original_features = original_features_from_ct
+        elif not check_lists_having_same_elements(original_features, original_features_from_ct):
+            # If user explicitly gives a list of input features, we compare it with the list derived from the ColumnTransformer
+            raise ValueError('The list of features given by user does not correspond to the list of features handled by the Pipeline.')
+
+        super(PipelinePreprocessor, self).__init__(original_features=original_features, preprocessed_features=[])
+
+        logger.info('Generating the feature id mapping dict')
+        self._create_feature_mapping(ct_preprocessor)
 
     def _create_feature_mapping(self, ct_preprocessor):
         """
@@ -115,7 +145,7 @@ class FeatureNameTransformer(object):
             self.preprocessed2original.update({self.len_preproc + i: orig_id for i in range(len(part_out_feature_names))})
             self.len_preproc += len(part_out_feature_names)
 
-    def transform_feature_id(self, index=None, name=None):
+    def _transform_feature_id(self, index=None, name=None):
         """
         Args:
             index: int
@@ -129,6 +159,96 @@ class FeatureNameTransformer(object):
             index = self.original_feature_names.index(name)
             new_index = self.original2preprocessed[index]
             return [self.preprocessed_feature_names[idx] for idx in new_index]
+        else:
+            raise ValueError("One of the input index or name should be specified.")
+
+    def transform(self, x):
+        """Transform the input feature values according to the preprocessing pipeline.
+
+        Args:
+            x (numpy.ndarray or pandas.DataFrame): input feature values.
+
+        Return:
+            numpy.ndarray: transformed feature values
+        """
+        return self.ct_preprocessor.transform(x)
+
+    def _get_feature_ids_related_to_transformer(self, transformer_feature_names):
+        original_features = self.get_original_feature_names()
+        original_feature_ids = np.where(np.in1d(original_features, transformer_feature_names))[0]
+        preprocessed_feature_ids = []
+        for i in original_feature_ids:
+            out_ids = self._transform_feature_id(i)
+            if isinstance(out_ids, int):
+                preprocessed_feature_ids.append(out_ids)
+            else:  # list of ids
+                preprocessed_feature_ids.extend(out_ids)
+        return original_feature_ids, preprocessed_feature_ids
+
+    def _inverse_single_step(single_step, step_output):
+        inverse_transform_function_available = getattr(single_step, "inverse_transform", None)
+        if inverse_transform_function_available:
+            logger.info("Reversing step {} using inverse_transform() function on column(s): {}".format(single_step, ', '.join([f for f in transformer_feature_names])))
+            step_input = single_step.inverse_transform(step_output)
+        elif isinstance(single_step, ErrorAnalyzerConstants.STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION):
+            logger.info("Reversing step {} using identity transformation on column(s): {}".format(single_step, ', '.join([f for f in transformer_feature_names])))
+            step_input = step_output
+        else:
+            raise ValueError('The package does not support {} because it does not provide inverse_transform function.'.format(single_step))
+        return step_input
+
+    def inverse_transform(self, preprocessed_x):
+        """Invert the preprocessing pipeline and inverse transform feature values.
+
+        Args:
+            preprocessed_x (numpy.ndarray): preprocessed feature values.
+
+        Return:
+            numpy.ndarray: feature values without preprocessing
+
+        """
+        original_features = self.get_original_feature_names()
+        undo_prep_test_x = np.zeros((preprocessed_x.shape[0], len(original_features)), dtype='O')
+
+        for (transformer_name, transformer, transformer_feature_names) in self.ct_preprocessor.transformers_:
+            if transformer_name == 'remainder' and transformer == 'drop':
+                continue
+            original_feature_ids, preprocessed_feature_ids = self._get_feature_ids_related_to_transformer(transformer_feature_names)
+            output_of_transformer = preprocessed_x[:, preprocessed_feature_ids]
+
+            is_cat = np.vectorize(self.is_categorical)
+            any_numeric = np.any(~is_cat(original_feature_ids))
+            if issparse(output_of_transformer) and any_numeric:
+                output_of_transformer = output_of_transformer.todense()
+
+            input_of_transformer = None
+            if isinstance(transformer, Pipeline):
+                for step_name, step in reversed(transformer.steps):
+                    input_of_transformer = _inverse_single_step(step, output_of_transformer)
+                    output_of_transformer = input_of_transformer
+                undo_prep_test_x[:, original_feature_ids] = input_of_transformer
+            else:
+                input_of_transformer = _inverse_single_step(transformer, output_of_transformer)
+                undo_prep_test_x[:, original_feature_ids] = input_of_transformer
+
+        return undo_prep_test_x
+
+    def is_categorical(self, index=None, name=None):
+        """Check whether an unprocessed feature at a given index or with a given name is categorical.
+
+        Args:
+            index (int): feature index.
+            name (str): feature name.
+
+        Return:
+            bool: True if the input feature is categorical, else False. If both index and name are provided, the index
+                is retained.
+        """
+        if index is not None:
+            name = self.original_feature_names[index]
+            return name in self.categorical_features
+        elif name is not None:
+            return name in self.categorical_features
         else:
             raise ValueError("One of the input index or name should be specified.")
 
@@ -156,122 +276,11 @@ class FeatureNameTransformer(object):
         else:
             raise ValueError("One of the input index or name should be specified.")
 
-    def is_categorical(self, index=None, name=None):
-        """Check whether an unprocessed feature at a given index or with a given name is categorical.
 
-        Args:
-            index (int): feature index.
-            name (str): feature name.
-
-        Return:
-            bool: True if the input feature is categorical, else False. If both index and name are provided, the index
-                is retained.
-        """
-        if index is not None:
-            name = self.original_feature_names[index]
-            return name in self.categorical_features
-        elif name is not None:
-            return name in self.categorical_features
-        else:
-            raise ValueError("One of the input index or name should be specified.")
-
-
-class PipelinePreprocessor(FeatureNameTransformer):
-    """ Transformer of feature values from the original values to preprocessed ones.
-
-        A PipelinePreprocessor parses an input Pipeline preprocessor and generate
-        a mapping between the input unprocessed feature values and the output
-        preprocessed feature values.
-
-        Args:
-            ct_preprocessor (sklearn.compose.ColumnTransformer): preprocessing steps
-            orig_feats (list): list of original unpreprocessed feature names, default=None.
-
-        Attributes:
-            fn_transformer (FeatureNameTransformer): transformer managing the mapping between original and
-                preprocessed feature names.
-
-    """
-
-    def __init__(self, ct_preprocessor, original_features=None):
-        FeatureNameTransformer.__init__(self, ct_preprocessor, original_features)
-
-    def transform(self, x):
-        """Transform the input feature values according to the preprocessing pipeline.
-
-        Args:
-            x (numpy.ndarray or pandas.DataFrame): input feature values.
-
-        Return:
-            numpy.ndarray: transformed feature values
-        """
-        return self.ct_preprocessor.transform(x)
-
-    def _get_feature_ids_related_to_transformer(self, transformer_feature_names):
-        original_features = self.get_original_feature_names()
-        original_feature_ids = np.where(np.in1d(original_features, transformer_feature_names))[0]
-        preprocessed_feature_ids = []
-        for i in original_feature_ids:
-            out_ids = self.transform_feature_id(i)
-            if isinstance(out_ids, int):
-                preprocessed_feature_ids.append(out_ids)
-            else:  # list of ids
-                preprocessed_feature_ids.extend(out_ids)
-        return original_feature_ids, preprocessed_feature_ids
-
-    def inverse_transform(self, preprocessed_x):
-        """Invert the preprocessing pipeline and inverse transform feature values.
-
-        Args:
-            preprocessed_x (numpy.ndarray): preprocessed feature values.
-
-        Return:
-            numpy.ndarray: feature values without preprocessing
-
-        """
-        def _inverse_single_step(single_step, step_output):
-            inverse_transform_function_available = getattr(single_step, "inverse_transform", None)
-            if inverse_transform_function_available:
-                logger.info("Reversing step {} using inverse_transform() function on column(s): {}".format(single_step, ', '.join([f for f in transformer_feature_names])))
-                step_input = single_step.inverse_transform(step_output)
-            elif isinstance(single_step, ErrorAnalyzerConstants.STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION):
-                logger.info("Reversing step {} using identity transformation on column(s): {}".format(single_step, ', '.join([f for f in transformer_feature_names])))
-                step_input = step_output
-            else:
-                raise ValueError('The package does not support {} because it does not provide inverse_transform function.'.format(single_step))
-            return step_input
-
-        original_features = self.get_original_feature_names()
-        undo_prep_test_x = np.zeros((preprocessed_x.shape[0], len(original_features)), dtype='O')
-
-        for (transformer_name, transformer, transformer_feature_names) in self.ct_preprocessor.transformers_:
-            if transformer_name == 'remainder' and transformer == 'drop':
-                continue
-            original_feature_ids, preprocessed_feature_ids = self._get_feature_ids_related_to_transformer(transformer_feature_names)
-            output_of_transformer = preprocessed_x[:, preprocessed_feature_ids]
-
-            is_cat = np.vectorize(self.is_categorical)
-            any_numeric = np.any(~is_cat(original_feature_ids))
-            if issparse(output_of_transformer) and any_numeric:
-                output_of_transformer = output_of_transformer.todense()
-
-            input_of_transformer = None
-            if isinstance(transformer, Pipeline):
-                for step_name, step in reversed(transformer.steps):
-                    input_of_transformer = _inverse_single_step(step, output_of_transformer)
-                    output_of_transformer = input_of_transformer
-                undo_prep_test_x[:, original_feature_ids] = input_of_transformer
-            else:
-                input_of_transformer = _inverse_single_step(transformer, output_of_transformer)
-                undo_prep_test_x[:, original_feature_ids] = input_of_transformer
-
-        return undo_prep_test_x
-
-
-class DummyPipelinePreprocessor(object):
+class DummyPipelinePreprocessor(FeatureNameTransformer):
 
     def __init__(self, model_performance_predictor_features):
-        self.model_performance_predictor_features = model_performance_predictor_features
+        super(DummyPipelinePreprocessor, self).__init__(model_performance_predictor_features, model_performance_predictor_features)
 
     def transform(self, x):
         """
@@ -287,9 +296,6 @@ class DummyPipelinePreprocessor(object):
             return x
         else:
             raise ValueError('x should be either a pandas dataframe or a numpy ndarray')
-
-    def get_original_feature_names(self):
-        return self.model_performance_predictor_features
 
     def is_categorical(self, index=None, name=None):
         return False
