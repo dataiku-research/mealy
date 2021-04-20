@@ -65,11 +65,7 @@ class PipelinePreprocessor(FeatureNameTransformer):
 
         Args:
             ct_preprocessor (sklearn.compose.ColumnTransformer): preprocessing steps
-            orig_feats (list): list of original unpreprocessed feature names, default=None.
-
-        Attributes:
-            fn_transformer (FeatureNameTransformer): transformer managing the mapping between original and
-                preprocessed feature names.
+            original_features (list): list of original unpreprocessed feature names, default=None.
 
     """
 
@@ -117,7 +113,7 @@ class PipelinePreprocessor(FeatureNameTransformer):
                 elif isinstance(single_tr, ErrorAnalyzerConstants.STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES):
                     self._update_feature_mapping_dict_using_output_names(single_tr, transformer_feature_names, orig_feats_ids)
                 else:
-                    raise ValueError('The package does not support {}, probably because it changes output dimension '
+                    raise TypeError('The package does not support {}, probably because it changes output dimension '
                                      'but does not provide get_feature_names function to keep track of new features '
                                      'generated.'.format(single_tr))
 
@@ -129,7 +125,7 @@ class PipelinePreprocessor(FeatureNameTransformer):
                 # skip the default drop step of ColumnTransformer
                 continue
             else:
-                raise ValueError('The package does not support {}, probably because it changes output dimension but '
+                raise TypeError('The package does not support {}, probably because it changes output dimension but '
                                  'does not provide get_feature_names function to keep track of new '
                                  'features generated.'.format(transformer))
 
@@ -192,7 +188,7 @@ class PipelinePreprocessor(FeatureNameTransformer):
         if isinstance(single_step, ErrorAnalyzerConstants.STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION):
             logger.info("Reversing step {} using identity transformation on column(s): {}".format(single_step, ', '.join([f for f in transformer_feature_names])))
             return step_output
-        raise ValueError('The package does not support {} because it does not provide inverse_transform function.'.format(single_step))
+        raise TypeError('The package does not support {} because it does not provide inverse_transform function.'.format(single_step))
 
     def inverse_transform(self, preprocessed_x):
         """Invert the preprocessing pipeline and inverse transform feature values.
@@ -246,7 +242,7 @@ class PipelinePreprocessor(FeatureNameTransformer):
         elif name is not None:
             return name in self.categorical_features
         else:
-            raise ValueError("One of the input index or name should be specified.")
+            raise ValueError("Either the input index or its name should be specified.")
 
     def inverse_transform_feature_id(self, index):
         """Undo preprocessing of feature name.
@@ -312,7 +308,7 @@ class DummyPipelinePreprocessor(FeatureNameTransformer):
             return x.values
         if isinstance(x, np.ndarray):
             return x
-        raise ValueError('x should be either a pandas dataframe or a numpy ndarray')
+        raise TypeError('x should be either a pandas dataframe or a numpy ndarray')
 
     def is_categorical(self, index=None, name=None):
         return False

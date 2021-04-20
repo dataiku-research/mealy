@@ -312,7 +312,7 @@ class ErrorAnalyzer(BaseEstimator):
         elif rank_by == 'class_difference':
             sorted_ids = np.lexsort((apply_leaf_selector(self._error_tree.impurity), apply_leaf_selector(self._error_tree.difference)))
         else:
-            raise NotImplementedError(
+            raise ValueError(
                 "Input argument for rank_by is invalid. Should be 'total_error_fraction', 'purity' or 'class_difference'")
         return selected_leaves.take(sorted_ids)
 

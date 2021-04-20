@@ -19,7 +19,7 @@ plt.rc("hatch", color="white", linewidth=4)
 class _BaseErrorVisualizer(object):
     def __init__(self, error_analyzer):
         if not isinstance(error_analyzer, ErrorAnalyzer):
-            raise NotImplementedError('You need to input an ErrorAnalyzer object.')
+            raise TypeError('You need to input an ErrorAnalyzer object.')
 
         self._error_analyzer = error_analyzer
 
