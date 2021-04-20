@@ -50,20 +50,20 @@ class ErrorAnalyzer(BaseEstimator):
         if isinstance(primary_model, Pipeline):
             estimator = primary_model.steps[-1][1]
             if not isinstance(estimator, BaseEstimator):
-                raise NotImplementedError("The last step of the pipeline has to be a BaseEstimator.")
+                raise TypeError("The last step of the pipeline has to be a BaseEstimator.")
             self._primary_model = estimator
+
             ct_preprocessor = Pipeline(primary_model.steps[:-1]).steps[0][1]
             if not isinstance(ct_preprocessor, ColumnTransformer):
-                raise NotImplementedError("The input preprocessor has to be a ColumnTransformer.")
+                raise TypeError("The input preprocessor has to be a ColumnTransformer.")
             self.pipeline_preprocessor = PipelinePreprocessor(ct_preprocessor, feature_names)
-            self._preprocessed_feature_names = self.pipeline_preprocessor.get_preprocessed_feature_names()
         elif isinstance(primary_model, BaseEstimator):
             self._primary_model = primary_model
-            self._preprocessed_feature_names = feature_names
             self.pipeline_preprocessor = DummyPipelinePreprocessor(feature_names)
         else:
-            raise ValueError('ErrorAnalyzer needs as input either a scikit Estimator or a scikit Pipeline.')
+            raise TypeError('ErrorAnalyzer needs as input either a scikit BaseEstimator or a scikit Pipeline.')
 
+        self._preprocessed_feature_names = self.pipeline_preprocessor.get_preprocessed_feature_names()
         self._error_tree = None
         self._error_train_x = None
         self._error_train_y = None
