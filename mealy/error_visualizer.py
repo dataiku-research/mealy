@@ -206,7 +206,10 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                 * array-like: Only return information of the leaves corresponding to these ids
                 * None (default): Return information of all the leaves
 
-            top_k_features (int): number of features to plot per node.
+            top_k_features (int): Number of features to plot per node.
+                * If a positive integer k is given, the distributions of the first k features (first in the sense of their importance) are displayed
+                * If a negative integer k is given, the distributions of all but the k last features (last in the sense of their importance) are displayed
+                * If k is 0, all the feature distributions are displayed
 
             show_global (bool): plot the feature distribution of samples in a node vs. samples in the whole data
                 (global baseline).
@@ -228,7 +231,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
 
         if self._error_analyzer.pipeline_preprocessor is None:
             ranked_feature_ids = rank_features_by_error_correlation(self._error_clf.feature_importances_)
-            if top_k_features > 0:
+            if top_k_features != 0:
                 ranked_feature_ids = ranked_feature_ids[:top_k_features]
 
             x, y = self._error_analyzer._error_train_x[:, ranked_feature_ids], self._error_analyzer._error_train_y
@@ -236,14 +239,14 @@ class ErrorVisualizer(_BaseErrorVisualizer):
         else:
             ranked_transformed_feature_ids = rank_features_by_error_correlation(self._error_clf.feature_importances_)
             ranked_feature_ids, seen = [], set()
+            max_nr_features = top_k_features if top_k_features > 0 else len(self._original_feature_names) + top_k_features
             for idx in ranked_transformed_feature_ids:
                 inverse_transformed_feature_id = self._error_analyzer.pipeline_preprocessor.inverse_transform_feature_id(idx)
                 if inverse_transformed_feature_id not in seen:
                     seen.add(inverse_transformed_feature_id)
                     ranked_feature_ids.append(inverse_transformed_feature_id)
-
-            if top_k_features > 0:
-                ranked_feature_ids = ranked_feature_ids[:top_k_features]
+                    if max_nr_features == len(ranked_feature_ids):
+                        break
 
             x, y = self._error_analyzer.pipeline_preprocessor.inverse_transform(self._error_analyzer._error_train_x)[:, ranked_feature_ids], self._error_analyzer._error_train_y
             # TODO to do what ?
