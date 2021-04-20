@@ -52,6 +52,9 @@ class FeatureNameTransformer(object):
     def get_top_ranked_feature_ids(self, feature_importances, max_nr_features):
         raise NotImplementedError
 
+    def inverse_thresholds(self, tree, n_cols):
+        raise NotImplementedError
+
 
 class PipelinePreprocessor(FeatureNameTransformer):
     """Transformer of feature values from the original values to preprocessed ones.
@@ -273,6 +276,24 @@ class PipelinePreprocessor(FeatureNameTransformer):
                     return ranked_feature_ids
         return ranked_feature_ids # should never be reached, but just in case
 
+    def inverse_thresholds(self, tree, n_cols):
+        used_feature_mask = tree.feature > 0
+        feats_idx = tree.feature[used_feature_mask]
+        thresholds = tree.threshold.astype('O')
+        thresh = thresholds[used_feature_mask]
+
+        dummy_x = np.zeros((len(feats_idx), n_cols))
+        indices, i = [], 0
+        for f, t in zip(feats_idx, thresh):
+            dummy_x[i, f] = t
+            indices.append((i, self.inverse_transform_feature_id(f)))
+            i += 1
+
+        undo_dummy_x = self.inverse_transform(dummy_x)
+        descaled_thresh = [undo_dummy_x[i, j] for i, j in indices]
+        thresholds[used_feature_mask] = descaled_thresh
+        return thresholds
+
 class DummyPipelinePreprocessor(FeatureNameTransformer):
 
     def __init__(self, model_performance_predictor_features):
@@ -306,3 +327,6 @@ class DummyPipelinePreprocessor(FeatureNameTransformer):
         if max_nr_feature == 0:
             return np.argsort(- feature_importances)
         return np.argsort(- feature_importances)[:max_nr_features]
+
+    def inverse_thresholds(self, tree, n_cols):
+        return tree.threshold.astype('O')

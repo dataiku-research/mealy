@@ -396,8 +396,8 @@ class ErrorAnalyzer(BaseEstimator):
                 indices of features of the Error Analyzer Tree, possibly mapped back to the
                 original unprocessed feature space.
         """
-        return [self.pipeline_preprocessor.inverse_transform_feature_id(feats_idx) if feats_idx > 0 else feats_idx
-            for feats_idx in self._error_tree.estimator_.tree_.feature]
+        return [self.pipeline_preprocessor.inverse_transform_feature_id(feat_idx) if feat_idx > 0 else feat_idx
+            for feat_idx in self._error_tree.estimator_.tree_.feature]
 
     #TODO naming is not very clear ?
     def _inverse_transform_thresholds(self):
@@ -412,24 +412,4 @@ class ErrorAnalyzer(BaseEstimator):
             numpy.ndarray:
                 thresholds of the Error Tree, possibly with preprocessing undone.
         """
-
-        used_feature_mask = self._error_tree.estimator_.tree_.feature > 0
-        feats_idx = self._error_tree.estimator_.tree_.feature[used_feature_mask]
-        thresholds = self._error_tree.estimator_.tree_.threshold.astype('O')
-        thresh = thresholds[used_feature_mask]
-        n_rows = len(feats_idx)
-        n_cols = self._error_train_x.shape[1]
-        dummy_x = np.zeros((n_rows, n_cols))
-
-        indices = []
-        i = 0
-
-        for f, t in zip(feats_idx, thresh):
-            dummy_x[i, f] = t
-            indices.append((i, self.pipeline_preprocessor.inverse_transform_feature_id(f)))
-            i += 1
-
-        undo_dummy_x = self.pipeline_preprocessor.inverse_transform(dummy_x)
-        descaled_thresh = [undo_dummy_x[i, j] for i, j in indices]
-        thresholds[used_feature_mask] = descaled_thresh
-        return thresholds
+        return self.pipeline_preprocessor.inverse_thresholds(self._error_tree.estimator_.tree_, n_cols)
