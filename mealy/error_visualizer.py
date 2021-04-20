@@ -240,7 +240,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
             max_nr_features = top_k_features if top_k_features > 0 else len(self._original_feature_names) + top_k_features
             for idx in ranked_transformed_feature_ids:
                 inverse_transformed_feature_id = self._error_analyzer.pipeline_preprocessor.inverse_transform_feature_id(idx)
-                if not in seen:
+                if inverse_transformed_feature_id not in seen:
                     seen.add(inverse_transformed_feature_id)
                     ranked_feature_ids.append(inverse_transformed_feature_id)
                     if max_nr_features == len(ranked_feature_ids):
