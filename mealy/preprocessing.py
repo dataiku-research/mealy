@@ -177,7 +177,7 @@ class PipelinePreprocessor(FeatureNameTransformer):
                 preprocessed_feature_ids.extend(out_ids)
         return original_feature_ids, preprocessed_feature_ids
 
-    def _inverse_single_step(single_step, step_output):
+    def _inverse_single_step(single_step, step_output, transformer_feature_names):
         inverse_transform_function_available = getattr(single_step, "inverse_transform", None)
         if inverse_transform_function_available:
             logger.info("Reversing step {} using inverse_transform() function on column(s): {}".format(single_step, ', '.join([f for f in transformer_feature_names])))
@@ -214,11 +214,11 @@ class PipelinePreprocessor(FeatureNameTransformer):
             input_of_transformer = None
             if isinstance(transformer, Pipeline):
                 for step_name, step in reversed(transformer.steps):
-                    input_of_transformer = _inverse_single_step(step, output_of_transformer)
+                    input_of_transformer = _inverse_single_step(step, output_of_transformer, transformer_feature_names)
                     output_of_transformer = input_of_transformer
                 undo_prep_test_x[:, original_feature_ids] = input_of_transformer
             else:
-                input_of_transformer = _inverse_single_step(transformer, output_of_transformer)
+                input_of_transformer = _inverse_single_step(transformer, output_of_transformer, transformer_feature_names)
                 undo_prep_test_x[:, original_feature_ids] = input_of_transformer
 
         return undo_prep_test_x
