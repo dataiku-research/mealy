@@ -396,13 +396,8 @@ class ErrorAnalyzer(BaseEstimator):
                 indices of features of the Error Analyzer Tree, possibly mapped back to the
                 original unprocessed feature space.
         """
-        feats_idx = self._error_tree.estimator_.tree_.feature.copy()
-
-        for i, f in enumerate(feats_idx):
-            if f > 0:
-                feats_idx[i] = self.pipeline_preprocessor.inverse_transform_feature_id(f)
-
-        return feats_idx
+        return [self.pipeline_preprocessor.inverse_transform_feature_id(feats_idx) if feats_idx > 0 else feats_idx
+            for feats_idx in self._error_tree.estimator_.tree_.feature]
 
     #TODO naming is not very clear ?
     def _inverse_transform_thresholds(self):
