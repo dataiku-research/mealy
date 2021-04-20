@@ -183,6 +183,7 @@ class PipelinePreprocessor(FeatureNameTransformer):
                 preprocessed_feature_ids.extend(out_ids)
         return original_feature_ids, preprocessed_feature_ids
 
+    @staticmethod
     def _inverse_single_step(single_step, step_output, transformer_feature_names):
         inverse_transform_function_available = getattr(single_step, "inverse_transform", None)
         if inverse_transform_function_available:
@@ -212,19 +213,18 @@ class PipelinePreprocessor(FeatureNameTransformer):
             original_feature_ids, preprocessed_feature_ids = self._get_feature_ids_related_to_transformer(transformer_feature_names)
             output_of_transformer = preprocessed_x[:, preprocessed_feature_ids]
 
-            is_cat = np.vectorize(self.is_categorical)
-            any_numeric = np.any(~is_cat(original_feature_ids))
+            any_numeric = np.any(~self.is_categorical(original_feature_ids))
             if issparse(output_of_transformer) and any_numeric:
                 output_of_transformer = output_of_transformer.todense()
 
             input_of_transformer = None
             if isinstance(transformer, Pipeline):
-                for step_name, step in reversed(transformer.steps):
-                    input_of_transformer = _inverse_single_step(step, output_of_transformer, transformer_feature_names)
+                for _, step in reversed(transformer.steps):
+                    input_of_transformer = PipelinePreprocessor._inverse_single_step(step, output_of_transformer, transformer_feature_names)
                     output_of_transformer = input_of_transformer
                 undo_prep_test_x[:, original_feature_ids] = input_of_transformer
             else:
-                input_of_transformer = _inverse_single_step(transformer, output_of_transformer, transformer_feature_names)
+                input_of_transformer = PipelinePreprocessor._inverse_single_step(transformer, output_of_transformer, transformer_feature_names)
                 undo_prep_test_x[:, original_feature_ids] = input_of_transformer
 
         return undo_prep_test_x
@@ -324,7 +324,7 @@ class DummyPipelinePreprocessor(FeatureNameTransformer):
         return x
 
     def get_top_ranked_feature_ids(self, feature_importances, max_nr_features):
-        if max_nr_feature == 0:
+        if max_nr_features == 0:
             return np.argsort(- feature_importances)
         return np.argsort(- feature_importances)[:max_nr_features]
 
