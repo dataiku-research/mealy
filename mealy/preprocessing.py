@@ -49,6 +49,9 @@ class FeatureNameTransformer(object):
     def transform(self, x):
         raise NotImplementedError
 
+    def get_top_ranked_feature_ids(self, feature_importances, max_nr_features):
+        raise NotImplementedError
+
 
 class PipelinePreprocessor(FeatureNameTransformer):
     """Transformer of feature values from the original values to preprocessed ones.
@@ -255,6 +258,20 @@ class PipelinePreprocessor(FeatureNameTransformer):
         """
         return self.preprocessed2original[index]
 
+    def get_top_ranked_feature_ids(self, feature_importances, max_nr_features):
+        ranked_transformed_feature_ids = np.argsort(- feature_importances)
+        if max_nr_features <= 0:
+            max_nr_features += len(self.get_original_feature_names())
+
+        ranked_feature_ids, seen = [], set()
+        for idx in ranked_transformed_feature_ids:
+            inverse_transformed_feature_id = self.inverse_transform_feature_id(idx)
+            if inverse_transformed_feature_id not in seen:
+                seen.add(inverse_transformed_feature_id)
+                ranked_feature_ids.append(inverse_transformed_feature_id)
+                if max_nr_features == len(ranked_feature_ids):
+                    return ranked_feature_ids
+        return ranked_feature_ids # should never be reached, but just in case
 
 class DummyPipelinePreprocessor(FeatureNameTransformer):
 
@@ -284,3 +301,8 @@ class DummyPipelinePreprocessor(FeatureNameTransformer):
 
     def inverse_transform(self, x):
         return x
+
+    def get_top_ranked_feature_ids(self, feature_importances, max_nr_features):
+        if max_nr_feature == 0:
+            return np.argsort(- feature_importances)
+        return np.argsort(- feature_importances)[:max_nr_features]
