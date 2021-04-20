@@ -1,3 +1,5 @@
+import os
+import json
 import numpy as np
 import pandas as pd
 import random
@@ -20,17 +22,22 @@ DATASET_URL = 'https://www.openml.org/data/get_csv/54002/adult-census.arff'
 df = pd.read_csv(DATASET_URL)
 target = 'class'
 
+script_dir = os.path.dirname(__file__)
+reference_result_file_path = os.path.join(script_dir, 'reference_data.json')
+with open(reference_result_file_path) as f:
+    reference_data = json.load(f)
+
+numeric_features = df.select_dtypes(include=['int64', 'float64']).columns.tolist()
+categorical_features = df.select_dtypes(include=['object']).drop([target], axis=1).columns.tolist()
+X_numerical = df.dropna().drop(target, axis=1)[numeric_features]
+X_all = df.dropna().drop(target, axis=1)
+y = df.dropna()[target]
 
 
 class TestErrorAnalyzer(unittest.TestCase):
 
     def test_with_only_scikit_model(self):
-        numeric_features = df.select_dtypes(include=['int64', 'float64']).columns.tolist()
-        X = df.dropna().drop(target, axis=1)[numeric_features]
-        y = df.dropna()[target]
-
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-
+        X_train, X_test, y_train, y_test = train_test_split(X_numerical, y, test_size=0.2)
         rf = RandomForestClassifier(n_estimators=10)
         rf.fit(X_train, y_train)
         error_tree = ErrorAnalyzer(rf, feature_names=numeric_features)
@@ -54,32 +61,38 @@ class TestErrorAnalyzer(unittest.TestCase):
             'fidelity': fidelity
         }
 
-        metric_reference = {
-            'error_tree_accuracy_score': 0.8651926915399969,
-            'error_tree_balanced_accuracy': 0.7003443854497639,
-            'primary_model_predicted_accuracy': 1,
-            'primary_model_true_accuracy': 0.8255796100107478,
-            'fidelity': 0.9419622293873791,
-        }
+        reference_data_for_single_estimator = reference_data.get('single_estimator')
+        metric_reference = reference_data_for_single_estimator.get('metric_reference')
 
         for metric_name, metric_value in metric_to_check.items():
-            print('Checking', metric_name)
-            self.assertTrue((metric_value - metric_reference[metric_name]) < 0.0001)
+            self.assertAlmostEqual(metric_value, metric_reference[metric_name], 5)
+
+        leaf_summary_str = error_tree.get_error_leaf_summary(leaf_selector=98, output_format='str')
+        leaf_summary_dct = error_tree.get_error_leaf_summary(leaf_selector=98, output_format='dict')
+        single_leaf_summary_reference_dict = reference_data_for_single_estimator.get('single_leaf_summary_reference')
+        self.assertListEqual(leaf_summary_str, single_leaf_summary_reference_dict['str'])
+        self.assertListEqual(leaf_summary_dct, single_leaf_summary_reference_dict['dct'])
+
+        all_leaves_summary_str = error_tree.get_error_leaf_summary(output_format='str')
+        all_leaves_summary_dct = error_tree.get_error_leaf_summary(output_format='dict')
+        all_leaves_summary_reference_dict = reference_data_for_single_estimator.get('all_leaves_summary_reference')
+        self.assertListEqual(all_leaves_summary_str, all_leaves_summary_reference_dict['str'])
+        self.assertListEqual(all_leaves_summary_dct, all_leaves_summary_reference_dict['dct'])
+
+        evaluate_str = error_tree.evaluate(X_test, y_test, output_format='str')
+        evaluate_dct = error_tree.evaluate(X_test, y_test, output_format='dict')
+        evaluate_reference_dict = reference_data_for_single_estimator.get('evaluate_reference')
+        self.assertEqual(evaluate_str, evaluate_reference_dict['str'])
+        self.assertDictEqual(evaluate_dct, evaluate_reference_dict['dct'])
+
 
     def test_with_scikit_pipeline(self):
-        X = df.dropna().drop(target, axis=1)
-        y = df.dropna()[target]
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-
-        numeric_features = df.select_dtypes(include=['int64', 'float64']).columns  # .tolist()
-        categorical_features = df.select_dtypes(include=['object']).drop([target], axis=1).columns.tolist()
-
+        X_train, X_test, y_train, y_test = train_test_split(X_all, y, test_size=0.2)
         numeric_transformer = Pipeline(steps=[
-            ('SimpleImputer', SimpleImputer(strategy='median')),
+            ('SimpleImputer', SimpleImputer(strategy='median', add_indicator=True)),
             ('StandardScaler', StandardScaler()),
         ])
         categorical_transformer = Pipeline(steps=[
-            ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
             ('OneHotEncoder', OneHotEncoder(handle_unknown='ignore')),
         ])
         preprocessor = ColumnTransformer(
@@ -114,30 +127,28 @@ class TestErrorAnalyzer(unittest.TestCase):
             'fidelity': fidelity
         }
 
-        metric_reference = {
-            'error_tree_accuracy_score': 0.8952863503761708,
-            'error_tree_balanced_accuracy': 0.7209989546416461,
-            'primary_model_predicted_accuracy': 1,
-            'primary_model_true_accuracy': 0.8602794411177644,
-            'fidelity': 0.9591586058651926
-        }
+        reference_data_for_pipeline = reference_data.get('pipeline')
+        metric_reference = reference_data_for_pipeline.get('metric_reference')
 
         for metric_name, metric_value in metric_to_check.items():
-            print('Checking', metric_name)
-            self.assertTrue((metric_value - metric_reference[metric_name]) < 0.0001)
+            self.assertAlmostEqual(metric_value, metric_reference[metric_name], 5)
 
-    def test_get_leaf_summary(self):
-        numeric_features = df.select_dtypes(include=['int64', 'float64']).columns.tolist()
-        X = df.dropna().drop(target, axis=1)[numeric_features]
-        y = df.dropna()[target]
+        _ = error_tree.get_error_leaf_summary(leaf_selector=98, add_path_to_leaves=True, output_format='str')
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+        leaf_summary_str = error_tree.get_error_leaf_summary(leaf_selector=98, output_format='str')
+        leaf_summary_dct = error_tree.get_error_leaf_summary(leaf_selector=98, output_format='dict')
+        single_leaf_summary_reference_dict = reference_data_for_pipeline.get('single_leaf_summary_reference')
+        self.assertListEqual(leaf_summary_str, single_leaf_summary_reference_dict['str'])
+        self.assertListEqual(leaf_summary_dct, single_leaf_summary_reference_dict['dct'])
 
-        rf = RandomForestClassifier(n_estimators=10)
-        rf.fit(X_train, y_train)
-        error_tree = ErrorAnalyzer(rf, feature_names=numeric_features)
-        error_tree.fit(X_test, y_test)
-        leaf_summary_str = error_tree.get_error_leaf_summary(output_format='str')
-        leaf_summary_dct = error_tree.get_error_leaf_summary(output_format='dict')
+        all_leaves_summary_str = error_tree.get_error_leaf_summary(output_format='str')
+        all_leaves_summary_dct = error_tree.get_error_leaf_summary(output_format='dict')
+        all_leaves_summary_reference_dict = reference_data_for_pipeline.get('all_leaves_summary_reference')
+        self.assertListEqual(all_leaves_summary_str, all_leaves_summary_reference_dict['str'])
+        self.assertListEqual(all_leaves_summary_dct, all_leaves_summary_reference_dict['dct'])
 
-        self.assertListEqual()
+        evaluate_str = error_tree.evaluate(X_test, y_test, output_format='str')
+        evaluate_dct = error_tree.evaluate(X_test, y_test, output_format='dict')
+        evaluate_reference_dict = reference_data_for_pipeline.get('evaluate_reference')
+        self.assertEqual(evaluate_str, evaluate_reference_dict['str'])
+        self.assertDictEqual(evaluate_dct, evaluate_reference_dict['dct'])
