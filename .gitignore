@@ -1,4 +1,5 @@
 .coverage
+.coveragerc
 .python-version
 .idea/
 mealy/__pycache__/
