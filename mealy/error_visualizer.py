@@ -261,9 +261,9 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                 else:
                     bins = np.unique(feature_column)[:nr_bins]
                     if show_class:
-                        histogram_func = lambda f_samples: np.bincount(np.searchsorted(bins, f_samples), minlength=len(bins))[:nr_bins].astype(float)
+                        histogram_func = lambda f_samples: np.bincount(np.searchsorted(bins, f_samples), minlength=len(bins))[:nr_bins]
                     else:
-                        histogram_func = lambda f_samples: np.bincount(np.searchsorted(bins, f_samples), minlength=len(bins))[:nr_bins].astype(float) / len(f_samples)
+                        histogram_func = lambda f_samples: np.bincount(np.searchsorted(bins, f_samples), minlength=len(bins))[:nr_bins] / len(f_samples)
 
                 root_hist_data = {}
                 if show_global:
