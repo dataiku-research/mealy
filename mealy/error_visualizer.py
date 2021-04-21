@@ -28,15 +28,16 @@ class _BaseErrorVisualizer(object):
     @staticmethod
     def _plot_histograms(hist_data, label, **params):
         bottom = None
-        for class_value, bar_heights in hist_data.items():
-            plt.bar(height=bar_heights,
-                    label="{} ({})".format(class_value, label),
-                    color=ErrorAnalyzerConstants.ERROR_TREE_COLORS[class_value],
-                    bottom=bottom,
-                    align="edge",
-                    alpha=.8,
-                    **params)
-            bottom = bar_heights
+        for class_value in [ErrorAnalyzerConstants.CORRECT_PREDICTION, ErrorAnalyzerConstants.WRONG_PREDICTION]:
+            bar_heights = hist_data.get(class_value)
+            if bar_heights is not None:
+                plt.bar(height=bar_heights,
+                        label="{} ({})".format(class_value, label),
+                        color=ErrorAnalyzerConstants.ERROR_TREE_COLORS[class_value],
+                        bottom=bottom,
+                        align="edge",
+                        **params)
+                bottom = bar_heights
 
     @staticmethod
     def _add_new_plot(figsize, bins, feature_name, leaf_id):
@@ -309,10 +310,8 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                     normalized_hist_wrong = hist_wrong / n_samples
                     normalized_hist_correct = hist_correct / n_samples
                     leaf_hist_data = {
-                        ErrorAnalyzerConstants.WRONG_PREDICTION:
-                            normalized_hist_wrong,
-                        ErrorAnalyzerConstants.CORRECT_PREDICTION:
-                            normalized_hist_correct
+                        ErrorAnalyzerConstants.WRONG_PREDICTION: normalized_hist_wrong,
+                        ErrorAnalyzerConstants.CORRECT_PREDICTION: normalized_hist_correct
                     }
                 else:
                     leaf_prediction = ErrorAnalyzerConstants.CORRECT_PREDICTION if proba_correct_leaf > proba_wrong_leaf else ErrorAnalyzerConstants.WRONG_PREDICTION
