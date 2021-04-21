@@ -289,6 +289,7 @@ class PipelinePreprocessor(FeatureNameTransformer):
         thresholds[used_feature_mask] = descaled_thresh
         return thresholds
 
+
 class DummyPipelinePreprocessor(FeatureNameTransformer):
 
     def __init__(self, model_performance_predictor_features):
