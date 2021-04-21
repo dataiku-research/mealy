@@ -19,7 +19,7 @@ plt.rc("hatch", color="white", linewidth=4)
 class _BaseErrorVisualizer(object):
     def __init__(self, error_analyzer):
         if not isinstance(error_analyzer, ErrorAnalyzer):
-            raise NotImplementedError('You need to input an ErrorAnalyzer object.')
+            raise TypeError('You need to input an ErrorAnalyzer object.')
 
         self._error_analyzer = error_analyzer
 
@@ -225,19 +225,10 @@ class ErrorVisualizer(_BaseErrorVisualizer):
             figsize (tuple of float): Tuple of size 2 for the size of the plots as (width, height) in inches. Defaults to (15, 10).
 
         """
+        ranked_feature_ids = self._error_analyzer.pipeline_preprocessor.get_top_ranked_feature_ids(self._error_clf.feature_importances_, top_k_features)
 
-        ranked_transformed_feature_ids = np.argsort(- self._error_clf.feature_importances_)
-        ranked_feature_ids, seen = [], set()
-        max_nr_features = top_k_features if top_k_features > 0 else len(self._original_feature_names) + top_k_features
-        for idx in ranked_transformed_feature_ids:
-            inverse_transformed_feature_id = self._error_analyzer.pipeline_preprocessor.inverse_transform_feature_id(idx)
-            if inverse_transformed_feature_id not in seen:
-                seen.add(inverse_transformed_feature_id)
-                ranked_feature_ids.append(inverse_transformed_feature_id)
-                if max_nr_features == len(ranked_feature_ids):
-                    break
-
-        x, y = self._error_analyzer.pipeline_preprocessor.inverse_transform(self._error_analyzer._error_train_x)[:, ranked_feature_ids], self._error_analyzer._error_train_y
+        x = self._error_analyzer.pipeline_preprocessor.inverse_transform(self._error_analyzer._error_train_x)[:, ranked_feature_ids]
+        y = self._error_analyzer._error_train_y
         # TODO to do what ?
         feature_names = self._original_feature_names
 
