@@ -8,3 +8,4 @@ build/
 dist/
 mealy.egg-info/
 cov_html/
+.vscode
