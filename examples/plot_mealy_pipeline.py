@@ -75,9 +75,15 @@ print(numeric_features)
 ##############################################################################
 # Build the preprocessing Pipeline.
 ##############################################################################
-# The final Pipeline should contain a `sklearn.compose.ColumnTransformer` as a
-# preprocessor and any `sklearn.base.BaseEstimator` as the primary model to
-# investigate.
+# The final Pipeline is required to contain two steps: the first step should
+# be a `sklearn.compose.ColumnTransformer` accounting for the preprocessing of
+# the features, while the second step should be a `sklearn.base.BaseEstimator`,
+# representing the primary model to investigate.
+# The `sklearn.compose.ColumnTransformer` should contain the desired
+# preprocessing steps separately by groups of columns. The columns not
+# specified in the `sklearn.compose.ColumnTransformer` are dropped by default,
+# unless using the option `remainder='passthrough'`, in which case they are
+# included without preprocessing.
 
 numeric_transformer = Pipeline(steps=[
     ('imputer', SimpleImputer(strategy='median')),
