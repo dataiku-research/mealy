@@ -118,7 +118,6 @@ class ErrorVisualizer(_BaseErrorVisualizer):
         thresholds = self._thresholds
         features = self._features
 
-        y = self._error_analyzer._error_train_y
         nodes = pydot_graph.get_node_list()
 
         for node in nodes:
