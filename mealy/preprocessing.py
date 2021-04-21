@@ -209,7 +209,7 @@ class PipelinePreprocessor(FeatureNameTransformer):
             original_feature_ids, preprocessed_feature_ids = self._get_feature_ids_related_to_transformer(transformer_feature_names)
             output_of_transformer = preprocessed_x[:, preprocessed_feature_ids]
 
-            any_numeric = np.any(~self.is_categorical(original_feature_ids))
+            any_numeric = np.any(np.vectorize(lambda x: not self.is_categorical(x)))
             if issparse(output_of_transformer) and any_numeric:
                 output_of_transformer = output_of_transformer.todense()
 
@@ -238,8 +238,7 @@ class PipelinePreprocessor(FeatureNameTransformer):
         """
         if index is not None:
             name = self.original_feature_names[index]
-            return name in self.categorical_features
-        elif name is not None:
+        if name is not None:
             return name in self.categorical_features
         else:
             raise ValueError("Either the input index or its name should be specified.")
