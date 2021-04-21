@@ -98,7 +98,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
 
         """
         digraph_tree = export_graphviz(self._error_clf,
-                                       feature_names=self._error_analyzer.pipeline_preprocessor.get_preprocessed_feature_names(),
+                                       feature_names=self._error_analyzer.preprocessed_feature_names,
                                        class_names=self._error_clf.classes_,
                                        node_ids=True,
                                        proportion=True,

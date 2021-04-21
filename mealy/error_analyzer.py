@@ -97,6 +97,10 @@ class ErrorAnalyzer(BaseEstimator):
                 for feature_index in range(tree.estimator_.n_features_)]
         self._error_tree = tree
 
+    @property
+    def preprocessed_feature_names(self):
+        return self.pipeline_preprocessor.get_preprocessed_feature_names()
+
     def fit(self, X, y):
         """
         Fit the Error Analyzer Tree.
