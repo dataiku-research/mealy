@@ -19,7 +19,7 @@ plt.rc("hatch", color="white", linewidth=4)
 class _BaseErrorVisualizer(object):
     def __init__(self, error_analyzer):
         if not isinstance(error_analyzer, ErrorAnalyzer):
-            raise NotImplementedError('You need to input an ErrorAnalyzer object.')
+            raise TypeError('You need to input an ErrorAnalyzer object.')
 
         self._error_analyzer = error_analyzer
 
@@ -84,12 +84,8 @@ class ErrorVisualizer(_BaseErrorVisualizer):
         self._thresholds = self._error_analyzer._inverse_transform_thresholds()
         self._features = self._error_analyzer._inverse_transform_features()
 
-        if self._error_analyzer.pipeline_preprocessor is None:
-            self._original_feature_names = self._error_analyzer.preprocessed_feature_names
-            self._numerical_feature_names = self._error_analyzer.preprocessed_feature_names
-        else:
-            self._original_feature_names = self._error_analyzer.pipeline_preprocessor.get_original_feature_names()
-            self._numerical_feature_names = [f for f in self._original_feature_names if not self._error_analyzer.pipeline_preprocessor.is_categorical(name=f)]
+        self._original_feature_names = self._error_analyzer.pipeline_preprocessor.get_original_feature_names()
+        self._numerical_feature_names = [f for f in self._original_feature_names if not self._error_analyzer.pipeline_preprocessor.is_categorical(name=f)]
 
     def plot_error_tree(self, size=None):
         """
@@ -229,29 +225,12 @@ class ErrorVisualizer(_BaseErrorVisualizer):
             figsize (tuple of float): Tuple of size 2 for the size of the plots as (width, height) in inches. Defaults to (15, 10).
 
         """
+        ranked_feature_ids = self._error_analyzer.pipeline_preprocessor.get_top_ranked_feature_ids(self._error_clf.feature_importances_, top_k_features)
 
-        if self._error_analyzer.pipeline_preprocessor is None:
-            ranked_feature_ids = np.argsort(- self._error_clf.feature_importances_)
-            if top_k_features != 0:
-                ranked_feature_ids = ranked_feature_ids[:top_k_features]
-
-            x, y = self._error_analyzer._error_train_x[:, ranked_feature_ids], self._error_analyzer._error_train_y
-            feature_names = self._error_analyzer.preprocessed_feature_names
-        else:
-            ranked_transformed_feature_ids = np.argsort(- self._error_clf.feature_importances_)
-            ranked_feature_ids, seen = [], set()
-            max_nr_features = top_k_features if top_k_features > 0 else len(self._original_feature_names) + top_k_features
-            for idx in ranked_transformed_feature_ids:
-                inverse_transformed_feature_id = self._error_analyzer.pipeline_preprocessor.inverse_transform_feature_id(idx)
-                if inverse_transformed_feature_id not in seen:
-                    seen.add(inverse_transformed_feature_id)
-                    ranked_feature_ids.append(inverse_transformed_feature_id)
-                    if max_nr_features == len(ranked_feature_ids):
-                        break
-
-            x, y = self._error_analyzer.pipeline_preprocessor.inverse_transform(self._error_analyzer._error_train_x)[:, ranked_feature_ids], self._error_analyzer._error_train_y
-            # TODO to do what ?
-            feature_names = self._original_feature_names
+        x = self._error_analyzer.pipeline_preprocessor.inverse_transform(self._error_analyzer._error_train_x)[:, ranked_feature_ids]
+        y = self._error_analyzer._error_train_y
+        # TODO to do what ?
+        feature_names = self._original_feature_names
 
         min_values, max_values = x.min(axis=0), x.max(axis=0)
         total_error_fraction_sample_ids = y == ErrorAnalyzerConstants.WRONG_PREDICTION
@@ -268,8 +247,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
             for i, feature_idx in enumerate(ranked_feature_ids):
 
                 feature_name = feature_names[feature_idx]
-                feature_is_numerical = True if self._error_analyzer.pipeline_preprocessor is None else (
-                    not self._error_analyzer.pipeline_preprocessor.is_categorical(feature_idx))
+                feature_is_numerical = not self._error_analyzer.pipeline_preprocessor.is_categorical(feature_idx)
 
                 feature_column = x[:, i]
 
