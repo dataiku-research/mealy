@@ -242,15 +242,13 @@ class ErrorAnalyzer(BaseEstimator):
              error_y: array of string of shape (n_sampled_X, )
              Boolean value of whether or not the primary model predicted correctly or incorrectly the samples in sampled_X.
         """
-        if is_regressor(self._primary_model):
+        if is_regressor(self._primary_model) or len(np.unique(y)) > 2:
+            # regression or multiclass classification models: no proba threshold
             y_pred = self._primary_model.predict(X)
-        else: # classification model
-            if len(np.unique(y)) > 2: # multiclass -> nothing to do
-                y_pred = self._primary_model.predict(X)
-            else: # binary -> need to check the proba threshold
-                prediction_index = (self._primary_model.predict_proba(X)[:, 1] > self.probability_threshold).astype(int)
-                #map the prediction indexes to the original target values
-                y_pred = [self._primary_model.classes_[i] for i in prediction_index]
+        else: # binary -> need to check the proba threshold
+            prediction_index = (self._primary_model.predict_proba(X)[:, 1] > self.probability_threshold).astype(int)
+            # map the prediction indexes to the original target values
+            y_pred = np.array([self._primary_model.classes_[i] for i in prediction_index])
 
         error_y, error_rate = self._evaluate_primary_model_predictions(y_true=y, y_pred=y_pred)
         return error_y, error_rate
