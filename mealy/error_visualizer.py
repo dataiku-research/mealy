@@ -298,6 +298,5 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                 x_ticks = range(len(bins))
                 _BaseErrorVisualizer._add_new_plot(figsize, bins, x_ticks, feature_name, leaf)
                 _BaseErrorVisualizer._plot_feature_distribution(x_ticks, feature_is_numerical, leaf_hist_data, root_hist_data)
-                break
 
         plt.show()
