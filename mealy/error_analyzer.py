@@ -48,12 +48,14 @@ class ErrorAnalyzer(BaseEstimator):
         self.random_state = random_state
 
         if isinstance(primary_model, Pipeline):
+            if len(primary_model.steps) != 2:
+                logger.warning("Pipeline should have two steps: the preprocessing of the features, and the primary model to analyze.")
             estimator = primary_model.steps[-1][1]
             if not isinstance(estimator, BaseEstimator):
                 raise TypeError("The last step of the pipeline has to be a BaseEstimator.")
             self._primary_model = estimator
 
-            ct_preprocessor = Pipeline(primary_model.steps[:-1]).steps[0][1]
+            ct_preprocessor = primary_model.steps[0][1]
             if not isinstance(ct_preprocessor, ColumnTransformer):
                 raise TypeError("The input preprocessor has to be a ColumnTransformer.")
             self.pipeline_preprocessor = PipelinePreprocessor(ct_preprocessor, feature_names)
