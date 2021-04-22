@@ -33,7 +33,7 @@ def compute_accuracy_score(y_true, y_pred):
 
 
 def compute_primary_model_accuracy(y):
-    """Return fidelity of the Error Tree and decision regarding its reliability.
+    """Return accuracy of the primary model.
 
     Args:
         y (numpy.ndarray): Array indicating whether the model is correct for each sample. Expected values in
@@ -47,7 +47,7 @@ def compute_primary_model_accuracy(y):
 
 
 def compute_fidelity_score(y_true, y_pred):
-    """Return fidelity of the Error Tree and decision regarding its reliability.
+    """Return fidelity of the Error Tree.
 
     Args:
         y_true (numpy.ndarray): Ground truth values of wrong/correct predictions of the error tree primary model.
