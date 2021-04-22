@@ -126,15 +126,21 @@ Load Adult income dataset.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-81
+.. GENERATED FROM PYTHON SOURCE LINES 76-87
 
 Build the preprocessing Pipeline.
 #############################################################################
- The final Pipeline should contain a `sklearn.compose.ColumnTransformer` as a
- preprocessor and any `sklearn.base.BaseEstimator` as the primary model to
- investigate.
+ The final Pipeline is required to contain two steps: the first step should
+ be a `sklearn.compose.ColumnTransformer` accounting for the preprocessing of
+ the features, while the second step should be a `sklearn.base.BaseEstimator`,
+ representing the primary model to investigate.
+ The `sklearn.compose.ColumnTransformer` should contain the desired
+ preprocessing steps by groups of columns. The columns not specified in the
+ `sklearn.compose.ColumnTransformer` are dropped by default, unless using the
+ option `remainder='passthrough'`, in which case they are included without
+ preprocessing.
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-97
+.. GENERATED FROM PYTHON SOURCE LINES 87-103
 
 .. code-block:: python3
 
@@ -161,11 +167,11 @@ Build the preprocessing Pipeline.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-99
+.. GENERATED FROM PYTHON SOURCE LINES 104-105
 
 Train preprocessing Pipeline and RandomForestClassifier.
 
-.. GENERATED FROM PYTHON SOURCE LINES 99-105
+.. GENERATED FROM PYTHON SOURCE LINES 105-111
 
 .. code-block:: python3
 
@@ -190,11 +196,11 @@ Train preprocessing Pipeline and RandomForestClassifier.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 106-107
+.. GENERATED FROM PYTHON SOURCE LINES 112-113
 
 Fit an Error Tree on the model performances.
 
-.. GENERATED FROM PYTHON SOURCE LINES 107-111
+.. GENERATED FROM PYTHON SOURCE LINES 113-117
 
 .. code-block:: python3
 
@@ -209,11 +215,11 @@ Fit an Error Tree on the model performances.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-113
+.. GENERATED FROM PYTHON SOURCE LINES 118-119
 
 Print metrics regarding the Error Tree.
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-116
+.. GENERATED FROM PYTHON SOURCE LINES 119-122
 
 .. code-block:: python3
 
@@ -241,11 +247,11 @@ Print metrics regarding the Error Tree.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-118
+.. GENERATED FROM PYTHON SOURCE LINES 123-124
 
 Plot the Error Tree.
 
-.. GENERATED FROM PYTHON SOURCE LINES 118-132
+.. GENERATED FROM PYTHON SOURCE LINES 124-138
 
 .. code-block:: python3
 
@@ -274,11 +280,11 @@ Plot the Error Tree.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 133-134
+.. GENERATED FROM PYTHON SOURCE LINES 139-140
 
 Print the details regarding the decision tree nodes containing the majority of errors.
 
-.. GENERATED FROM PYTHON SOURCE LINES 134-137
+.. GENERATED FROM PYTHON SOURCE LINES 140-143
 
 .. code-block:: python3
 
@@ -292,12 +298,12 @@ Print the details regarding the decision tree nodes containing the majority of e
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 138-140
+.. GENERATED FROM PYTHON SOURCE LINES 144-146
 
 Plot the feature distributions of samples in the leaf containing the majority of errors.
 Rank features by correlation to error.
 
-.. GENERATED FROM PYTHON SOURCE LINES 140-143
+.. GENERATED FROM PYTHON SOURCE LINES 146-149
 
 .. code-block:: python3
 
@@ -308,7 +314,7 @@ Rank features by correlation to error.
 
 
 .. image:: /auto_examples/images/sphx_glr_plot_mealy_pipeline_002.png
-    :alt: Distribution of marital-status: in leaf 107
+    :alt: Distribution of age in leaf 107
     :class: sphx-glr-single-img
 
 
@@ -323,7 +329,7 @@ Rank features by correlation to error.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 144-170
+.. GENERATED FROM PYTHON SOURCE LINES 150-176
 
 Discussion
 ----------
@@ -355,7 +361,7 @@ subpopulations.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  9.978 seconds)
+   **Total running time of the script:** ( 0 minutes  10.465 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_mealy_pipeline.py:
