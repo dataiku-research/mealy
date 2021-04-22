@@ -40,16 +40,13 @@ class _BaseErrorVisualizer(object):
                 bottom = bar_heights
 
     @staticmethod
-    def _add_new_plot(figsize, bins, feature_name, leaf_id):
-        x_ticks = range(len(bins))
+    def _add_new_plot(figsize, bins, x_ticks, feature_name, leaf_id):
         plt.figure(figsize=figsize)
         plt.xticks(x_ticks)
         plt.gca().set_xticklabels(labels=bins)
         plt.xlabel('{}'.format(feature_name))
         plt.ylabel('Proportion of samples')
         plt.title('Distribution of {} in leaf {}'.format(feature_name, leaf_id))
-
-        return x_ticks
 
     @staticmethod
     def _plot_feature_distribution(x_ticks, feature_is_numerical, leaf_data, root_data=None):
@@ -298,7 +295,8 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                     leaf_prediction = ErrorAnalyzerConstants.CORRECT_PREDICTION if proba_correct_leaf > proba_wrong_leaf else ErrorAnalyzerConstants.WRONG_PREDICTION
                     leaf_hist_data = {leaf_prediction: histogram_func(feature_column[leaf_sample_ids])}
 
-                x_ticks = _BaseErrorVisualizer._add_new_plot(figsize, bins, feature_name, leaf)
+                x_ticks = range(len(bins))
+                _BaseErrorVisualizer._add_new_plot(figsize, bins, x_ticks, feature_name, leaf)
                 _BaseErrorVisualizer._plot_feature_distribution(x_ticks, feature_is_numerical, leaf_hist_data, root_hist_data)
                 break
 
