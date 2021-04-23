@@ -308,7 +308,9 @@ class DummyPipelinePreprocessor(FeatureNameTransformer):
             return x.values
         if isinstance(x, np.ndarray):
             return x
-        raise TypeError('x should be either a pandas dataframe or a numpy ndarray')
+        if issparse(x):
+            return x
+        raise TypeError('x should be either a pandas dataframe, a numpy ndarray or a scipy sparse matrix')
 
     def is_categorical(self, index=None, name=None):
         return False
