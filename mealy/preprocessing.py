@@ -306,9 +306,7 @@ class DummyPipelinePreprocessor(FeatureNameTransformer):
         """
         if isinstance(x, pd.DataFrame):
             return x.values
-        if isinstance(x, np.ndarray):
-            return x
-        if issparse(x):
+        if isinstance(x, np.ndarray) or issparse(x):
             return x
         raise TypeError('x should be either a pandas dataframe, a numpy ndarray or a scipy sparse matrix')
 
