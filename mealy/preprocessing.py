@@ -160,7 +160,7 @@ class PipelinePreprocessor(FeatureNameTransformer):
         """Transform the input feature values according to the preprocessing pipeline.
 
         Args:
-            x (numpy.ndarray or pandas.DataFrame): input feature values.
+            x ({array-like, dataframe} of shape (n_samples, n_features)): input feature values.
 
         Return:
             numpy.ndarray: transformed feature values
@@ -194,7 +194,7 @@ class PipelinePreprocessor(FeatureNameTransformer):
         """Invert the preprocessing pipeline and inverse transform feature values.
 
         Args:
-            preprocessed_x (numpy.ndarray): preprocessed feature values.
+            preprocessed_x (numpy.ndarray or scipy sparse matrix): preprocessed feature values.
 
         Return:
             numpy.ndarray: feature values without preprocessing
@@ -300,7 +300,7 @@ class DummyPipelinePreprocessor(FeatureNameTransformer):
     def transform(self, x):
         """
         Args:
-            x: dataframe or ndarray
+            x ({array-like, dataframe} of shape (n_samples, n_features)): input feature values.
         Returns:
             ndarray
         """
