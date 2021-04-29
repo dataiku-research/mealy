@@ -42,18 +42,22 @@ class ErrorAnalyzer(BaseEstimator):
     def __init__(self, primary_model,
                 feature_names=None,
                 param_grid=None,
+                probability_threshold=0.5,
                 random_state=65537):
 
         self.param_grid = param_grid
+        self.probability_threshold = probability_threshold
         self.random_state = random_state
 
         if isinstance(primary_model, Pipeline):
+            if len(primary_model.steps) != 2:
+                logger.warning("Pipeline should have two steps: the preprocessing of the features, and the primary model to analyze.")
             estimator = primary_model.steps[-1][1]
             if not isinstance(estimator, BaseEstimator):
                 raise TypeError("The last step of the pipeline has to be a BaseEstimator.")
             self._primary_model = estimator
 
-            ct_preprocessor = Pipeline(primary_model.steps[:-1]).steps[0][1]
+            ct_preprocessor = primary_model.steps[0][1]
             if not isinstance(ct_preprocessor, ColumnTransformer):
                 raise TypeError("The input preprocessor has to be a ColumnTransformer.")
             self.pipeline_preprocessor = PipelinePreprocessor(ct_preprocessor, feature_names)
@@ -242,7 +246,14 @@ class ErrorAnalyzer(BaseEstimator):
              error_y: array of string of shape (n_sampled_X, )
              Boolean value of whether or not the primary model predicted correctly or incorrectly the samples in sampled_X.
         """
-        y_pred = self._primary_model.predict(X)
+        if is_regressor(self._primary_model) or len(np.unique(y)) > 2:
+            # regression or multiclass classification models: no proba threshold
+            y_pred = self._primary_model.predict(X)
+        else: # binary -> need to check the proba threshold
+            prediction_index = (self._primary_model.predict_proba(X)[:, 1] > self.probability_threshold).astype(int)
+            # map the prediction indexes to the original target values
+            y_pred = np.array([self._primary_model.classes_[i] for i in prediction_index])
+
         error_y, error_rate = self._evaluate_primary_model_predictions(y_true=y, y_pred=y_pred)
         return error_y, error_rate
 
@@ -282,7 +293,7 @@ class ErrorAnalyzer(BaseEstimator):
             logger.warning('All predictions are {}. To build a proper ErrorAnalyzer decision tree we need both correct and incorrect predictions'.format(error_y[0]))
 
         error_rate = n_wrong_preds / len(error_y)
-        logger.info('The primary model has an error rate of {}'.format(round(error_rate, 3)))
+        logger.info('The primary model has an error rate of {}'.format(error_rate))
         return error_y, error_rate
 
     def _get_ranked_leaf_ids(self, leaf_selector=None, rank_by='total_error_fraction'):
