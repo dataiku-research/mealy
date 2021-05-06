@@ -23,7 +23,8 @@ class _BaseErrorVisualizer(object):
 
         self._error_analyzer = error_analyzer
 
-        self._get_ranked_leaf_ids = lambda leaf_selector, rank_by: error_analyzer._get_ranked_leaf_ids(leaf_selector, rank_by)
+        self._get_ranked_leaf_ids = lambda leaf_selector, rank_by: \
+            error_analyzer._get_ranked_leaf_ids(leaf_selector, rank_by)
 
     @staticmethod
     def _plot_histograms(hist_data, label, **params):
@@ -35,7 +36,6 @@ class _BaseErrorVisualizer(object):
                         label="{} ({})".format(class_value, label),
                         color=ErrorAnalyzerConstants.ERROR_TREE_COLORS[class_value],
                         bottom=bottom,
-                        align="edge",
                         **params)
                 bottom = bar_heights
 
@@ -51,16 +51,20 @@ class _BaseErrorVisualizer(object):
     @staticmethod
     def _plot_feature_distribution(x_ticks, feature_is_numerical, leaf_data, root_data=None):
         width, x = 1.0, x_ticks
+        align = "edge"
         if root_data is not None:
             width /= 2
             if feature_is_numerical:
                 x = x_ticks[1:]
-            _BaseErrorVisualizer._plot_histograms(root_data, label="global data", x=x, hatch="///", width=-width)
+            _BaseErrorVisualizer._plot_histograms(root_data, label="global data", x=x, hatch="///",
+                                                  width=-width, align=align)
         if leaf_data is not None:
             if feature_is_numerical:
                 x = x_ticks[:-1]
-            _BaseErrorVisualizer._plot_histograms(leaf_data, label="leaf data", x=x, width=width)
-
+            elif root_data is None:
+                align = "center"
+            _BaseErrorVisualizer._plot_histograms(leaf_data, label="leaf data", x=x,
+                                                  align=align, width=width)
         plt.legend()
         plt.pause(0.05)
 
@@ -263,7 +267,6 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                     else:
                         histogram_func = lambda f_samples: np.bincount(np.searchsorted(bins, f_samples), minlength=len(bins))[:nr_bins] / len(f_samples)
 
-                root_hist_data = {}
                 if show_global:
                     if show_class:
                         hist_wrong = histogram_func(feature_column[total_error_fraction_sample_ids])
