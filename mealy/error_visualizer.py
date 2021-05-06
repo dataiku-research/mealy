@@ -34,6 +34,8 @@ class _BaseErrorVisualizer(object):
             if bar_heights is not None:
                 plt.bar(height=bar_heights,
                         label="{} ({})".format(class_value, label),
+                        edgecolor="white",
+                        linewidth=1,
                         color=ErrorAnalyzerConstants.ERROR_TREE_COLORS[class_value],
                         bottom=bottom,
                         **params)
