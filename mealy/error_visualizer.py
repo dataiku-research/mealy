@@ -42,7 +42,7 @@ class _BaseErrorVisualizer(object):
     @staticmethod
     def _add_new_plot(figsize, bins, x_ticks, feature_name, leaf_id):
         plt.figure(figsize=figsize)
-        plt.xticks(x_ticks)
+        plt.xticks(x_ticks, rotation="45")
         plt.gca().set_xticklabels(labels=bins)
         plt.xlabel('{}'.format(feature_name))
         plt.ylabel('Proportion of samples')
