@@ -75,7 +75,19 @@ def check_enough_data(df, min_len):
             'The original dataset is too small ({} rows) to have stable result, it needs to have at least {} rows'.format(
                 df.shape[0], min_len))
 
+def format_float(number, decimals):
+    """
+    Format a number to have the required number of decimals. Ensure no trailing zeros remain.
 
-def rank_features_by_error_correlation(feature_importances):
-    """Rank features by feature importance according to the error model."""
-    return np.argsort(- feature_importances)
+    Args:
+        number (float or int): The number to format
+        decimals (int): The number of decimals required
+
+    Return:
+        formatted (str): The number as a formatted string
+
+    """
+    formatted = ("{:." + str(decimals) + "f}").format(number).rstrip("0")
+    if formatted.endswith("."):
+        return formatted[:-1]
+    return formatted

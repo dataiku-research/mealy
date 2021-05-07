@@ -7,19 +7,19 @@ class ErrorAnalyzerConstants(object):
 
     WRONG_PREDICTION = "Wrong prediction"
     CORRECT_PREDICTION = "Correct prediction"
-    PARAMETERS_GRID = {'max_depth': [5, 10], 'min_samples_leaf': [0.05, 0.1]}
+    MAX_DEPTH = [5, 10]
+    MIN_SAMPLES_LEAF_LOWEST_UPPER_BOUND = .01 # for min_samples_leaf, the min upper bound value should be 0.01
     TEST_SIZE = 0.2
 
     MIN_NUM_ROWS = 100  # heuristic choice
-    MAX_NUM_ROW = 100000  # heuristic choice
 
     TREE_ACCURACY_TOLERANCE = 0.1
     CRITERION = 'entropy'
     NUMBER_EPSILON_VALUES = 50
 
-    ERROR_TREE_COLORS = {CORRECT_PREDICTION: '#538BC8', WRONG_PREDICTION: '#EC6547'}
+    ERROR_TREE_COLORS = {CORRECT_PREDICTION: '#DDDDDD', WRONG_PREDICTION: '#CE1228'}
 
-    TOP_K_FEATURES = 3
+    TOP_K_FEATURES = 5
 
     TREE_ACCURACY = 'error_tree_accuracy_score'
     TREE_FIDELITY = 'error_tree_fidelity_score'

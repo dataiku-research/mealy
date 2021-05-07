@@ -8,11 +8,13 @@ from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.base import BaseEstimator
 from sklearn.metrics import make_scorer
-from mealy.error_analysis_utils import check_enough_data, get_epsilon
-from mealy.constants import ErrorAnalyzerConstants
-from mealy.metrics import error_decision_tree_report, fidelity_balanced_accuracy_score
-from mealy.preprocessing import PipelinePreprocessor, DummyPipelinePreprocessor
-from mealy.error_tree import ErrorTree
+from .error_analysis_utils import check_enough_data, get_epsilon, format_float
+from .constants import ErrorAnalyzerConstants
+from .metrics import error_decision_tree_report, fidelity_balanced_accuracy_score
+from .preprocessing import PipelinePreprocessor, DummyPipelinePreprocessor
+from .error_tree import ErrorTree
+from sklearn.exceptions import NotFittedError
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -30,80 +32,52 @@ class ErrorAnalyzer(BaseEstimator):
         primary_model (sklearn.base.BaseEstimator or sklearn.pipeline.Pipeline): A sklearn model to analyze. Either an estimator
             or a Pipeline containing a ColumnTransformer with the preprocessing steps and an estimator as last step.
         feature_names (list): List of feature names, default=None.
-        max_num_row (int): Maximum number of rows to process.
         param_grid (dict): The sklearn.tree.DecisionTree hyper-parameters values for grid search.
         random_state (int): Random seed.
 
     Attributes:
-        primary_model (sklearn.base.BaseEstimator or sklearn.pipeline.Pipeline): A sklearn model to analyze. Either an estimator
+        _primary_model (sklearn.base.BaseEstimator or sklearn.pipeline.Pipeline): A sklearn model to analyze. Either an estimator
             or a Pipeline containing a ColumnTransformer with the preprocessing steps and an estimator as last step.
         feature_names (list): List of feature names.
-        max_num_row (int): Maximum number of rows to process.
         param_grid (dict): The sklearn.tree.DecisionTreeClassifier hyper-parameters values for grid search.
         random_state (int): Random seed.
         preprocessed_feature_names (list): List of preprocessed feature names.
         error_tree (ErrorTree): the Error Tree.
+        epsilon (float): The threshold used to assess if a prediction is wrong, only used for regression primary models.
     """
 
     def __init__(self, primary_model,
-                 feature_names=None,
-                 max_num_row=ErrorAnalyzerConstants.MAX_NUM_ROW,
-                 param_grid=ErrorAnalyzerConstants.PARAMETERS_GRID,
-                 random_state=65537):
+                feature_names=None,
+                param_grid=None,
+                probability_threshold=0.5,
+                random_state=65537):
 
-        self.feature_names = feature_names
-        self.max_num_row = max_num_row
         self.param_grid = param_grid
+        self.probability_threshold = probability_threshold
         self.random_state = random_state
 
         if isinstance(primary_model, Pipeline):
+            if len(primary_model.steps) != 2:
+                logger.warning("Pipeline should have two steps: the preprocessing of the features, and the primary model to analyze.")
             estimator = primary_model.steps[-1][1]
             if not isinstance(estimator, BaseEstimator):
-                raise NotImplementedError("The last step of the pipeline has to be a BaseEstimator.")
+                raise TypeError("The last step of the pipeline has to be a BaseEstimator.")
             self._primary_model = estimator
-            ct_preprocessor = Pipeline(primary_model.steps[:-1]).steps[0][1]
+
+            ct_preprocessor = primary_model.steps[0][1]
             if not isinstance(ct_preprocessor, ColumnTransformer):
-                raise NotImplementedError("The input preprocessor has to be a ColumnTransformer.")
+                raise TypeError("The input preprocessor has to be a ColumnTransformer.")
             self.pipeline_preprocessor = PipelinePreprocessor(ct_preprocessor, feature_names)
-            self._preprocessed_feature_names = self.pipeline_preprocessor.get_preprocessed_feature_names()
         elif isinstance(primary_model, BaseEstimator):
             self._primary_model = primary_model
-            self._preprocessed_feature_names = feature_names
             self.pipeline_preprocessor = DummyPipelinePreprocessor(feature_names)
         else:
-            raise ValueError('ErrorAnalyzer needs as input either a scikit Estimator or a scikit Pipeline.')
+            raise TypeError('ErrorAnalyzer needs as input either a scikit BaseEstimator or a scikit Pipeline.')
 
         self._error_tree = None
-        self._is_regression = is_regressor(self._primary_model)
         self._error_train_x = None
         self._error_train_y = None
-        self._epsilon = None
-
-        self._error_train_leaf_id = None
-
-    @property
-    def feature_names(self):
-        return self._feature_names
-
-    @feature_names.setter
-    def feature_names(self, value):
-        self._feature_names = value
-
-    @property
-    def primary_model(self):
-        return self._primary_model
-
-    @primary_model.setter
-    def primary_model(self, value):
-        self._primary_model = value
-
-    @property
-    def max_num_row(self):
-        return self._max_num_row
-
-    @max_num_row.setter
-    def max_num_row(self, value):
-        self._max_num_row = value
+        self.epsilon = None
 
     @property
     def param_grid(self):
@@ -117,25 +91,26 @@ class ErrorAnalyzer(BaseEstimator):
     def random_state(self):
         return self._random_state
 
-    @property
-    def regression_error_tolerance(self):
-        return self._epsilon
-
     @random_state.setter
     def random_state(self, value):
         self._random_state = value
 
     @property
     def error_tree(self):
+        if self._error_tree is None:
+            raise NotFittedError("The error tree is not fitted yet. Call 'fit' method with appropriate arguments before using this estimator.")
         return self._error_tree
+
+    @error_tree.setter
+    def error_tree(self, tree):
+        if self.pipeline_preprocessor.get_preprocessed_feature_names() is None:
+            self.pipeline_preprocessor.preprocessed_feature_names = ["feature#%s" % feature_index
+                for feature_index in range(tree.estimator_.n_features_)]
+        self._error_tree = tree
 
     @property
     def preprocessed_feature_names(self):
-        if self._preprocessed_feature_names is None:
-            self._preprocessed_feature_names = ["feature#%s" % feature_index
-                                                for feature_index in
-                                                range(self._error_tree.estimator_.n_features_)]
-        return self._preprocessed_feature_names
+        return self.pipeline_preprocessor.get_preprocessed_feature_names()
 
     def fit(self, X, y):
         """Fit the Error Analyzer Tree.
@@ -162,13 +137,13 @@ class ErrorAnalyzer(BaseEstimator):
         # entropy/mutual information is used to split nodes in Microsoft Pandora system
         dt_clf = tree.DecisionTreeClassifier(criterion=ErrorAnalyzerConstants.CRITERION,
                                              random_state=self._random_state)
-
-        # for the min_sample_leaf, the min value should be 0.01
-        min_samples_leaf_max = min(error_rate, 0.01)
-        param_grid = {
-            'max_depth': [3, 5, 7],
-            'min_samples_leaf': np.linspace(min_samples_leaf_max/5, min_samples_leaf_max, 5)
-        }
+        param_grid = self.param_grid
+        if param_grid is None:
+            min_samples_leaf_max = min(error_rate, ErrorAnalyzerConstants.MIN_SAMPLES_LEAF_LOWEST_UPPER_BOUND)
+            param_grid = {
+                'max_depth': ErrorAnalyzerConstants.MAX_DEPTH,
+                'min_samples_leaf': np.linspace(min_samples_leaf_max/5, min_samples_leaf_max, 5)
+            }
 
         logger.info('Grid search the Error Tree with the following grid: {}'.format(param_grid))
         gs_clf = GridSearchCV(dt_clf,
@@ -177,12 +152,12 @@ class ErrorAnalyzer(BaseEstimator):
                               scoring=make_scorer(fidelity_balanced_accuracy_score))
 
         gs_clf.fit(self._error_train_x, self._error_train_y)
-        self._error_tree = ErrorTree(error_decision_tree=gs_clf.best_estimator_)
+        self.error_tree = ErrorTree(error_decision_tree=gs_clf.best_estimator_)
         logger.info('Chosen parameters: {}'.format(gs_clf.best_params_))
 
-    #TODO rewrite this method using the ranking arrays
-    def get_error_leaf_summary(self, leaf_selector=None, add_path_to_leaves=False, output_format='dict', rank_by='total_error_fraction'):
-        """Return summary information regarding leaves.
+    def get_error_leaf_summary(self, leaf_selector=None, add_path_to_leaves=False,
+                               output_format='dict', rank_by='total_error_fraction'):
+        """ Return summary information regarding leaves.
 
         Args:
             leaf_selector (None, int or array-like): The leaves whose information will be returned
@@ -205,10 +180,10 @@ class ErrorAnalyzer(BaseEstimator):
 
         leaves_summary = []
         for leaf_id in leaf_nodes:
-            n_errors = int(self._error_tree.estimator_.tree_.value[leaf_id, 0, self._error_tree.error_class_idx])
-            n_samples = self._error_tree.estimator_.tree_.n_node_samples[leaf_id]
+            n_errors = int(self.error_tree.estimator_.tree_.value[leaf_id, 0, self.error_tree.error_class_idx])
+            n_samples = self.error_tree.estimator_.tree_.n_node_samples[leaf_id]
             local_error = n_errors / n_samples
-            total_error_fraction = n_errors / self._error_tree.n_total_errors
+            total_error_fraction = n_errors / self.error_tree.n_total_errors
             n_corrects = n_samples - n_errors
 
             if output_format == 'dict':
@@ -232,15 +207,17 @@ class ErrorAnalyzer(BaseEstimator):
                     for (step_idx, step) in enumerate(self._get_path_to_node(leaf_id)):
                         leaf_summary += '     ' + '   ' * step_idx + step  + '\n'
 
+                leaves_summary.append(leaf_summary)
+
             else:
                 raise ValueError("Output format should either be 'dict' or 'str'")
 
         return leaves_summary
 
     def evaluate(self, X, y, output_format='str'):
-        """Evaluate performance of ErrorAnalyzer on new the given test data and labels.
-
-        Print ErrorAnalyzer summary metrics regarding the Error Tree.
+        """
+        Evaluate performance of ErrorAnalyzer on the given test data and labels.
+        Return ErrorAnalyzer summary metrics regarding the Error Tree.
 
         Args:
             X (numpy.ndarray or pandas.DataFrame): Feature data from a test set to evaluate the primary predictor
@@ -253,8 +230,8 @@ class ErrorAnalyzer(BaseEstimator):
             dict or str: Dictionary or string report storing different metrics regarding the Error Tree.
         """
         prep_x, prep_y = self.pipeline_preprocessor.transform(X), np.array(y)
+        y_pred = self.error_tree.estimator_.predict(prep_x)
         y_true, _ = self._compute_primary_model_error(prep_x, prep_y)
-        y_pred = self._error_tree.estimator_.predict(prep_x)
         return error_decision_tree_report(y_true, y_pred, output_format)
 
     def _compute_primary_model_error(self, X, y):
@@ -269,7 +246,14 @@ class ErrorAnalyzer(BaseEstimator):
                 not the primary model got the prediction right.
              error_rate (float): Accuracy of the primary model.
         """
-        y_pred = self._primary_model.predict(X)
+        if is_regressor(self._primary_model) or len(np.unique(y)) > 2:
+            # regression or multiclass classification models: no proba threshold
+            y_pred = self._primary_model.predict(X)
+        else: # binary -> need to check the proba threshold
+            prediction_index = (self._primary_model.predict_proba(X)[:, 1] > self.probability_threshold).astype(int)
+            # map the prediction indexes to the original target values
+            y_pred = np.array([self._primary_model.classes_[i] for i in prediction_index])
+
         error_y, error_rate = self._evaluate_primary_model_predictions(y_true=y, y_pred=y_pred)
         return error_y, error_rate
 
@@ -287,10 +271,12 @@ class ErrorAnalyzer(BaseEstimator):
         """
 
         error_y = np.full_like(y_true, ErrorAnalyzerConstants.CORRECT_PREDICTION, dtype="O")
-        if self._is_regression:
+        if is_regressor(self._primary_model):
             difference = np.abs(y_true - y_pred)
-            self._epsilon = get_epsilon(difference)
-            error_mask = difference > self._epsilon
+            if self.epsilon is None:
+                # only compute epsilon when fitting the model (not while evaluating)
+                self.epsilon = get_epsilon(difference)
+            error_mask = difference > self.epsilon
         else:
             error_mask = y_true != y_pred
 
@@ -301,7 +287,7 @@ class ErrorAnalyzer(BaseEstimator):
             logger.warning('All predictions are {}. To build a proper ErrorAnalyzer decision tree we need both correct and incorrect predictions'.format(error_y[0]))
 
         error_rate = n_wrong_preds / len(error_y)
-        logger.info('The primary model has an error rate of {}'.format(round(error_rate, 3)))
+        logger.info('The primary model has an error rate of {}'.format(error_rate))
         return error_y, error_rate
 
     def _get_ranked_leaf_ids(self, leaf_selector=None, rank_by='total_error_fraction'):
@@ -323,17 +309,17 @@ class ErrorAnalyzer(BaseEstimator):
 
         """
         apply_leaf_selector = self._get_leaf_selector(leaf_selector)
-        selected_leaves = apply_leaf_selector(self._error_tree.leaf_ids)
+        selected_leaves = apply_leaf_selector(self.error_tree.leaf_ids)
         if selected_leaves.size == 0:
             return selected_leaves
         if rank_by == 'total_error_fraction':
-            sorted_ids = np.argsort(-apply_leaf_selector(self._error_tree.total_error_fraction))
+            sorted_ids = np.argsort(-apply_leaf_selector(self.error_tree.total_error_fraction))
         elif rank_by == 'purity':
-            sorted_ids = np.lexsort((apply_leaf_selector(self._error_tree.difference), apply_leaf_selector(self._error_tree.quantized_impurity)))
+            sorted_ids = np.lexsort((apply_leaf_selector(self.error_tree.difference), apply_leaf_selector(self.error_tree.quantized_impurity)))
         elif rank_by == 'class_difference':
-            sorted_ids = np.lexsort((apply_leaf_selector(self._error_tree.impurity), apply_leaf_selector(self._error_tree.difference)))
+            sorted_ids = np.lexsort((apply_leaf_selector(self.error_tree.impurity), apply_leaf_selector(self.error_tree.difference)))
         else:
-            raise NotImplementedError(
+            raise ValueError(
                 "Input argument for rank_by is invalid. Should be 'total_error_fraction', 'purity' or 'class_difference'")
         return selected_leaves.take(sorted_ids)
 
@@ -358,7 +344,7 @@ class ErrorAnalyzer(BaseEstimator):
             return lambda array: array
 
         leaf_selector_as_array = np.array(leaf_selector)
-        leaf_selector = np.in1d(self._error_tree.leaf_ids, leaf_selector_as_array)
+        leaf_selector = np.in1d(self.error_tree.leaf_ids, leaf_selector_as_array)
         nr_kept_leaves = np.count_nonzero(leaf_selector)
         if nr_kept_leaves == 0:
             print("None of the ids provided correspond to a leaf id.")
@@ -376,8 +362,8 @@ class ErrorAnalyzer(BaseEstimator):
             path_to_node (str): Text describing the path from the root to the input node.
         """
         feature_names = self.pipeline_preprocessor.get_original_feature_names()
-        children_left = list(self._error_tree.estimator_.tree_.children_left)
-        children_right = list(self._error_tree.estimator_.tree_.children_right)
+        children_left = list(self.error_tree.estimator_.tree_.children_left)
+        children_right = list(self.error_tree.estimator_.tree_.children_right)
         threshold = self._inverse_transform_thresholds()
         feature = self._inverse_transform_features()
 
@@ -395,7 +381,7 @@ class ErrorAnalyzer(BaseEstimator):
             thresh = threshold[parent_id]
 
             is_categorical = self.pipeline_preprocessor.is_categorical(feat)
-            thresh = str(thresh) if is_categorical else "{:.2f}".format(thresh)
+            thresh = str(thresh) if is_categorical else format_float(thresh, 2)
 
             decision_rule = ''
             if node_is_left_child:
@@ -424,13 +410,8 @@ class ErrorAnalyzer(BaseEstimator):
                 indices of features of the Error Analyzer Tree, possibly mapped back to the
                 original unprocessed feature space.
         """
-        feats_idx = self._error_tree.estimator_.tree_.feature.copy()
-
-        for i, f in enumerate(feats_idx):
-            if f > 0:
-                feats_idx[i] = self.pipeline_preprocessor.inverse_transform_feature_id(f)
-
-        return feats_idx
+        return [self.pipeline_preprocessor.inverse_transform_feature_id(feat_idx) if feat_idx > 0 else feat_idx
+            for feat_idx in self.error_tree.estimator_.tree_.feature]
 
     #TODO naming is not very clear ?
     def _inverse_transform_thresholds(self):
@@ -445,24 +426,4 @@ class ErrorAnalyzer(BaseEstimator):
             numpy.ndarray:
                 thresholds of the Error Tree, possibly with preprocessing undone.
         """
-
-        used_feature_mask = self._error_tree.estimator_.tree_.feature > 0
-        feats_idx = self._error_tree.estimator_.tree_.feature[used_feature_mask]
-        thresholds = self._error_tree.estimator_.tree_.threshold.astype('O')
-        thresh = thresholds[used_feature_mask]
-        n_rows = len(feats_idx)
-        n_cols = self._error_train_x.shape[1]
-        dummy_x = np.zeros((n_rows, n_cols))
-
-        indices = []
-        i = 0
-
-        for f, t in zip(feats_idx, thresh):
-            dummy_x[i, f] = t
-            indices.append((i, self.pipeline_preprocessor.inverse_transform_feature_id(f)))
-            i += 1
-
-        undo_dummy_x = self.pipeline_preprocessor.inverse_transform(dummy_x)
-        descaled_thresh = [undo_dummy_x[i, j] for i, j in indices]
-        thresholds[used_feature_mask] = descaled_thresh
-        return thresholds
+        return self.pipeline_preprocessor.inverse_thresholds(self.error_tree.estimator_.tree_, self._error_train_x.shape[1])
