@@ -8,11 +8,11 @@ from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.base import BaseEstimator
 from sklearn.metrics import make_scorer
-from mealy.error_analysis_utils import check_enough_data, get_epsilon
-from mealy.constants import ErrorAnalyzerConstants
-from mealy.metrics import error_decision_tree_report, fidelity_balanced_accuracy_score
-from mealy.preprocessing import PipelinePreprocessor, DummyPipelinePreprocessor
-from mealy.error_tree import ErrorTree
+from .error_analysis_utils import check_enough_data, get_epsilon, format_float
+from .constants import ErrorAnalyzerConstants
+from .metrics import error_decision_tree_report, fidelity_balanced_accuracy_score
+from .preprocessing import PipelinePreprocessor, DummyPipelinePreprocessor
+from .error_tree import ErrorTree
 from sklearn.exceptions import NotFittedError
 
 import logging
@@ -149,8 +149,8 @@ class ErrorAnalyzer(BaseEstimator):
         self.error_tree = ErrorTree(error_decision_tree=gs_clf.best_estimator_)
         logger.info('Chosen parameters: {}'.format(gs_clf.best_params_))
 
-    #TODO rewrite this method using the ranking arrays
-    def get_error_leaf_summary(self, leaf_selector=None, add_path_to_leaves=False, output_format='dict', rank_by='total_error_fraction'):
+    def get_error_leaf_summary(self, leaf_selector=None, add_path_to_leaves=False,
+                               output_format='dict', rank_by='total_error_fraction'):
         """ Return summary information regarding leaves.
 
         Args:
@@ -380,7 +380,7 @@ class ErrorAnalyzer(BaseEstimator):
             thresh = threshold[parent_id]
 
             is_categorical = self.pipeline_preprocessor.is_categorical(feat)
-            thresh = str(thresh) if is_categorical else "{:.2f}".format(thresh)
+            thresh = str(thresh) if is_categorical else format_float(thresh, 2)
 
             decision_rule = ''
             if node_is_left_child:

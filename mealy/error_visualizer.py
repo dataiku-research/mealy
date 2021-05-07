@@ -4,8 +4,9 @@ import graphviz as gv
 import pydotplus
 from sklearn.tree import export_graphviz
 import matplotlib.pyplot as plt
-from mealy.constants import ErrorAnalyzerConstants
-from mealy.error_analyzer import ErrorAnalyzer
+from .constants import ErrorAnalyzerConstants
+from .error_analyzer import ErrorAnalyzer
+from .error_analysis_utils import format_float
 
 plt.rc('font', family="sans-serif")
 SMALL_SIZE, MEDIUM_SIZE, BIGGER_SIZE = 8, 10, 12
@@ -42,13 +43,13 @@ class _BaseErrorVisualizer(object):
                 bottom = bar_heights
 
     @staticmethod
-    def _add_new_plot(figsize, bins, x_ticks, feature_name, leaf_id):
+    def _add_new_plot(figsize, bins, x_ticks, feature_name, suptitle):
         plt.figure(figsize=figsize)
         plt.xticks(x_ticks, rotation="45")
         plt.gca().set_xticklabels(labels=bins)
-        plt.xlabel('{}'.format(feature_name))
         plt.ylabel('Proportion of samples')
-        plt.title('Distribution of {} in leaf {}'.format(feature_name, leaf_id))
+        plt.title('Distribution of {}'.format(feature_name))
+        plt.suptitle(suptitle)
 
     @staticmethod
     def _plot_feature_distribution(x_ticks, feature_is_numerical, leaf_data, root_data=None):
@@ -245,8 +246,8 @@ class ErrorVisualizer(_BaseErrorVisualizer):
             leaf_sample_ids = self._train_leaf_ids == leaf
             nr_leaf_samples = self._error_clf.tree_.n_node_samples[leaf]
             proba_wrong_leaf = nr_wrong[leaf] / nr_leaf_samples
-            proba_correct_leaf = 1 - proba_wrong_leaf
-            print('Leaf {} (Wrong prediction: {:.3f}, Correct prediction: {:.3f})'.format(leaf, proba_wrong_leaf, proba_correct_leaf))
+            suptitle = 'Leaf {} (Wrong prediction: {},'.format(leaf, format_float(proba_wrong_leaf, 3))
+            suptitle += ' Correct prediction: {})'.format(format_float(1 - proba_wrong_leaf, 3))
 
             for i, feature_idx in enumerate(ranked_feature_ids):
 
@@ -297,11 +298,11 @@ class ErrorVisualizer(_BaseErrorVisualizer):
                         ErrorAnalyzerConstants.CORRECT_PREDICTION: normalized_hist_correct
                     }
                 else:
-                    leaf_prediction = ErrorAnalyzerConstants.CORRECT_PREDICTION if proba_correct_leaf > proba_wrong_leaf else ErrorAnalyzerConstants.WRONG_PREDICTION
+                    leaf_prediction = ErrorAnalyzerConstants.CORRECT_PREDICTION if proba_wrong_leaf < .5 else ErrorAnalyzerConstants.WRONG_PREDICTION
                     leaf_hist_data = {leaf_prediction: histogram_func(feature_column[leaf_sample_ids])}
 
                 x_ticks = range(len(bins))
-                _BaseErrorVisualizer._add_new_plot(figsize, bins, x_ticks, feature_name, leaf)
+                _BaseErrorVisualizer._add_new_plot(figsize, bins, x_ticks, feature_name, suptitle)
                 _BaseErrorVisualizer._plot_feature_distribution(x_ticks, feature_is_numerical, leaf_hist_data, root_hist_data)
 
         plt.show()
