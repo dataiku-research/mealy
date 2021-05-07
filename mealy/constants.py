@@ -17,9 +17,9 @@ class ErrorAnalyzerConstants(object):
     CRITERION = 'entropy'
     NUMBER_EPSILON_VALUES = 50
 
-    ERROR_TREE_COLORS = {CORRECT_PREDICTION: '#CCCCCC', WRONG_PREDICTION: '#CE1228'}
+    ERROR_TREE_COLORS = {CORRECT_PREDICTION: '#DDDDDD', WRONG_PREDICTION: '#CE1228'}
 
-    TOP_K_FEATURES = 3
+    TOP_K_FEATURES = 5
 
     TREE_ACCURACY = 'error_tree_accuracy_score'
     TREE_FIDELITY = 'error_tree_fidelity_score'
