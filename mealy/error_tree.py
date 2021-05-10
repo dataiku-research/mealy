@@ -83,4 +83,4 @@ class ErrorTree(object):
 
     def _check_error_tree(self):
         if self.estimator_.tree_.node_count == 1:
-            logger.warning("The error tree has only 1 node, there will be problem when using it with ErrorVisualizer")
+            logger.warning("The error tree has only one node, there will be problems when using it with ErrorVisualizer")

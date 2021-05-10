@@ -1,42 +1,53 @@
 import numpy as np
-import random
 import unittest
 
-from sklearn.model_selection import train_test_split
-from sklearn.datasets import load_breast_cancer
-from sklearn.tree import DecisionTreeClassifier
 from sklearn.exceptions import NotFittedError
 from mealy import ErrorTree, ErrorAnalyzerConstants
 
-default_seed = 10
-np.random.seed(default_seed)
-random.seed(default_seed)
-
 
 class TestErrorTree(unittest.TestCase):
-    def setUp(self):
-        target_mapping_dict = {0: ErrorAnalyzerConstants.WRONG_PREDICTION,
-                               1: ErrorAnalyzerConstants.CORRECT_PREDICTION}
-
-        X, target = load_breast_cancer(return_X_y=True)
-        y = list(map(lambda x: target_mapping_dict[x], target))
-        X_train, _, y_train, _ = train_test_split(X, y, random_state=0)
-
-        clf = DecisionTreeClassifier(max_depth=2, random_state=0)
-        clf.fit(X_train, y_train)
-        self.tree = ErrorTree(clf)
-
     def test_empty_tree(self):
-        with self.assertRaises(NotFittedError):
+        with self.assertRaises(NotFittedError, msg="You should fit the ErrorAnalyzer first"):
             ErrorTree(None)
 
+    def test_small_tree(self):
+        clf = unittest.mock.Mock()
+        clf.tree_.node_count = 1
+        with self.assertLogs("mealy.error_tree", level="WARNING") as caplog:
+            error_tree = ErrorTree(clf)
+            self.assertEqual(caplog.output, [
+                "WARNING:mealy.error_tree:The error tree has only one node, " +
+                "there will be problems when using it with ErrorVisualizer"
+            ])
+
     def test_tree(self):
-        self.assertEqual(self.tree.error_class_idx, 1)
-        self.assertEqual(self.tree.n_total_errors, 159)
-        self.assertListEqual(self.tree.correctly_predicted_leaves.tolist(), [245., 2., 17., 3.])
-        self.assertListEqual(self.tree.difference.tolist(), [238., -4., 4., -130.])
-        self.assertListEqual(self.tree.impurity.tolist(), [0.9722222222222222, 0.25, 0.5666666666666667, 0.022058823529411766])
-        self.assertListEqual(self.tree.leaf_ids.tolist(), [2, 3, 5, 6])
-        self.assertListEqual(self.tree.quantized_impurity.tolist(), [9, 3, 6, 1])
-        self.assertListEqual(self.tree.total_error_fraction.tolist(), [0.0440251572327044, 0.03773584905660377, 0.08176100628930817, 0.8364779874213837])
-        self.assertListEqual(self.tree.wrongly_predicted_leaves.tolist(), [7.0, 6.0, 13.0, 133.0])
+        tree_ = unittest.mock.Mock(value=np.array([
+            [[42, 69]],
+            [[2, 9]],
+            [[40, 58]],
+            [[30, 0]],
+            [[10, 10]],
+            [[2, 9]],
+            [[8, 1]],
+            [[2, 30]],
+            [[28, 28]],
+            [[1, 10]],
+            [[27, 18]]
+            ]), feature=np.array([1, 2, -2, -2, 0, -2, -2, 0, 1]))
+
+        clf = unittest.mock.Mock(classes_=np.array([ErrorAnalyzerConstants.CORRECT_PREDICTION,
+            ErrorAnalyzerConstants.WRONG_PREDICTION]), tree_=tree_)
+
+        error_tree = ErrorTree(clf)
+
+        self.assertEqual(error_tree.error_class_idx, 1)
+        self.assertEqual(error_tree.n_total_errors, 69)
+        self.assertTrue((error_tree.leaf_ids == [2, 3, 5, 6]).all())
+
+        # Ranking arrays
+        self.assertTrue((error_tree.correctly_predicted_leaves == [40, 30, 2, 8]).all())
+        self.assertTrue((error_tree.wrongly_predicted_leaves == [58, 0, 9, 1]).all())
+        self.assertTrue((error_tree.difference == [-18, 30, -7, 7]).all())
+        self.assertTrue((error_tree.impurity == [20/49, 1, 2/11, 8/9]).all())
+        self.assertTrue((error_tree.quantized_impurity == [4, 10, 2, 9]).all())
+        self.assertTrue((error_tree.total_error_fraction == [58/69, 0, 9/69, 1/69]).all())
