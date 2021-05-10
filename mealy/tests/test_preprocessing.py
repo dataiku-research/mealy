@@ -1,20 +1,14 @@
-import os
-import json
 import numpy as np
 import pandas as pd
 from scipy.sparse import csr_matrix
 import random
 import unittest
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.tree import DecisionTreeClassifier
 
-from mealy import ErrorAnalyzer
-from mealy.metrics import compute_accuracy_score, balanced_accuracy_score, compute_primary_model_accuracy, compute_confidence_decision
 from mealy.preprocessing import PipelinePreprocessor, DummyPipelinePreprocessor
 
 default_seed = 10

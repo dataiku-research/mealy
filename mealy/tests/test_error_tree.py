@@ -1,28 +1,12 @@
-import os
-import json
 import numpy as np
-import pandas as pd
-from scipy.sparse import csr_matrix
 import random
 import unittest
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from sklearn.impute import SimpleImputer
-from sklearn.pipeline import Pipeline
 
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import load_breast_cancer
 from sklearn.tree import DecisionTreeClassifier
-from sklearn import tree
 from sklearn.exceptions import NotFittedError
-from mealy.error_tree import ErrorTree
-from mealy import ErrorAnalyzerConstants
-
-from mealy import ErrorAnalyzer
-from mealy.metrics import compute_accuracy_score, balanced_accuracy_score, compute_primary_model_accuracy, compute_confidence_decision
-from mealy.preprocessing import PipelinePreprocessor, DummyPipelinePreprocessor
+from mealy import ErrorTree, ErrorAnalyzerConstants
 
 default_seed = 10
 np.random.seed(default_seed)
@@ -30,20 +14,17 @@ random.seed(default_seed)
 
 
 class TestErrorTree(unittest.TestCase):
-
     def setUp(self):
         target_mapping_dict = {0: ErrorAnalyzerConstants.WRONG_PREDICTION,
                                1: ErrorAnalyzerConstants.CORRECT_PREDICTION}
 
-        breast_cancer = load_breast_cancer()
-        X = breast_cancer.data
-        y = list(map(lambda x: target_mapping_dict[x], breast_cancer.target))
-        X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+        X, target = load_breast_cancer(return_X_y=True)
+        y = list(map(lambda x: target_mapping_dict[x], target))
+        X_train, _, y_train, _ = train_test_split(X, y, random_state=0)
 
         clf = DecisionTreeClassifier(max_depth=2, random_state=0)
         clf.fit(X_train, y_train)
         self.tree = ErrorTree(clf)
-
 
     def test_empty_tree(self):
         with self.assertRaises(NotFittedError):
@@ -59,5 +40,3 @@ class TestErrorTree(unittest.TestCase):
         self.assertListEqual(self.tree.quantized_impurity.tolist(), [9, 3, 6, 1])
         self.assertListEqual(self.tree.total_error_fraction.tolist(), [0.0440251572327044, 0.03773584905660377, 0.08176100628930817, 0.8364779874213837])
         self.assertListEqual(self.tree.wrongly_predicted_leaves.tolist(), [7.0, 6.0, 13.0, 133.0])
-
-
