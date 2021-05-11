@@ -26,18 +26,26 @@ def get_epsilon(difference):
 def get_feature_list_from_column_transformer(ct_preprocessor):
     all_features, categorical_features = [], []
     for transformer_name, transformer, transformer_feature_names in ct_preprocessor.transformers_:
-        if transformer_name == 'remainder' and transformer == 'drop':
-            continue
-        all_features.extend(transformer_feature_names)
+        transformers = transformer.steps if isinstance(transformer, Pipeline)\
+            else [(transformer_name, transformer)]
 
-        # check for categorical features
-        if isinstance(transformer, Pipeline):
-            for step in transformer.steps:
-                if isinstance(step[1], ErrorAnalyzerConstants.VALID_CATEGORICAL_STEPS):
-                    categorical_features.extend(transformer_feature_names)
-                    break
-        elif isinstance(transformer, ErrorAnalyzerConstants.VALID_CATEGORICAL_STEPS):
-            categorical_features.extend(transformer_feature_names)
+        for name, step in transformers:
+            if name == 'remainder' and step == 'drop':
+                # Skip the drop step of ColumnTransformer
+                continue
+            if not isinstance(step, ErrorAnalyzerConstants.SUPPORTED_STEPS):
+                # Check all the preprocessing steps are supported by mealy
+                unsupported_class = step.__class__
+                raise TypeError('Mealy package does not support {}, '.format(unsupported_class) +
+                                'probably because it changes output dimension but does not ' +
+                                'provide a get_feature_names function to keep track of the '
+                                'generated features.')
+            if isinstance(step, ErrorAnalyzerConstants.VALID_CATEGORICAL_STEPS):
+                # Check for categorical features
+                categorical_features.extend(transformer_feature_names)
+                break
+
+        all_features.extend(transformer_feature_names)
     return all_features, categorical_features
 
 
