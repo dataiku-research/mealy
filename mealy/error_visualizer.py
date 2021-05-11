@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-import graphviz as gv
-import pydotplus
-from sklearn.tree import export_graphviz
+from graphviz import Source
+from collections import deque
 import matplotlib.pyplot as plt
 from .constants import ErrorAnalyzerConstants
 from .error_analyzer import ErrorAnalyzer
@@ -92,7 +91,7 @@ class ErrorVisualizer(_BaseErrorVisualizer):
         self._original_feature_names = self._error_analyzer.pipeline_preprocessor.get_original_feature_names()
         self._numerical_feature_names = [f for f in self._original_feature_names if not self._error_analyzer.pipeline_preprocessor.is_categorical(name=f)]
 
-    def plot_error_tree(self, size=None):
+    def plot_error_tree(self, size=(50, 50)):
         """
         Plot the graph of the decision tree.
 
@@ -103,91 +102,58 @@ class ErrorVisualizer(_BaseErrorVisualizer):
             graphviz.Source: graph of the Error Analyzer Tree.
 
         """
-        digraph_tree = export_graphviz(self._error_clf,
-                                       feature_names=self._error_analyzer.preprocessed_feature_names,
-                                       class_names=self._error_clf.classes_,
-                                       node_ids=True,
-                                       proportion=True,
-                                       rotate=False,
-                                       out_file=None,
-                                       filled=True,
-                                       rounded=True,
-                                       impurity=False)
+        dot_str = 'digraph Tree {{\n size="{0},{1}!";\n'.format(size[0], size[1])
+        dot_str += 'node [shape=box, style="filled, rounded", color="black", fontname=helvetica] ;\n'
+        dot_str += 'edge [fontname=helvetica] ;\ngraph [ranksep=equally, splines=polyline] ;\n'
+        color = ErrorAnalyzerConstants.ERROR_TREE_COLORS[ErrorAnalyzerConstants.WRONG_PREDICTION]
+        leaves, left_child_to_parent, right_child_to_parent = set(), {}, {}
+        ids = deque()
+        ids.append(0)
 
-        pydot_graph = pydotplus.graph_from_dot_data(str(digraph_tree))
+        while ids:
+            node_id = ids.popleft()
+            dot_str += '{0} [label="node #{0}\n'.format(node_id)
 
-        # descale threshold value
-        thresholds = self._thresholds
-        features = self._features
+            parent_id = left_child_to_parent.get(node_id, right_child_to_parent.get(node_id))
+            if parent_id is not None:
+                rule = self.node_decision_rule(parent_id, node_id in left_child_to_parent)
+                dot_str += "{}\n".format((rule[:32] + "...") if len(rule) > 35 else rule)
 
-        nodes = pydot_graph.get_node_list()
+            n_wrong_preds = self._error_clf.tree_.value[node_id, 0, self._error_tree.error_class_idx]
+            total_error_fraction = n_wrong_preds / self._error_tree.n_total_errors
+            samples = self._error_clf.tree_.n_node_samples[node_id]
+            local_error = n_wrong_preds / samples
+            dot_str += 'samples = {:.3f}%\n'.format(100 * samples / self._error_clf.tree_.n_node_samples[0])
+            dot_str += 'local error = {:.3f}%\n'.format(100 * local_error)
+            dot_str += 'fraction of total error = {:.3f}%\n'.format(100 * total_error_fraction)
 
-        for node in nodes:
-            if node.get_label():
-                node_label = node.get_label().strip('"')
-                idx = int(node_label.split('node #')[1].split('\\n')[0])
-                n_wrong_preds = self._error_clf.tree_.value[idx, 0, self._error_tree.error_class_idx]
-                total_error_fraction = n_wrong_preds / self._error_tree.n_total_errors
-                local_error = n_wrong_preds / self._error_clf.tree_.n_node_samples[idx]
-                if ' <= ' in node_label:
-                    lte_split = node_label.split(' <= ')
-                    samples_split = lte_split[1].split('\\nsamples')
+            alpha = "{:02x}".format(int(local_error*255))
+            dot_str += '", fillcolor="{}", tooltip="{}"] ;'.format(color+alpha, "root" if parent_id is None else rule)
 
-                    split_feature = self._original_feature_names[features[idx]]
-                    descaled_value = thresholds[idx]
+            if parent_id is not None:
+                edge_width = max(1, ErrorAnalyzerConstants.GRAPH_MAX_EDGE_WIDTH * total_error_fraction)
+                dot_str += '{} -> {} [penwidth={}];\n'.format(parent_id, node_id, edge_width)
+            left_child_id, right_child_id = self._error_clf.tree_.children_left[node_id], self._error_clf.tree_.children_right[node_id]
+            if left_child_id > 0:
+                ids += [left_child_id, right_child_id]
+                left_child_to_parent[left_child_id] = node_id
+                right_child_to_parent[right_child_id] = node_id
+            else:
+                leaves.add(node_id)
 
-                    if split_feature in self._numerical_feature_names:
-                        descaled_value = '%.2f' % descaled_value
-                        lte_modified = ' <= '.join([lte_split[0], descaled_value])
-                    else:
-                        lte_split_without_feature = lte_split[0].split('\\n')[0]
-                        lte_split_with_new_feature = lte_split_without_feature + '\\n' + split_feature
-                        lte_modified = ' != '.join([lte_split_with_new_feature, str(descaled_value)])
-                    new_label = lte_modified
-                else:
-                    samples_split = node_label.split('\\nsamples')
-                    new_label = samples_split[0]
+        dot_str += '{rank=same ; '+ '; '.join(map(str, leaves)) + '} ;\n'
+        dot_str += "}"
+        return Source(dot_str)
 
-                value_split = samples_split[1].split('\\nvalue')
-
-                new_label += '\\nsamples' + value_split[0] + \
-                             '\\nlocal error = %.3f %%' % (local_error * 100) + \
-                             '\\nfraction of total error = %.3f %%\\n' % (total_error_fraction * 100)
-
-                node.set_label(new_label)
-
-                alpha = 0.0
-                if 'value = [' in node_label:
-                    # transparency as the local error
-                    if local_error >= ErrorAnalyzerConstants.GRAPH_MIN_LOCAL_ERROR_OPAQUE:
-                        alpha = 1.0
-                    else:
-                        alpha = local_error
-
-                node_class = ErrorAnalyzerConstants.CORRECT_PREDICTION if total_error_fraction == 0 else ErrorAnalyzerConstants.WRONG_PREDICTION
-                class_color = ErrorAnalyzerConstants.ERROR_TREE_COLORS[node_class].strip('#')
-                class_color_rgb = tuple(int(class_color[i:i + 2], 16) for i in (0, 2, 4))
-                # compute the color as alpha against white
-                color_rgb = [int(round(alpha * c + (1 - alpha) * 255, 0)) for c in class_color_rgb]
-                color = '#{:02x}{:02x}{:02x}'.format(color_rgb[0], color_rgb[1], color_rgb[2])
-                node.set_fillcolor(color)
-
-                if idx in self._error_clf.tree_.children_left:
-                    parent_id = np.where(self._error_clf.tree_.children_left == idx)[0][0]
-                elif idx in self._error_clf.tree_.children_right:
-                    parent_id = np.where(self._error_clf.tree_.children_right == idx)[0][0]
-                else:
-                    parent_id = None
-
-                if parent_id is not None:
-                    parent_edge = pydot_graph.get_edge(str(parent_id), node.get_name())[0]
-                    parent_edge.set_penwidth(max(1, ErrorAnalyzerConstants.GRAPH_MAX_EDGE_WIDTH * total_error_fraction))
-
-        if size is not None:
-            pydot_graph.set_size('"%d,%d!"' % (size[0], size[1]))
-        gvz_graph = gv.Source(pydot_graph.to_string())
-
-        return gvz_graph
+    def node_decision_rule(self, parent_id, left_child):
+        feature = self._original_feature_names[self._features[parent_id]]
+        value = self._thresholds[parent_id]
+        numerical_split = feature in self._numerical_feature_names
+        if numerical_split:
+            if left_child:
+                return '{} <= {:.2f}'.format(feature, value)
+            return '{:.2f} < {}'.format(value, feature)
+        return feature + ' is ' + ( '' if left_child else 'not ') + str(value)
 
     def plot_feature_distributions_on_leaves(self, leaf_selector=None,
                                              top_k_features=ErrorAnalyzerConstants.TOP_K_FEATURES,

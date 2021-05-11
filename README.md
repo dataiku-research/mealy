@@ -161,7 +161,6 @@ mealy depends on:
 - scikit-learn >= 0.19
 - matplotlib >= 2.0
 - graphviz >= 0.14
-- pydotplus >= 2.0
 - kneed == 0.6
 
 ### Installing with pip
