@@ -88,14 +88,11 @@ class PipelinePreprocessor(FeatureNameTransformer):
         logger.info('Generating the feature id mapping dict')
         self._create_feature_mapping(ct_preprocessor)
 
-    def _create_feature_mapping(self, ct_preprocessor):
+    def _create_feature_mapping(self):
         """
         Update the dicts of input <-> output feature id mapping: self.original2preprocessed and self.preprocessed2original
-
-        Args:
-            ct_preprocessor: a ColumnTransformer object.
         """
-        for i, (transformer_name, transformer, transformer_feature_names) in enumerate(ct_preprocessor.transformers_):
+        for i, (transformer_name, transformer, transformer_feature_names) in enumerate(self.ct_preprocessor.transformers_):
             orig_feats_ids = np.where(np.in1d(self.original_feature_names, transformer_feature_names))[0]
             if isinstance(transformer, Pipeline):
                 # The assumption here is that for each pipeline there is at most one step that change feature dimension

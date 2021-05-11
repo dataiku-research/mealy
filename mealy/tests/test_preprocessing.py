@@ -1,13 +1,12 @@
 import numpy as np
 import pandas as pd
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix, issparse
 import random
 import unittest
 from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
-from sklearn.tree import DecisionTreeClassifier
 
 from mealy.preprocessing import PipelinePreprocessor, DummyPipelinePreprocessor
 
@@ -16,8 +15,7 @@ np.random.seed(default_seed)
 random.seed(default_seed)
 
 
-class TestPreprocessing(unittest.TestCase):
-
+class TestFeatureTransformer(unittest.TestCase):
     def setUp(self):
         self.feature_list = ['a', 'b', 'c']
         self.x = np.array([[1, 2, 3], [2, 4, 6], [3, 6, 9]])
@@ -26,49 +24,175 @@ class TestPreprocessing(unittest.TestCase):
         self.sparse_x = csr_matrix(self.x)
         self.feature_importances = np.array([0.5, 0.2, 0.3])
 
-    def test_with_dummy_pipeline(self):
-        pipe = DummyPipelinePreprocessor(self.feature_list)
-        preprocessed_x_from_array = pipe.transform(self.x)
-        preprocessed_x_from_df = pipe.transform(self.df)
-        preprocessed_x_from_sparse_matrix = pipe.transform(self.sparse_x)
-        all_feature_importances = pipe.get_top_ranked_feature_ids(self.feature_importances, max_nr_features=0)
-        top_2_feature_importances = pipe.get_top_ranked_feature_ids(self.feature_importances, max_nr_features=2)
 
-        self.assertIsNone(np.testing.assert_array_equal(preprocessed_x_from_array, self.x))
-        self.assertIsNone(np.testing.assert_array_equal(preprocessed_x_from_df, self.x))
-        self.assertIsNone(np.testing.assert_array_equal(preprocessed_x_from_sparse_matrix.toarray(), self.x))
-        self.assertListEqual(pipe.get_original_feature_names(), self.feature_list)
-        self.assertListEqual(pipe.get_preprocessed_feature_names(), self.feature_list)
-        self.assertFalse(pipe.is_categorical(index=0), False)
-        self.assertEqual(pipe.inverse_transform_feature_id(index=0), 0)
-        self.assertIsNone(np.testing.assert_array_equal(pipe.inverse_transform(preprocessed_x_from_array), self.x))
-        self.assertListEqual(all_feature_importances.tolist(), [0, 2, 1])
-        self.assertListEqual(top_2_feature_importances.tolist(), [0, 2])
+class TestDummyPipeline(TestFeatureTransformer):
+    def setUp(self):
+        super(TestDummyPipeline, self).setUp()
+        self.pipe = DummyPipelinePreprocessor(self.feature_list)
 
-    def test_with_scikit_pipeline(self):
-        numeric_transformer = Pipeline(steps=[
-            ('SimpleImputer', SimpleImputer(strategy='median', add_indicator=True)),
-            ('StandardScaler', StandardScaler()),
-        ])
+    def test_transform_array(self):
+        preprocessed_x = self.pipe.transform(self.x)
+        self.assertTrue((preprocessed_x == self.x).all())
 
-        preprocessor = ColumnTransformer(transformers=[('num', numeric_transformer, self.feature_list)])
-        scikit_pipeline = Pipeline(steps=[('preprocessor', preprocessor),
-                                        ('classifier', DecisionTreeClassifier(max_depth=2, random_state=0))])
+    def test_transform_df(self):
+        preprocessed_x = self.pipe.transform(self.df)
+        self.assertTrue((preprocessed_x == self.x).all())
 
-        scikit_pipeline.fit(self.df, self.y)
+    def test_transform_sparse(self):
+        preprocessed_x = self.pipe.transform(self.sparse_x)
+        self.assertEqual((preprocessed_x != self.sparse_x).nnz, 0)
 
-        pipe = PipelinePreprocessor(scikit_pipeline.steps[0][1], self.feature_list)
+    def test_get_top_ranked_feature_ids(self):
+        input_to_results = {
+            0: np.array([0, 2, 1]),
+            2: np.array([0, 2]),
+            -2: np.array([0])
+        }
+        for max_nr_features, result in input_to_results.items():
+            with self.subTest(max_nr_features=max_nr_features):
+                ranked = self.pipe.get_top_ranked_feature_ids(self.feature_importances,
+                                                              max_nr_features=max_nr_features)
+                self.assertTrue((ranked == result).all())
 
-        ref_transformed_array = np.array([[-1.22474487, -1.22474487, -1.22474487],
-                                       [ 0., 0., 0.],
-                                       [ 1.22474487, 1.22474487, 1.22474487]])
-        self.assertIsNone(np.testing.assert_allclose(pipe.transform(self.df), ref_transformed_array))
-        # got a weird error with assert_allclose if we don't manually recast the result to np array
-        self.assertIsNone(np.testing.assert_allclose(np.array(pipe.inverse_transform(ref_transformed_array).tolist()), self.x))
+    def test_original_features(self):
+        self.assertListEqual(self.pipe.get_original_feature_names(), self.feature_list)
 
-        self.assertEqual(pipe.inverse_transform_feature_id(0), 0)
-        self.assertEqual(pipe.inverse_transform_feature_id(1), 1)
-        self.assertEqual(pipe.inverse_transform_feature_id(2), 2)
+    def test_preprocessed_features(self):
+        self.assertListEqual(self.pipe.get_preprocessed_feature_names(), self.feature_list)
 
-        self.assertListEqual(pipe.get_top_ranked_feature_ids(self.feature_importances, 0), [0, 2, 1])
-        self.assertListEqual(pipe.get_top_ranked_feature_ids(self.feature_importances, 2), [0, 2])
+    def test_is_cat(self):
+        pass
+
+    def test_inverse_transform(self):
+        pass
+
+    def test_inverse_transform_feature_id(self):
+        pass
+
+
+class TestPreprocessingPipelineWithPipeline(TestFeatureTransformer):
+    @unittest.mock.patch("mealy.preprocessing.get_feature_list_from_column_transformer", return_value=(["num_1", "num_2", "cat_1", "cat_2"], ["cat_1", "cat_2"]))
+    @unittest.mock.patch("mealy.preprocessing.PipelinePreprocessor._create_feature_mapping", return_value=None)
+    def setUp(self, patched_create_mapping, patched_feature_list):
+        super(TestPreprocessingPipelineWithPipeline, self).setUp()
+        col_transformer = unittest.mock.Mock(spec=ColumnTransformer)
+        self.pipe = PipelinePreprocessor(col_transformer)
+
+    @unittest.mock.patch("mealy.preprocessing.PipelinePreprocessor._update_feature_mapping_dict_using_input_names", return_value=None)
+    @unittest.mock.patch("mealy.preprocessing.PipelinePreprocessor._update_feature_mapping_dict_using_output_names", return_value=None)
+    def test_create_feature_mapping_output_dim_change(self, mocked_o, mocked_i):
+        mocked_pipeline = unittest.mock.Mock(spec=Pipeline)
+        ohe = unittest.mock.Mock(spec=OneHotEncoder)
+        mocked_pipeline.steps = [
+            ("stds", unittest.mock.Mock(spec=StandardScaler)),
+            ("ohe", ohe)
+        ]
+        self.pipe.ct_preprocessor.transformers_ = [("pipeline", mocked_pipeline, ["num_1", "cat_2"])]
+        self.pipe._create_feature_mapping()
+        step, features, feat_ids = mocked_o.call_args[0]
+        self.assertEqual(step, ohe)
+        self.assertListEqual(features, ["num_1", "cat_2"])
+        np.testing.assert_array_equal(feat_ids, np.array([0,3]))
+        self.assertEqual(mocked_o.call_count, 1)
+        self.assertEqual(mocked_i.call_count, 0)
+
+    @unittest.mock.patch("mealy.preprocessing.PipelinePreprocessor._update_feature_mapping_dict_using_input_names", return_value=None)
+    @unittest.mock.patch("mealy.preprocessing.PipelinePreprocessor._update_feature_mapping_dict_using_output_names", return_value=None)
+    def test_create_feature_mapping_no_change_in_output_dim(self, mocked_o, mocked_i):
+        mocked_pipeline = unittest.mock.Mock(spec=Pipeline)
+        mocked_pipeline.steps = [
+            ("stds", unittest.mock.Mock(spec=StandardScaler)),
+            ("si", unittest.mock.Mock(spec=SimpleImputer))
+        ]
+        self.pipe.ct_preprocessor.transformers_ = [("pipeline", mocked_pipeline, ["num_1", "num_2", "cat_1", "cat_2"])]
+        self.pipe._create_feature_mapping()
+        self.assertEqual(mocked_o.call_count, 0)
+        self.assertEqual(mocked_i.call_count, 1)
+        features, feat_ids = mocked_i.call_args[0]
+        self.assertListEqual(features, ["num_1", "num_2", "cat_1", "cat_2"])
+        np.testing.assert_array_equal(feat_ids, np.array([0,1,2,3]))
+
+    @unittest.mock.patch("mealy.preprocessing.PipelinePreprocessor._update_feature_mapping_dict_using_input_names", return_value=None)
+    @unittest.mock.patch("mealy.preprocessing.PipelinePreprocessor._update_feature_mapping_dict_using_output_names", return_value=None)
+    def test_create_feature_mapping_unsupported_step(self, mocked_o, mocked_i):
+        mocked_pipeline = unittest.mock.Mock(spec=Pipeline)
+        mocked_pipeline.steps = [
+            ("unsupported", unittest.mock.Mock())
+        ]
+        self.pipe.ct_preprocessor.transformers_ = [("pipeline", mocked_pipeline, ["num_1", "num_2", "cat_1", "cat_2"])]
+        with self.assertRaises(TypeError): #TODO: add msg
+            self.pipe._create_feature_mapping()
+        self.assertEqual(mocked_o.call_count, 0)
+        self.assertEqual(mocked_i.call_count, 0)
+
+    def test_update_feature_mapping_dict_using_input_names(self):
+        self.pipe._update_feature_mapping_dict_using_input_names(["transformed_name_1", "transformed_name_2"], [0, 4])
+        self.assertListEqual(self.pipe.preprocessed_feature_names, ["transformed_name_1", "transformed_name_2"])
+        self.assertDictEqual(self.pipe.original2preprocessed, {0: 0, 4: 1})
+        self.assertDictEqual(self.pipe.preprocessed2original, {0: 0, 1: 4})
+        self.assertEqual(self.pipe.len_preproc, 2)
+
+    def test_update_feature_mapping_dict_using_output_names(self):
+        single_tr = unittest.mock.Mock()
+        single_tr.get_feature_names.return_value = ["very_transformed_name_1_0", "even_more_transformed_name"]
+        self.pipe._update_feature_mapping_dict_using_output_names(single_tr, ["transformed_name_1", "transformed_name_2"], [0, 4])
+        self.assertListEqual(self.pipe.preprocessed_feature_names, ["very_transformed_name_1_0", "even_more_transformed_name"])
+        #self.assertDictEqual(self.pipe.original2preprocessed, {0: [0]})
+        self.assertDictEqual(self.pipe.preprocessed2original, {0: 0})
+        self.assertEqual(self.pipe.len_preproc, 1)
+
+    def test_original_features(self):
+        self.assertListEqual(self.pipe.get_original_feature_names(), ["num_1", "num_2", "cat_1", "cat_2"])
+
+    def test_is_cat(self):
+        self.assertFalse(self.pipe.is_categorical(1))
+        self.assertFalse(self.pipe.is_categorical(name="num_1"))
+        self.assertTrue(self.pipe.is_categorical(3))
+        self.assertTrue(self.pipe.is_categorical(name="cat_1"))
+        with self.assertRaises(ValueError, msg="Either the input index or its name should be specified."):
+            self.pipe.is_categorical()
+
+    @unittest.mock.patch("mealy.preprocessing.PipelinePreprocessor.inverse_transform_feature_id", side_effect=lambda idx: idx)
+    @unittest.mock.patch("mealy.preprocessing.PipelinePreprocessor.inverse_transform", side_effect=lambda a: a+1)
+    def test_inverse_thresholds(self, mocked_inverse_transform, mocked_inverse_transform_feature_id):
+        nr_cols = 6
+        tree = unittest.mock.Mock(feature=np.array([0,-2,1,3,-2,-2,0]), threshold=np.array([1, -2, 42,6,-2,-2,12]))
+        thresholds = self.pipe.inverse_thresholds(tree, nr_cols)
+        a = mocked_inverse_transform.call_args[0][0]
+        self.assertTrue(mocked_inverse_transform.call_count == 1)
+        #np.testing.assert_array_equal(a, np.array([
+        #    [1,0,0,0,0,0],
+        #    [0,42,0,0,0,0],
+        #    [0,0,0,6,0,0],
+        #    [12,0,0,0,0,0],
+        #]))
+        #self.assertTrue(mocked_inverse_transform_feature_id.call_count == 4)
+        #first, second, third, fourth = mocked_inverse_transform_feature_id.call_args_list
+        #self.assertEqual(first[0][0], 0)
+        #self.assertEqual(second[0][0], 1)
+        #self.assertEqual(third[0][0], 3)
+        #self.assertEqual(fourth[0][0], 0)
+        #self.assertTrue((thresholds == [2, -2, 43, 7, -2, -2, 13]).all())
+
+    def test_get_feature_ids_related_to_transformer(self):
+        self.pipe.original2preprocessed = {0: 42, 1: 6, 2: [7], 3: [6, 7]}
+        orig_feature_ids, preprocessed_feature_ids = self.pipe._get_feature_ids_related_to_transformer(["num_1", "cat_2"])
+        self.assertListEqual(preprocessed_feature_ids, [42, 6, 7])
+        self.assertTrue((orig_feature_ids == [0, 3]).all())
+
+    def test_get_top_ranked_feature_ids(self):
+        importance = np.array([20, 1, -2, 43])
+        self.pipe.preprocessed2original = {0:1, 1:2, 2:3, 3:0}
+        self.assertListEqual(self.pipe.get_top_ranked_feature_ids(importance, 0), [0, 1, 2, 3])
+        self.assertListEqual(self.pipe.get_top_ranked_feature_ids(importance, -2), [0, 1])
+        self.assertListEqual(self.pipe.get_top_ranked_feature_ids(importance, 1), [0])
+
+    def test_get_top_ranked_feature_ids_with_duplicates(self):
+        importance = np.array([20, 1, -2, 43])
+        self.pipe.preprocessed2original = {0:1, 1:1, 2:3, 3:3}
+        self.assertListEqual(self.pipe.get_top_ranked_feature_ids(importance, 0), [3, 1])
+        self.assertListEqual(self.pipe.get_top_ranked_feature_ids(importance, -1), [3, 1])
+        self.assertListEqual(self.pipe.get_top_ranked_feature_ids(importance, 1), [3])
+
+    def test_inverse_transform(self):
+        pass #TODO
