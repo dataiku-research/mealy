@@ -188,18 +188,19 @@ class PipelinePreprocessor(FeatureNameTransformer):
         """
         nr_original_features = len(self.get_original_feature_names())
         undo_prep_test_x = np.zeros((preprocessed_x.shape[0], nr_original_features), dtype='O')
+        any_numeric = np.any(np.vectorize(lambda x: not self.is_categorical(x)))
 
-        for transformer_name, transformer, feature_names in self.ct_preprocessor.transformers_:
+        for _, transformer, feature_names in self.ct_preprocessor.transformers_:
+            original_feature_ids, preprocessed_feature_ids = self._get_feature_ids_related_to_transformer(feature_names)
+            transformer_output = preprocessed_x[:, preprocessed_feature_ids]
+            if issparse(transformer_output) and any_numeric(transformer_output):
+                transformer_output = transformer_output.todense()
+
+            # TODO: could be simplified as sklearn.Pipeline implements inverse_transform
             for step in generate_preprocessing_steps(transformer, invert_order=True):
-                original_feature_ids, preprocessed_feature_ids = self._get_feature_ids_related_to_transformer(feature_names)
-
-                output_of_transformer = preprocessed_x[:, preprocessed_feature_ids]
-                any_numeric = np.any(np.vectorize(lambda x: not self.is_categorical(x)))
-                if issparse(output_of_transformer) and any_numeric:
-                    output_of_transformer = output_of_transformer.todense()
-
-                input_of_transformer = PipelinePreprocessor._inverse_single_step(step, output_of_transformer, feature_names)
-                undo_prep_test_x[:, original_feature_ids] = input_of_transformer
+                transformer_input = PipelinePreprocessor._inverse_single_step(step, transformer_output, feature_names)
+                transformer_output = transformer_input
+            undo_prep_test_x[:, original_feature_ids] = transformer_input
 
         return undo_prep_test_x
 
