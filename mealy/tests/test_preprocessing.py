@@ -61,13 +61,14 @@ class TestDummyPipeline(TestFeatureTransformer):
         self.assertListEqual(self.pipe.get_preprocessed_feature_names(), self.feature_list)
 
     def test_is_cat(self):
-        pass
+        self.assertFalse(self.pipe.is_categorical(0))
 
     def test_inverse_transform(self):
-        pass
+        array = np.random.rand(3,4)
+        np.testing.assert_array_equal(self.pipe.inverse_transform(array), array)
 
     def test_inverse_transform_feature_id(self):
-        pass
+        self.assertEqual(self.pipe.inverse_transform_feature_id(1), 1)
 
 
 class TestPreprocessingPipelineWithPipeline(TestFeatureTransformer):
@@ -160,19 +161,19 @@ class TestPreprocessingPipelineWithPipeline(TestFeatureTransformer):
         thresholds = self.pipe.inverse_thresholds(tree, nr_cols)
         a = mocked_inverse_transform.call_args[0][0]
         self.assertTrue(mocked_inverse_transform.call_count == 1)
-        #np.testing.assert_array_equal(a, np.array([
-        #    [1,0,0,0,0,0],
-        #    [0,42,0,0,0,0],
-        #    [0,0,0,6,0,0],
-        #    [12,0,0,0,0,0],
-        #]))
-        #self.assertTrue(mocked_inverse_transform_feature_id.call_count == 4)
-        #first, second, third, fourth = mocked_inverse_transform_feature_id.call_args_list
-        #self.assertEqual(first[0][0], 0)
-        #self.assertEqual(second[0][0], 1)
-        #self.assertEqual(third[0][0], 3)
-        #self.assertEqual(fourth[0][0], 0)
-        #self.assertTrue((thresholds == [2, -2, 43, 7, -2, -2, 13]).all())
+        np.testing.assert_array_equal(a, np.array([
+            [1,0,0,0,0,0],
+            [0,42,0,0,0,0],
+            [0,0,0,6,0,0],
+            [12,0,0,0,0,0],
+        ]))
+        self.assertTrue(mocked_inverse_transform_feature_id.call_count == 4)
+        first, second, third, fourth = mocked_inverse_transform_feature_id.call_args_list
+        self.assertEqual(first[0][0], 0)
+        self.assertEqual(second[0][0], 1)
+        self.assertEqual(third[0][0], 3)
+        self.assertEqual(fourth[0][0], 0)
+        self.assertTrue((thresholds == [2, -2, 43, 7, -2, -2, 13]).all())
 
     def test_get_feature_ids_related_to_transformer(self):
         self.pipe.original2preprocessed = {0: 42, 1: 6, 2: [7], 3: [6, 7]}
