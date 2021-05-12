@@ -70,11 +70,11 @@ class TestDummyPipeline(TestFeatureTransformer):
         self.assertEqual(self.pipe.inverse_transform_feature_id(1), 1)
 
 
-class TestPreprocessingPipelineWithPipeline(TestFeatureTransformer):
+class TestPreprocessingPipeline(TestFeatureTransformer):
     @unittest.mock.patch("mealy.preprocessing.PipelinePreprocessor._get_feature_list_from_column_transformer", return_value=["num_1", "num_2", "cat_1", "cat_2"])
     @unittest.mock.patch("mealy.preprocessing.PipelinePreprocessor._create_feature_mapping", return_value=None)
     def setUp(self, patched_create_mapping, patched_feature_list):
-        super(TestPreprocessingPipelineWithPipeline, self).setUp()
+        super(TestPreprocessingPipeline, self).setUp()
         col_transformer = unittest.mock.Mock(spec=ColumnTransformer)
         self.pipe = PipelinePreprocessor(col_transformer)
 
