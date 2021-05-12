@@ -3,8 +3,9 @@ from sklearn.pipeline import Pipeline
 import numpy as np
 import pandas as pd
 from scipy.sparse import issparse
+from collections import defaultdict
 import logging
-from mealy.error_analysis_utils import check_lists_having_same_elements, get_feature_list_from_column_transformer
+from mealy.error_analysis_utils import check_lists_having_same_elements, generate_preprocessing_steps
 from mealy.constants import ErrorAnalyzerConstants
 
 logger = logging.getLogger(__name__)
@@ -71,11 +72,12 @@ class PipelinePreprocessor(FeatureNameTransformer):
 
     def __init__(self, ct_preprocessor, original_features=None):
         self.ct_preprocessor = ct_preprocessor
-        self.original2preprocessed = {}
+        self.original2preprocessed = defaultdict(list)
         self.preprocessed2original = {}
+        self.categorical_features = []
 
         logger.info('Retrieving the list of features used in the pipeline')
-        original_features_from_ct, self.categorical_features = get_feature_list_from_column_transformer(self.ct_preprocessor)
+        original_features_from_ct = self._get_feature_list_from_column_transformer()
         if original_features is None:
             original_features = original_features_from_ct
         elif not check_lists_having_same_elements(original_features, original_features_from_ct):
@@ -87,30 +89,36 @@ class PipelinePreprocessor(FeatureNameTransformer):
         logger.info('Generating the feature id mapping dict')
         self._create_feature_mapping()
 
+    def _get_feature_list_from_column_transformer(self):
+        all_features = []
+        for _, transformer, feature_names in self.ct_preprocessor.transformers_:
+            for step in generate_preprocessing_steps(transformer):
+                if isinstance(step, ErrorAnalyzerConstants.VALID_CATEGORICAL_STEPS):
+                    # Check for categorical features
+                    self.categorical_features += feature_names
+                    break
+
+            all_features += feature_names
+        return all_features
+
     def _create_feature_mapping(self):
         """
         Update the dicts of input <-> output feature id mapping: self.original2preprocessed and self.preprocessed2original
         """
-        for transformer_name, transformer, transformer_feature_names in self.ct_preprocessor.transformers_:
-            orig_feat_ids = np.where(np.in1d(self.original_feature_names, transformer_feature_names))[0]
-            transformers = transformer.steps if isinstance(transformer, Pipeline)\
-                else [(transformer_name, transformer)]
-
-            output_dimension_is_changed = False
-            for name, step in transformers:
-                if name == 'remainder' and step == 'drop':
-                    # Skip the default drop step of ColumnTransformer
-                    continue
+        for _, transformer, feature_names in self.ct_preprocessor.transformers_:
+            orig_feat_ids = np.where(np.in1d(self.original_feature_names, feature_names))[0]
+            for step in generate_preprocessing_steps(transformer):
+                output_dim_changed = False
                 if isinstance(step, ErrorAnalyzerConstants.STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES):
                     # It is assumed that for each pipeline, at most one step changes the feature's dimension
                     # For now, it can only be a OneHotEncoder step
                     self._update_feature_mapping_dict_using_output_names(step,
-                                                                         transformer_feature_names,
-                                                                         orig_feat_ids)
-                    output_dimension_is_changed = True
+                                                                        feature_names,
+                                                                        orig_feat_ids)
+                    output_dim_changed = True
                     break
-            if not output_dimension_is_changed:
-                self._update_feature_mapping_dict_using_input_names(transformer_feature_names, orig_feat_ids)
+            if not output_dim_changed:
+                self._update_feature_mapping_dict_using_input_names(feature_names, orig_feat_ids)
 
     def _update_feature_mapping_dict_using_input_names(self, transformer_feature_names, original_feature_ids):
         self.preprocessed_feature_names.extend(transformer_feature_names)
@@ -124,7 +132,6 @@ class PipelinePreprocessor(FeatureNameTransformer):
         self.preprocessed_feature_names.extend(out_feature_names)
         for orig_id, orig_name in zip(original_feature_ids, transformer_feature_names):
             part_out_feature_names = [name for name in out_feature_names if orig_name + '_' in name]
-            self.original2preprocessed[orig_id] = []
             offset = len(self.preprocessed2original)
             for i in range(len(part_out_feature_names)):
                 self.original2preprocessed[orig_id].append(offset + i)
@@ -182,23 +189,17 @@ class PipelinePreprocessor(FeatureNameTransformer):
         nr_original_features = len(self.get_original_feature_names())
         undo_prep_test_x = np.zeros((preprocessed_x.shape[0], nr_original_features), dtype='O')
 
-        for (transformer_name, transformer, transformer_feature_names) in self.ct_preprocessor.transformers_:
-            if transformer_name == 'remainder' and transformer == 'drop':
-                continue
-            original_feature_ids, preprocessed_feature_ids = self._get_feature_ids_related_to_transformer(transformer_feature_names)
-            output_of_transformer = preprocessed_x[:, preprocessed_feature_ids]
+        for transformer_name, transformer, feature_names in self.ct_preprocessor.transformers_:
+            for step in generate_preprocessing_steps(transformer, invert_order=True):
+                original_feature_ids, preprocessed_feature_ids = self._get_feature_ids_related_to_transformer(feature_names)
 
-            any_numeric = np.any(np.vectorize(lambda x: not self.is_categorical(x)))
-            if issparse(output_of_transformer) and any_numeric:
-                output_of_transformer = output_of_transformer.todense()
+                output_of_transformer = preprocessed_x[:, preprocessed_feature_ids]
+                any_numeric = np.any(np.vectorize(lambda x: not self.is_categorical(x)))
+                if issparse(output_of_transformer) and any_numeric:
+                    output_of_transformer = output_of_transformer.todense()
 
-            transformers = reversed(transformer.steps) if isinstance(transformer, Pipeline) else [(transformer_name, transformer)]
-            for name, step in transformers:
-                if name == 'remainder' and step == 'drop':
-                    continue
-                input_of_transformer = PipelinePreprocessor._inverse_single_step(step, output_of_transformer, transformer_feature_names)
-                output_of_transformer = input_of_transformer
-            undo_prep_test_x[:, original_feature_ids] = input_of_transformer
+                input_of_transformer = PipelinePreprocessor._inverse_single_step(step, output_of_transformer, feature_names)
+                undo_prep_test_x[:, original_feature_ids] = input_of_transformer
 
         return undo_prep_test_x
 
