@@ -17,10 +17,8 @@ random.seed(default_seed)
 
 class TestFeatureTransformer(unittest.TestCase):
     def setUp(self):
-        self.feature_list = ['a', 'b', 'c']
+        self.feature_list = ["num_1", "num_2", "cat_1", "cat_2"]
         self.x = np.array([[1, 2, 3], [2, 4, 6], [3, 6, 9]])
-        self.y = [1, 1, 0]
-        self.df = pd.DataFrame(self.x, columns=self.feature_list)
         self.sparse_x = csr_matrix(self.x)
         self.feature_importances = np.array([0.5, 0.2, 0.3])
 
@@ -28,6 +26,7 @@ class TestFeatureTransformer(unittest.TestCase):
 class TestDummyPipeline(TestFeatureTransformer):
     def setUp(self):
         super(TestDummyPipeline, self).setUp()
+        self.df = pd.DataFrame(self.x, columns=self.feature_list[:-1])
         self.pipe = DummyPipelinePreprocessor(self.feature_list)
 
     def test_transform_array(self):
@@ -81,15 +80,16 @@ class TestPreprocessingPipelineWithPipeline(TestFeatureTransformer):
 
     @unittest.mock.patch("mealy.preprocessing.PipelinePreprocessor._update_feature_mapping_dict_using_input_names", return_value=None)
     @unittest.mock.patch("mealy.preprocessing.PipelinePreprocessor._update_feature_mapping_dict_using_output_names", return_value=None)
-    @unittest.mock.patch("mealy.preprocessing.generate_preprocessing_steps", side_effect=lambda transformer: map(lambda _: _[1], transformer.steps))
+    @unittest.mock.patch("mealy.preprocessing.generate_preprocessing_steps", side_effect=lambda transformer: transformer)
     def test_create_feature_mapping_output_dim_change(self, _, mocked_o, mocked_i):
-        mocked_pipeline = unittest.mock.Mock(spec=Pipeline)
         ohe = unittest.mock.Mock(spec=OneHotEncoder)
-        mocked_pipeline.steps = [
-            ("stds", unittest.mock.Mock(spec=StandardScaler)),
-            ("ohe", ohe)
+        steps = [
+            unittest.mock.Mock(spec=StandardScaler),
+            "drop",
+            "passthrough",
+            ohe
         ]
-        self.pipe.ct_preprocessor.transformers_ = [("pipeline", mocked_pipeline, ["num_1", "cat_2"])]
+        self.pipe.ct_preprocessor.transformers_ = [("does_not_matter", steps, ["num_1", "cat_2"])]
         self.pipe._create_feature_mapping()
         step, features, feat_ids = mocked_o.call_args[0]
         self.assertEqual(step, ohe)
@@ -100,19 +100,20 @@ class TestPreprocessingPipelineWithPipeline(TestFeatureTransformer):
 
     @unittest.mock.patch("mealy.preprocessing.PipelinePreprocessor._update_feature_mapping_dict_using_input_names", return_value=None)
     @unittest.mock.patch("mealy.preprocessing.PipelinePreprocessor._update_feature_mapping_dict_using_output_names", return_value=None)
-    @unittest.mock.patch("mealy.preprocessing.generate_preprocessing_steps", side_effect=lambda transformer: map(lambda _: _[1], transformer.steps))
+    @unittest.mock.patch("mealy.preprocessing.generate_preprocessing_steps", side_effect=lambda transformer: transformer)
     def test_create_feature_mapping_no_change_in_output_dim(self, _, mocked_o, mocked_i):
-        mocked_pipeline = unittest.mock.Mock(spec=Pipeline)
-        mocked_pipeline.steps = [
-            ("stds", unittest.mock.Mock(spec=StandardScaler)),
-            ("si", unittest.mock.Mock(spec=SimpleImputer))
+        steps = [
+            unittest.mock.Mock(spec=StandardScaler),
+            "drop",
+            "passthrough",
+            unittest.mock.Mock(spec=SimpleImputer)
         ]
-        self.pipe.ct_preprocessor.transformers_ = [("pipeline", mocked_pipeline, ["num_1", "num_2", "cat_1", "cat_2"])]
+        self.pipe.ct_preprocessor.transformers_ = [("does_not_matter", steps, self.feature_list)]
         self.pipe._create_feature_mapping()
         self.assertEqual(mocked_o.call_count, 0)
         self.assertEqual(mocked_i.call_count, 1)
         features, feat_ids = mocked_i.call_args[0]
-        self.assertListEqual(features, ["num_1", "num_2", "cat_1", "cat_2"])
+        self.assertListEqual(features, self.feature_list)
         np.testing.assert_array_equal(feat_ids, np.array([0,1,2,3]))
 
     def test_update_feature_mapping_dict_using_input_names(self):
@@ -130,7 +131,7 @@ class TestPreprocessingPipelineWithPipeline(TestFeatureTransformer):
         self.assertDictEqual(self.pipe.preprocessed2original, {0: 0})
 
     def test_original_features(self):
-        self.assertListEqual(self.pipe.get_original_feature_names(), ["num_1", "num_2", "cat_1", "cat_2"])
+        self.assertListEqual(self.pipe.get_original_feature_names(), self.feature_list)
 
     def test_is_cat(self):
         self.pipe.categorical_features = ["cat_1", "cat_2"]
@@ -183,18 +184,25 @@ class TestPreprocessingPipelineWithPipeline(TestFeatureTransformer):
         self.assertListEqual(self.pipe.get_top_ranked_feature_ids(importance, -1), [3, 1])
         self.assertListEqual(self.pipe.get_top_ranked_feature_ids(importance, 1), [3])
 
-    def test_get_feature_list_from_column_transformer(self):
-        mocked_pipeline = unittest.mock.Mock(spec=Pipeline, steps=[
-            ("stds", unittest.mock.Mock(spec=StandardScaler)),
-            ("ohe", unittest.mock.Mock(spec=OneHotEncoder))
-        ])
-        other_mocked_pipeline = unittest.mock.Mock(spec=Pipeline, steps=[
-            ("stds", unittest.mock.Mock(spec=StandardScaler)),
-            ("si", unittest.mock.Mock(spec=SimpleImputer))
-        ])
+    @unittest.mock.patch("mealy.preprocessing.generate_preprocessing_steps", side_effect=lambda transformer: transformer)
+    def test_get_feature_list_from_column_transformer(self, _):
+        steps = [
+            "drop",
+            "passthrough",
+            unittest.mock.Mock(spec=StandardScaler),
+            unittest.mock.Mock(spec=OneHotEncoder)
+        ]
+
+        other_steps = [
+            "drop",
+            "passthrough",
+            unittest.mock.Mock(spec=StandardScaler),
+            unittest.mock.Mock(spec=SimpleImputer)
+        ]
+
         self.pipe.ct_preprocessor.transformers_ = [
-            ("pipeline", mocked_pipeline, ["cat_1", "cat_2"]),
-            ("pipeline_bis", other_mocked_pipeline, ["num_1"])
+            ("does_not_matter", steps, ["cat_1", "cat_2"]),
+            ("does_not_matter", other_steps, ["num_1"])
         ]
 
         features = self.pipe._get_feature_list_from_column_transformer()

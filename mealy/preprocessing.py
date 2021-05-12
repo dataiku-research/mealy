@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from sklearn.pipeline import Pipeline
 import numpy as np
 import pandas as pd
 from scipy.sparse import issparse
