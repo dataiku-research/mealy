@@ -31,7 +31,6 @@ DEPENDENCIES_METADATA = (
     ('scikit-learn', {'min_version': '0.19'}),
     ('matplotlib', {'min_version': '2.0'}),
     ('graphviz', {'min_version': '0.14'}),
-    ('pydotplus', {'min_version': '2.0'}),
     ('sphinx-gallery', {
         'min_version': '0.5.0', 'extra_options': ['doc']}),
     ('sphinx', {
@@ -59,12 +58,6 @@ def check_modules(extra_option=None, import_module=None, strict=True):
         import_module = '.' + import_module
 
     for package_name, metadata in DEPENDENCIES_METADATA:
-
-
-        if package_name == 'pydotplus':
-            # pydotplus does not have __version__ attribute
-            continue
-
         if not ((extra_option is None and 'extra_options' not in metadata)
                 or (extra_option in metadata.get('extra_options', []))):
             continue

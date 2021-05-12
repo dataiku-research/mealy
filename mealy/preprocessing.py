@@ -269,7 +269,7 @@ class PipelinePreprocessor(FeatureNameTransformer):
         return ranked_feature_ids # should never be reached, but just in case
 
     def inverse_thresholds(self, tree, n_cols):
-        used_feature_mask = tree.feature > 0
+        used_feature_mask = tree.feature >= 0
         feats_idx = tree.feature[used_feature_mask]
         thresholds = tree.threshold.astype('O')
         thresh = thresholds[used_feature_mask]
