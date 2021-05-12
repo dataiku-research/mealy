@@ -5,7 +5,7 @@ import pandas as pd
 from scipy.sparse import issparse
 from collections import defaultdict
 import logging
-from mealy.error_analysis_utils import check_lists_having_same_elements, generate_preprocessing_steps
+from mealy.error_analysis_utils import check_lists_having_same_elements, generate_preprocessing_steps, invert_transform_via_identity
 from mealy.constants import ErrorAnalyzerConstants
 
 logger = logging.getLogger(__name__)
@@ -169,10 +169,10 @@ class PipelinePreprocessor(FeatureNameTransformer):
     def _inverse_single_step(single_step, step_output, transformer_feature_names):
         inverse_transform_function_available = getattr(single_step, "inverse_transform", None)
         if inverse_transform_function_available:
-            logger.info("Reversing step {} using inverse_transform() function on column(s): {}".format(single_step, ', '.join(transformer_feature_names)))
+            logger.info("Reversing step using inverse_transform() method on column(s): {}".format(single_step, ', '.join(transformer_feature_names)))
             return single_step.inverse_transform(step_output)
-        if isinstance(single_step, ErrorAnalyzerConstants.STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION):
-            logger.info("Reversing step {} using identity transformation on column(s): {}".format(single_step, ', '.join(transformer_feature_names)))
+        if invert_transform_via_identity(single_step):
+            logger.info("Reversing step using identity transformation on column(s): {}".format(single_step, ', '.join(transformer_feature_names)))
             return step_output
         raise TypeError('The package does not support {} because it does not provide inverse_transform function.'.format(single_step))
 

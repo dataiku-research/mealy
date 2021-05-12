@@ -34,7 +34,7 @@ def generate_preprocessing_steps(transformer, invert_order=False):
         if step == 'drop':
             # Skip the drop step of ColumnTransformer
             continue
-        if not isinstance(step, ErrorAnalyzerConstants.SUPPORTED_STEPS):
+        if step != 'passthrough' and not isinstance(step, ErrorAnalyzerConstants.SUPPORTED_STEPS):
             # Check all the preprocessing steps are supported by mealy
             unsupported_class = step.__class__
             raise TypeError('Mealy package does not support {}. '.format(unsupported_class) +
@@ -43,6 +43,13 @@ def generate_preprocessing_steps(transformer, invert_order=False):
                         'generated features, or that it does not provide an ' +
                         'inverse_tranform method.')
         yield step
+
+def invert_transform_via_identity(step):
+    if isinstance(step, ErrorAnalyzerConstants.STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION):
+        return True
+    if step == 'passthrough' or step is None:
+        return True
+    return False
 
 def check_lists_having_same_elements(list_A, list_B):
     return set(list_A) == set(list_B)
