@@ -3,7 +3,7 @@ import numpy as np
 from unittest import TestCase, skip
 from unittest.mock import Mock, patch
 
-from .. import ErrorVisualizer, ErrorAnalyzer, ErrorAnalyzerConstants
+from .. import ErrorVisualizer, ErrorAnalyzer
 
 
 class TestVisualizer(TestCase):

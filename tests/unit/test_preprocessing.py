@@ -1,33 +1,26 @@
 import numpy as np
 import pandas as pd
 from scipy.sparse import csr_matrix, issparse
-import random
 from unittest import TestCase
 from unittest.mock import patch, Mock
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.impute import SimpleImputer
-from sklearn.pipeline import Pipeline
 
 from .. import PipelinePreprocessor, DummyPipelinePreprocessor
-
-default_seed = 10
-np.random.seed(default_seed)
-random.seed(default_seed)
 
 
 class TestFeatureTransformer(TestCase):
     def setUp(self):
         self.feature_list = ["num_1", "num_2", "cat_1", "cat_2"]
-        self.x = np.array([[1, 2, 3], [2, 4, 6], [3, 6, 9]])
-        self.sparse_x = csr_matrix(self.x)
-        self.feature_importances = np.array([0.5, 0.2, 0.3])
 
 
 class TestDummyPipeline(TestFeatureTransformer):
     def setUp(self):
         super(TestDummyPipeline, self).setUp()
+        self.x = np.array([[1, 2, 3], [2, 4, 6], [3, 6, 9]])
         self.df = pd.DataFrame(self.x, columns=self.feature_list[:-1])
+        self.sparse_x = csr_matrix(self.x)
         self.pipe = DummyPipelinePreprocessor(self.feature_list)
 
     def test_transform_array(self):
@@ -50,7 +43,7 @@ class TestDummyPipeline(TestFeatureTransformer):
         }
         for max_nr_features, result in input_to_results.items():
             with self.subTest(max_nr_features=max_nr_features):
-                ranked = self.pipe.get_top_ranked_feature_ids(self.feature_importances,
+                ranked = self.pipe.get_top_ranked_feature_ids(np.array([0.5, 0.2, 0.3]),
                                                               max_nr_features=max_nr_features)
                 self.assertTrue((ranked == result).all())
 
@@ -75,9 +68,21 @@ class TestPreprocessingPipeline(TestFeatureTransformer):
     def setUp(self):
         super(TestPreprocessingPipeline, self).setUp()
         col_transformer = Mock(spec=ColumnTransformer)
-        with patch("mealy.preprocessing.PipelinePreprocessor._get_feature_list_from_column_transformer", return_value=["num_1", "num_2", "cat_1", "cat_2"]),\
+        with patch("mealy.preprocessing.PipelinePreprocessor._get_feature_list_from_column_transformer", return_value=self.feature_list),\
             patch("mealy.preprocessing.PipelinePreprocessor._create_feature_mapping", return_value=None):
             self.pipe = PipelinePreprocessor(col_transformer)
+
+    def test_init(self):
+        col_transformer = Mock(spec=ColumnTransformer)
+        with patch("mealy.preprocessing.PipelinePreprocessor._get_feature_list_from_column_transformer", return_value=self.feature_list),\
+            patch("mealy.preprocessing.PipelinePreprocessor._create_feature_mapping", return_value=None):
+            pipe_with_feature_arg = PipelinePreprocessor(col_transformer, self.feature_list)
+            pipe_without_feature_arg = PipelinePreprocessor(col_transformer)
+            with self.assertRaisesRegex(ValueError,
+                "The list of features given by user does not correspond to the list of features handled by the Pipeline."):
+                error = PipelinePreprocessor(col_transformer, ["cat_1", "num_2"])
+        self.assertListEqual(pipe_with_feature_arg.get_original_feature_names(), self.feature_list)
+        self.assertListEqual(pipe_without_feature_arg.get_original_feature_names(), self.feature_list)
 
     @patch("mealy.preprocessing.PipelinePreprocessor._update_feature_mapping_dict_using_input_names", return_value=None)
     @patch("mealy.preprocessing.PipelinePreprocessor._update_feature_mapping_dict_using_output_names", return_value=None)
@@ -140,7 +145,7 @@ class TestPreprocessingPipeline(TestFeatureTransformer):
         self.assertFalse(self.pipe.is_categorical(name="num_1"))
         self.assertTrue(self.pipe.is_categorical(3))
         self.assertTrue(self.pipe.is_categorical(name="cat_1"))
-        with self.assertRaises(ValueError, msg="Either the input index or its name should be specified."):
+        with self.assertRaisesRegex(ValueError, "Either the input index or its name should be specified."):
             self.pipe.is_categorical()
 
     @patch("mealy.preprocessing.PipelinePreprocessor.inverse_transform_feature_id", side_effect=lambda idx: idx)
@@ -211,4 +216,47 @@ class TestPreprocessingPipeline(TestFeatureTransformer):
         self.assertListEqual(features, ["cat_1", "cat_2", "num_1"])
 
     def test_inverse_transform(self):
-        pass #TODO
+        stsd = Mock(spec=StandardScaler)
+        ohe = Mock(spec=OneHotEncoder)
+        si = Mock(spec=SimpleImputer)
+
+        self.pipe.ct_preprocessor.transformers_ = [
+            ("does_not_matter", [stsd, ohe], ["num_1", "num_2"]),
+            ("does_not_matter", [si], ["cat_1"])
+        ]
+
+        preprocessed_x = np.array([
+            [0,1,2,3,4,5],
+            [0,1,2,3,4,5],
+            [0,1,2,3,4,5],
+            [0,1,2,3,4,5],
+            [0,1,2,3,4,5]
+        ])
+
+        expected = np.array([
+            [5,6,2,0],
+            [5,6,2,0],
+            [5,6,2,0],
+            [5,6,2,0],
+            [5,6,2,0],
+        ])
+
+        def f(feature_names):
+            if feature_names == ["cat_1"]:
+                return 2, 1
+            if feature_names == ["num_1", "num_2"]:
+                return [0,1], [4,5]
+
+        def g(step, transformer_output, feature_names):
+            if step == si:
+                return transformer_output * 2
+            if step == ohe:
+                return transformer_output + 4
+            if step == stsd:
+                return transformer_output - 3
+
+        with patch("mealy.preprocessing.PipelinePreprocessor._get_feature_ids_related_to_transformer", side_effect=f),\
+            patch("mealy.preprocessing.generate_preprocessing_steps", side_effect=lambda transformer, invert_order: reversed(transformer) if invert_order else transformer),\
+            patch("mealy.preprocessing.PipelinePreprocessor._inverse_single_step", side_effect=g):
+            result = self.pipe.inverse_transform(preprocessed_x)
+        np.testing.assert_array_equal(result, expected)

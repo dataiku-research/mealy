@@ -8,7 +8,7 @@ from .. import ErrorTree, ErrorAnalyzerConstants
 
 class TestErrorTree(TestCase):
     def test_empty_tree(self):
-        with self.assertRaises(NotFittedError, msg="You should fit the ErrorAnalyzer first"):
+        with self.assertRaisesRegex(NotFittedError, "You should fit the ErrorAnalyzer first"):
             ErrorTree(None)
 
     def test_small_tree(self):
