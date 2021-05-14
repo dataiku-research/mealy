@@ -25,11 +25,11 @@ class TestDummyPipeline(TestFeatureTransformer):
 
     def test_transform_array(self):
         preprocessed_x = self.pipe.transform(self.x)
-        self.assertTrue((preprocessed_x == self.x).all())
+        np.testing.assert_array_equal(preprocessed_x, self.x)
 
     def test_transform_df(self):
         preprocessed_x = self.pipe.transform(self.df)
-        self.assertTrue((preprocessed_x == self.x).all())
+        np.testing.assert_array_equal(preprocessed_x, self.x)
 
     def test_transform_sparse(self):
         preprocessed_x = self.pipe.transform(self.sparse_x)
@@ -45,7 +45,7 @@ class TestDummyPipeline(TestFeatureTransformer):
             with self.subTest(max_nr_features=max_nr_features):
                 ranked = self.pipe.get_top_ranked_feature_ids(np.array([0.5, 0.2, 0.3]),
                                                               max_nr_features=max_nr_features)
-                self.assertTrue((ranked == result).all())
+                np.testing.assert_array_equal(ranked, result)
 
     def test_original_features(self):
         self.assertListEqual(self.pipe.get_original_feature_names(), self.feature_list)
@@ -168,13 +168,13 @@ class TestPreprocessingPipeline(TestFeatureTransformer):
         self.assertEqual(second[0][0], 1)
         self.assertEqual(third[0][0], 3)
         self.assertEqual(fourth[0][0], 0)
-        self.assertTrue((thresholds == [2, -2, 43, 7, -2, -2, 13]).all())
+        np.testing.assert_array_equal(thresholds, [2, -2, 43, 7, -2, -2, 13])
 
     def test_get_feature_ids_related_to_transformer(self):
         self.pipe.original2preprocessed = {0: [42], 1: [6], 2: [7], 3: [6, 7]}
         orig_feature_ids, preprocessed_feature_ids = self.pipe._get_feature_ids_related_to_transformer(["num_1", "cat_2"])
         self.assertListEqual(preprocessed_feature_ids, [42, 6, 7])
-        self.assertTrue((orig_feature_ids == [0, 3]).all())
+        np.testing.assert_array_equal(orig_feature_ids, [0, 3])
 
     def test_get_top_ranked_feature_ids(self):
         importance = np.array([20, 1, -2, 43])

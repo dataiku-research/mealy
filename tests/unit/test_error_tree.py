@@ -43,12 +43,12 @@ class TestErrorTree(TestCase):
 
         self.assertEqual(error_tree.error_class_idx, 1)
         self.assertEqual(error_tree.n_total_errors, 69)
-        self.assertTrue((error_tree.leaf_ids == [2, 3, 5, 6]).all())
+        np.testing.assert_array_equal(error_tree.leaf_ids, [2, 3, 5, 6])
 
         # Ranking arrays
-        self.assertTrue((error_tree.correctly_predicted_leaves == [40, 30, 2, 8]).all())
-        self.assertTrue((error_tree.wrongly_predicted_leaves == [58, 0, 9, 1]).all())
-        self.assertTrue((error_tree.difference == [-18, 30, -7, 7]).all())
-        self.assertTrue((error_tree.impurity == [20/49, 1, 2/11, 8/9]).all())
-        self.assertTrue((error_tree.quantized_impurity == [4, 10, 2, 9]).all())
-        self.assertTrue((error_tree.total_error_fraction == [58/69, 0, 9/69, 1/69]).all())
+        np.testing.assert_array_equal(error_tree.correctly_predicted_leaves, [40, 30, 2, 8])
+        np.testing.assert_array_equal(error_tree.wrongly_predicted_leaves, [58, 0, 9, 1])
+        np.testing.assert_array_equal(error_tree.difference, [-18, 30, -7, 7])
+        np.testing.assert_array_equal(error_tree.impurity, [20/49, 1, 2/11, 8/9])
+        np.testing.assert_array_equal(error_tree.quantized_impurity, [4, 10, 2, 9])
+        np.testing.assert_array_equal(error_tree.total_error_fraction, [58/69, 0, 9/69, 1/69])
