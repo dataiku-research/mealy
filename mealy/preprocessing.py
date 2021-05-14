@@ -189,7 +189,7 @@ class PipelinePreprocessor(FeatureNameTransformer):
         undo_prep_test_x = np.zeros((preprocessed_x.shape[0], nr_original_features), dtype='O')
         any_cat = np.vectorize(lambda x: self.is_categorical(x))
 
-        for _, transformer, feature_names in self.ct_preprocessor.transformers_:
+        for _, transformer, feature_names in reversed(self.ct_preprocessor.transformers_):
             original_feature_ids, preprocessed_feature_ids = self._get_feature_ids_related_to_transformer(feature_names)
             transformer_output = preprocessed_x[:, preprocessed_feature_ids]
             if issparse(transformer_output) and not np.any(any_cat(original_feature_ids)):
