@@ -1,6 +1,6 @@
 
 import numpy as np
-from unittest import TestCase
+from unittest import TestCase, skip
 from unittest.mock import Mock, patch
 
 from .. import ErrorVisualizer, ErrorAnalyzer, ErrorAnalyzerConstants
@@ -99,8 +99,9 @@ class TestNodeDecisionRule(TestVisualizer):
 
 
 # TODO: finish the tests
+@skip(reason="Not done yet")
 class TestPlotDistribution(TestVisualizer):
-    def setUp():
+    def setUp(self):
         super(TestPlotDistribution, self).setUp()
 
     def test_show_global_show_class(self):
