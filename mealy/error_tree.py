@@ -6,8 +6,32 @@ import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format='mealy | %(levelname)s - %(message)s')
 
-class ErrorTree(object):
 
+class ErrorTree(object):
+    """ ErrorTree analyzes the errors of a prediction model on a test set.
+
+    It uses model predictions and ground truth target to compute the model errors on the test set.
+    It then trains a Decision Tree, called a Error Analyzer Tree, on the same test set by using the model error
+    as target. The nodes of the decision tree are different segments of errors to be studied individually.
+
+    Args:
+        error_decision_tree (sklearn.tree.DecisionTreeClassifier): The estimator used to train the Error Tree.
+
+    Attributes:
+        estimator_ (sklearn.tree.DecisionTreeClassifier): The estimator used to train the Error Tree.
+        impurity (numpy.ndarray): Impurity of leaves.
+        quantized_impurity (numpy.ndarray): Impurity of leaves quantized into ErrorAnalyzerConstants.NUMBER_PURITY_LEVELS
+            levels.
+        difference (numpy.ndarray): Difference of number of wrongly and correctly predicted samples in leaves.
+        total_error_fraction (numpy.ndarray): Percentage of incorrectly predicted samples in leaves over the total
+            number of errors (used to rank the nodes).
+        error_class_idx (int): Index of class of wrongly predicted samples in the Error Tree.
+        n_total_errors (int): Number of total errors.
+        wrongly_predicted_leaves (numpy.ndarray): Array of number of wrongly predicted samples in leaves.
+        correctly_predicted_leaves (numpy.ndarray): Array of number of correctly predicted samples in leaves.
+        leaf_ids (numpy.ndarray): List of all leaves indices.
+
+    """
     def __init__(self, error_decision_tree):
 
         self._estimator = error_decision_tree

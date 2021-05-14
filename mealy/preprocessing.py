@@ -12,19 +12,19 @@ logging.basicConfig(level=logging.INFO, format='mealy | %(levelname)s - %(messag
 
 
 class FeatureNameTransformer(object):
-    """ Transformer of feature names and indices.
+    """Transformer of feature names and indices.
 
-        A FeatureNameTransformer parses an input Pipeline preprocessor and generate
-        a mapping between the input unprocessed feature names/indices and the output
-        preprocessed feature names/indices.
+    A FeatureNameTransformer parses an input Pipeline preprocessor and generate
+    a mapping between the input unprocessed feature names/indices and the output
+    preprocessed feature names/indices.
 
-        Args:
-            ct_preprocessor (sklearn.compose.ColumnTransformer): preprocessor.
-            orig_feats (list): list of original unpreprocessed feature names, default=None.
+    Args:
+        ct_preprocessor (sklearn.compose.ColumnTransformer): Preprocessor.
+        original_features (list): List of original unpreprocessed feature names, default=None.
 
-        Attributes:
-            original_feature_names (list): list of original unpreprocessed feature names.
-            preprocessed_feature_names (list): list of preprocessed feature names.
+    Attributes:
+        original_feature_names (list): List of original unpreprocessed feature names.
+        preprocessed_feature_names (list): List of preprocessed feature names.
 
     """
     def __init__(self, original_features, preprocessed_features):
@@ -32,9 +32,11 @@ class FeatureNameTransformer(object):
         self.preprocessed_feature_names = preprocessed_features
 
     def get_original_feature_names(self):
+        """Get the list of original unpreprocessed feature names."""
         return self.original_feature_names
 
     def get_preprocessed_feature_names(self):
+        """Get the list of preprocessed feature names."""
         return self.preprocessed_feature_names
 
     def is_categorical(self, index=None, name=None):
@@ -59,14 +61,13 @@ class FeatureNameTransformer(object):
 class PipelinePreprocessor(FeatureNameTransformer):
     """Transformer of feature values from the original values to preprocessed ones.
 
-        A PipelinePreprocessor parses an input Pipeline preprocessor and generate
-        a mapping between the input unprocessed feature values and the output
-        preprocessed feature values.
+    A PipelinePreprocessor parses an input Pipeline preprocessor and generate
+    a mapping between the input unprocessed feature values and the output
+    preprocessed feature values.
 
-        Args:
-            ct_preprocessor (sklearn.compose.ColumnTransformer): preprocessing steps.
-            original_features (list): list of original unpreprocessed feature names, default=None.
-
+    Args:
+        ct_preprocessor (sklearn.compose.ColumnTransformer): Preprocessing steps
+        original_features (list): List of original unpreprocessed feature names, default=None.
     """
 
     def __init__(self, ct_preprocessor, original_features=None):
@@ -89,8 +90,7 @@ class PipelinePreprocessor(FeatureNameTransformer):
         self._create_feature_mapping(ct_preprocessor)
 
     def _create_feature_mapping(self, ct_preprocessor):
-        """
-        Update the dicts of input <-> output feature id mapping: self.original2preprocessed and self.preprocessed2original
+        """Update the dicts of input <-> output feature id mapping: original2preprocessed and preprocessed2original.
 
         Args:
             ct_preprocessor: a ColumnTransformer object.
@@ -160,7 +160,7 @@ class PipelinePreprocessor(FeatureNameTransformer):
         """Transform the input feature values according to the preprocessing pipeline.
 
         Args:
-            x (array-like or dataframe of shape (number of samples, number of features)): input feature values.
+            x (array-like or dataframe of shape (number of samples, number of features)): Input feature values.
 
         Return:
             numpy.ndarray: transformed feature values.
@@ -194,11 +194,10 @@ class PipelinePreprocessor(FeatureNameTransformer):
         """Invert the preprocessing pipeline and inverse transform feature values.
 
         Args:
-            preprocessed_x (numpy.ndarray or scipy sparse matrix): preprocessed feature values.
+            preprocessed_x (numpy.ndarray or scipy sparse matrix): Preprocessed feature values.
 
-        Return:
-            numpy.ndarray: feature values without preprocessing.
-
+        Returns:
+            numpy.ndarray: Feature values without preprocessing.
         """
         original_features = self.get_original_feature_names()
         undo_prep_test_x = np.zeros((preprocessed_x.shape[0], len(original_features)), dtype='O')
@@ -298,11 +297,13 @@ class DummyPipelinePreprocessor(FeatureNameTransformer):
             preprocessed_features=model_performance_predictor_features)
 
     def transform(self, x):
-        """
+        """ Transformation of the input (here, transformation is identity).
+
         Args:
-            x (array-like or dataframe of shape (number of samples, number of features)): input feature values.
+            x (array-like or pandas.DataFrale of shape (number of samples, number of features)): Input feature values.
+
         Returns:
-            ndarray
+            numpy.ndarray: Transformed feature values.
         """
         if isinstance(x, pd.DataFrame):
             return x.values
