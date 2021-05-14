@@ -249,21 +249,22 @@ class PipelinePreprocessor(FeatureNameTransformer):
                     return ranked_feature_ids
         return ranked_feature_ids # should never be reached, but just in case
 
-    def inverse_thresholds(self, tree, n_cols):
+    def inverse_thresholds(self, tree):
         used_feature_mask = tree.feature >= 0
         feats_idx = tree.feature[used_feature_mask]
         thresholds = tree.threshold.astype('O')
         thresh = thresholds[used_feature_mask]
+        n_cols = len(self.get_preprocessed_feature_names())
 
-        dummy_x = np.zeros((len(feats_idx), n_cols))
-        indices, i = [], 0
+        dummy_x, indices= [], []
         for f, t in zip(feats_idx, thresh):
-            dummy_x[i, f] = t
-            indices.append((i, self.inverse_transform_feature_id(f)))
-            i += 1
+            row = [0]*n_cols
+            row[f] = t
+            dummy_x.append(row)
+            indices.append(self.inverse_transform_feature_id(f))
 
-        undo_dummy_x = self.inverse_transform(dummy_x)
-        descaled_thresh = [undo_dummy_x[i, j] for i, j in indices]
+        undo_dummy_x = self.inverse_transform(np.array(dummy_x))
+        descaled_thresh = [undo_dummy_x[i, j] for i, j in enumerate(indices)]
         thresholds[used_feature_mask] = descaled_thresh
         return thresholds
 

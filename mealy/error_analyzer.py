@@ -422,4 +422,4 @@ class ErrorAnalyzer(BaseEstimator):
             numpy.ndarray:
                 thresholds of the Error Tree, possibly with preprocessing undone.
         """
-        return self.pipeline_preprocessor.inverse_thresholds(self.error_tree.estimator_.tree_, self._error_train_x.shape[1])
+        return self.pipeline_preprocessor.inverse_thresholds(self.error_tree.estimator_.tree_)

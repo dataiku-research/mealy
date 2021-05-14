@@ -146,9 +146,9 @@ class TestPreprocessingPipeline(TestFeatureTransformer):
     @patch("mealy.preprocessing.PipelinePreprocessor.inverse_transform_feature_id", side_effect=lambda idx: idx)
     @patch("mealy.preprocessing.PipelinePreprocessor.inverse_transform", side_effect=lambda a: a+1)
     def test_inverse_thresholds(self, mocked_inverse_transform, mocked_inverse_transform_feature_id):
-        nr_cols = 6
         tree = Mock(feature=np.array([0,-2,1,3,-2,-2,0]), threshold=np.array([1, -2, 42,6,-2,-2,12]))
-        thresholds = self.pipe.inverse_thresholds(tree, nr_cols)
+        self.pipe.preprocessed_feature_names = ["a", "b", "c", "d", "e", "f"]
+        thresholds = self.pipe.inverse_thresholds(tree)
         a = mocked_inverse_transform.call_args[0][0]
         self.assertTrue(mocked_inverse_transform.call_count == 1)
         np.testing.assert_array_equal(a, np.array([
