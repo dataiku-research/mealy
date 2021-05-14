@@ -23,23 +23,33 @@ def get_epsilon(difference):
         cdf_error.append(np.count_nonzero(correct_predictions) / float(n_samples))
     return KneeLocator(epsilon_range, cdf_error).knee
 
-def get_feature_list_from_column_transformer(ct_preprocessor):
-    all_features, categorical_features = [], []
-    for transformer_name, transformer, transformer_feature_names in ct_preprocessor.transformers_:
-        if transformer_name == 'remainder' and transformer == 'drop':
+def generate_preprocessing_steps(transformer, invert_order=False):
+    if isinstance(transformer, Pipeline):
+        steps = [step for name, step in transformer.steps]
+        if invert_order:
+            steps = reversed(steps)
+    else:
+        steps = [transformer]
+    for step in steps:
+        if step == 'drop':
+            # Skip the drop step of ColumnTransformer
             continue
-        all_features.extend(transformer_feature_names)
+        if step != 'passthrough' and not isinstance(step, ErrorAnalyzerConstants.SUPPORTED_STEPS):
+            # Check all the preprocessing steps are supported by mealy
+            unsupported_class = step.__class__
+            raise TypeError('Mealy package does not support {}. '.format(unsupported_class) +
+                        'It might be because it changes output dimension without ' +
+                        'providing a get_feature_names function to keep track of the ' +
+                        'generated features, or that it does not provide an ' +
+                        'inverse_tranform method.')
+        yield step
 
-        # check for categorical features
-        if isinstance(transformer, Pipeline):
-            for step in transformer.steps:
-                if isinstance(step[1], ErrorAnalyzerConstants.VALID_CATEGORICAL_STEPS):
-                    categorical_features.extend(transformer_feature_names)
-                    break
-        elif isinstance(transformer, ErrorAnalyzerConstants.VALID_CATEGORICAL_STEPS):
-            categorical_features.extend(transformer_feature_names)
-    return all_features, categorical_features
-
+def invert_transform_via_identity(step):
+    if isinstance(step, ErrorAnalyzerConstants.STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION):
+        return True
+    if step == 'passthrough' or step is None:
+        return True
+    return False
 
 def check_lists_having_same_elements(list_A, list_B):
     return set(list_A) == set(list_B)

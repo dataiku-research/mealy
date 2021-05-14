@@ -36,6 +36,7 @@ class ErrorAnalyzerConstants(object):
                                                    Binarizer, Normalizer, MinMaxScaler, RobustScaler, SimpleImputer,
                                                    OrdinalEncoder)
     STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES = (OneHotEncoder,)
+    SUPPORTED_STEPS = STEPS_THAT_DOES_NOT_CHANGE_OUTPUT_DIMENSION + STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES
     GRAPH_MAX_EDGE_WIDTH = 10
     GRAPH_MIN_LOCAL_ERROR_OPAQUE = 0.5
     

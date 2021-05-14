@@ -1,17 +1,18 @@
 import numpy as np
-import unittest
+from unittest import TestCase
+from unittest.mock import Mock
 
 from sklearn.exceptions import NotFittedError
 from mealy import ErrorTree, ErrorAnalyzerConstants
 
 
-class TestErrorTree(unittest.TestCase):
+class TestErrorTree(TestCase):
     def test_empty_tree(self):
         with self.assertRaises(NotFittedError, msg="You should fit the ErrorAnalyzer first"):
             ErrorTree(None)
 
     def test_small_tree(self):
-        clf = unittest.mock.Mock()
+        clf = Mock()
         clf.tree_.node_count = 1
         with self.assertLogs("mealy.error_tree", level="WARNING") as caplog:
             error_tree = ErrorTree(clf)
@@ -21,7 +22,7 @@ class TestErrorTree(unittest.TestCase):
             ])
 
     def test_tree(self):
-        tree_ = unittest.mock.Mock(value=np.array([
+        tree_ = Mock(value=np.array([
             [[42, 69]],
             [[2, 9]],
             [[40, 58]],
@@ -35,7 +36,7 @@ class TestErrorTree(unittest.TestCase):
             [[27, 18]]
             ]), feature=np.array([1, 2, -2, -2, 0, -2, -2, 0, 1]))
 
-        clf = unittest.mock.Mock(classes_=np.array([ErrorAnalyzerConstants.CORRECT_PREDICTION,
+        clf = Mock(classes_=np.array([ErrorAnalyzerConstants.CORRECT_PREDICTION,
             ErrorAnalyzerConstants.WRONG_PREDICTION]), tree_=tree_)
 
         error_tree = ErrorTree(clf)
