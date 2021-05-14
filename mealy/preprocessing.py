@@ -52,7 +52,7 @@ class FeatureNameTransformer(object):
     def get_top_ranked_feature_ids(self, feature_importances, max_nr_features):
         raise NotImplementedError
 
-    def inverse_thresholds(self, tree, n_cols):
+    def inverse_thresholds(self, tree):
         raise NotImplementedError
 
 
@@ -303,5 +303,5 @@ class DummyPipelinePreprocessor(FeatureNameTransformer):
             return np.argsort(- feature_importances)
         return np.argsort(- feature_importances)[:max_nr_features]
 
-    def inverse_thresholds(self, tree, n_cols):
+    def inverse_thresholds(self, tree):
         return tree.threshold.astype('O')
