@@ -9,7 +9,7 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 
-from mealy.preprocessing import PipelinePreprocessor, DummyPipelinePreprocessor
+from .. import PipelinePreprocessor, DummyPipelinePreprocessor
 
 default_seed = 10
 np.random.seed(default_seed)

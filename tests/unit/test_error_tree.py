@@ -3,7 +3,7 @@ from unittest import TestCase
 from unittest.mock import Mock
 
 from sklearn.exceptions import NotFittedError
-from mealy import ErrorTree, ErrorAnalyzerConstants
+from .. import ErrorTree, ErrorAnalyzerConstants
 
 
 class TestErrorTree(TestCase):
