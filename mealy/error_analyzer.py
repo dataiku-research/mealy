@@ -329,7 +329,6 @@ class ErrorAnalyzer(BaseEstimator):
                 "Input argument for rank_by is invalid. Should be 'total_error_fraction', 'purity' or 'class_difference'")
         return selected_leaves.take(sorted_ids)
 
-    #TODO leaf_selector is taking too many different types of data ?
     def _get_leaf_selector(self, leaf_selector):
         """
         Return a function that select rows of provided arrays. Arrays must be of shape (1, number of leaves)
@@ -394,7 +393,6 @@ class ErrorAnalyzer(BaseEstimator):
 
         return path_to_node
 
-    #TODO naming is not very clear ?
     def _inverse_transform_features(self):
         """ Undo preprocessing of feature values.
 
@@ -412,7 +410,6 @@ class ErrorAnalyzer(BaseEstimator):
         return [self.pipeline_preprocessor.inverse_transform_feature_id(feat_idx) if feat_idx > 0 else feat_idx
             for feat_idx in self.error_tree.estimator_.tree_.feature]
 
-    #TODO naming is not very clear ?
     def _inverse_transform_thresholds(self):
         """  Undo preprocessing of feature threshold values.
 
