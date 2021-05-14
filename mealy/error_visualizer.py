@@ -85,11 +85,23 @@ class ErrorVisualizer(_BaseErrorVisualizer):
         self._error_tree = self._error_analyzer.error_tree
         self._error_clf = self._error_tree.estimator_
         self._train_leaf_ids = self._error_clf.apply(self._error_analyzer._error_train_x)
-        self._thresholds = self._error_analyzer._inverse_transform_thresholds()
-        self._features = self._error_analyzer._inverse_transform_features()
+        self._thresholds = None
+        self._features = None
 
         self._original_feature_names = self._error_analyzer.pipeline_preprocessor.get_original_feature_names()
         self._numerical_feature_names = [f for f in self._original_feature_names if not self._error_analyzer.pipeline_preprocessor.is_categorical(name=f)]
+
+    @property
+    def thresholds_(self):
+        if self._thresholds is None:
+            self._thresholds = self._error_analyzer._inverse_transform_thresholds()
+        return self._thresholds
+
+    @property
+    def features_(self):
+        if self._features is None:
+            self._features = self._error_analyzer._inverse_transform_features()
+        return self._features
 
     def plot_error_tree(self, size=(50, 50)):
         """
@@ -123,12 +135,12 @@ class ErrorVisualizer(_BaseErrorVisualizer):
             total_error_fraction = n_wrong_preds / self._error_tree.n_total_errors
             samples = self._error_clf.tree_.n_node_samples[node_id]
             local_error = n_wrong_preds / samples
-            dot_str += 'samples = {:.3f}%\n'.format(100 * samples / self._error_clf.tree_.n_node_samples[0])
-            dot_str += 'local error = {:.3f}%\n'.format(100 * local_error)
-            dot_str += 'fraction of total error = {:.3f}%\n'.format(100 * total_error_fraction)
+            dot_str += 'samples = {}%\n'.format(format_float(100 * samples / self._error_clf.tree_.n_node_samples[0], 3))
+            dot_str += 'local error = {}%\n'.format(format_float(100 * local_error, 3))
+            dot_str += 'fraction of total error = {}%\n'.format(format_float(100 * total_error_fraction, 3))
 
             alpha = "{:02x}".format(int(local_error*255))
-            dot_str += '", fillcolor="{}", tooltip="{}"] ;'.format(color+alpha, "root" if parent_id is None else rule)
+            dot_str += '", fillcolor="{}", tooltip="{}"] ;\n'.format(color+alpha, "root" if parent_id is None else rule)
 
             if parent_id is not None:
                 edge_width = max(1, ErrorAnalyzerConstants.GRAPH_MAX_EDGE_WIDTH * total_error_fraction)
@@ -146,13 +158,13 @@ class ErrorVisualizer(_BaseErrorVisualizer):
         return Source(dot_str)
 
     def node_decision_rule(self, parent_id, left_child):
-        feature = self._original_feature_names[self._features[parent_id]]
-        value = self._thresholds[parent_id]
+        feature = self._original_feature_names[self.features_[parent_id]]
+        value = self.thresholds_[parent_id]
         numerical_split = feature in self._numerical_feature_names
         if numerical_split:
             if left_child:
-                return '{} <= {:.2f}'.format(feature, value)
-            return '{:.2f} < {}'.format(value, feature)
+                return '{} <= {}'.format(feature, format_float(value, 2))
+            return '{} < {}'.format(format_float(value, 2), feature)
         return feature + ' is ' + ( '' if left_child else 'not ') + str(value)
 
     def plot_feature_distributions_on_leaves(self, leaf_selector=None,
@@ -200,7 +212,6 @@ class ErrorVisualizer(_BaseErrorVisualizer):
 
         x = self._error_analyzer.pipeline_preprocessor.inverse_transform(self._error_analyzer._error_train_x)[:, ranked_feature_ids]
         y = self._error_analyzer._error_train_y
-        # TODO to do what ?
         feature_names = self._original_feature_names
 
         min_values, max_values = x.min(axis=0), x.max(axis=0)
@@ -216,8 +227,8 @@ class ErrorVisualizer(_BaseErrorVisualizer):
             suptitle += ' Correct prediction: {})'.format(format_float(1 - proba_wrong_leaf, 3))
 
             for i, feature_idx in enumerate(ranked_feature_ids):
-
                 feature_name = feature_names[feature_idx]
+                # TODO: use self._numerical_feature_names instead
                 feature_is_numerical = not self._error_analyzer.pipeline_preprocessor.is_categorical(feature_idx)
 
                 feature_column = x[:, i]
