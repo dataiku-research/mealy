@@ -44,7 +44,6 @@ class ErrorAnalyzer(BaseEstimator):
                 param_grid=None,
                 probability_threshold=0.5,
                 random_state=65537):
-
         self.param_grid = param_grid
         self.probability_threshold = probability_threshold
         self.random_state = random_state
@@ -293,7 +292,7 @@ class ErrorAnalyzer(BaseEstimator):
             logger.warning('All predictions are {}. To build a proper ErrorAnalyzer decision tree we need both correct and incorrect predictions'.format(error_y[0]))
 
         error_rate = n_wrong_preds / len(error_y)
-        logger.info('The primary model has an error rate of {}'.format(error_rate))
+        logger.info('The primary model has an error rate of {}'.format(format_float(error_rate, 3)))
         return error_y, error_rate
 
     def _get_ranked_leaf_ids(self, leaf_selector=None, rank_by='total_error_fraction'):
@@ -314,7 +313,7 @@ class ErrorAnalyzer(BaseEstimator):
             list or numpy.ndarray: list of selected leaves indices.
 
         """
-        apply_leaf_selector = self._get_leaf_selector(leaf_selector)
+        apply_leaf_selector = self._get_leaf_selector(self.error_tree.leaf_ids, leaf_selector)
         selected_leaves = apply_leaf_selector(self.error_tree.leaf_ids)
         if selected_leaves.size == 0:
             return selected_leaves
@@ -329,8 +328,8 @@ class ErrorAnalyzer(BaseEstimator):
                 "Input argument for rank_by is invalid. Should be 'total_error_fraction', 'purity' or 'class_difference'")
         return selected_leaves.take(sorted_ids)
 
-    #TODO leaf_selector is taking too many different types of data ?
-    def _get_leaf_selector(self, leaf_selector):
+    @staticmethod
+    def _get_leaf_selector(leaf_ids, leaf_selector=None):
         """
         Return a function that select rows of provided arrays. Arrays must be of shape (1, number of leaves)
             Args:
@@ -350,12 +349,12 @@ class ErrorAnalyzer(BaseEstimator):
             return lambda array: array
 
         leaf_selector_as_array = np.array(leaf_selector)
-        leaf_selector = np.in1d(self.error_tree.leaf_ids, leaf_selector_as_array)
+        leaf_selector = np.in1d(leaf_ids, leaf_selector_as_array)
         nr_kept_leaves = np.count_nonzero(leaf_selector)
         if nr_kept_leaves == 0:
-            print("None of the ids provided correspond to a leaf id.")
+            logger.info("None of the ids provided correspond to a leaf id.")
         elif nr_kept_leaves < leaf_selector_as_array.size:
-            print("Some of the ids provided do not belong to leaves. Only leaf ids are kept.")
+            logger.info("Some of the ids provided do not belong to leaves. Only leaf ids are kept.")
         return lambda array: array[leaf_selector]
 
     def _get_path_to_node(self, node_id):
@@ -384,9 +383,9 @@ class ErrorAnalyzer(BaseEstimator):
 
             decision_rule = ''
             if node_is_left_child:
-                decision_rule += ' <= ' if not is_categorical else ' != '
+                decision_rule += ' <= ' if not is_categorical else ' is not '
             else:
-                decision_rule += " > " if not is_categorical else ' == '
+                decision_rule += " > " if not is_categorical else ' is '
 
             decision_rule = str(feature_names[feat]) + decision_rule + thresh
             path_to_node.appendleft(decision_rule)
@@ -394,7 +393,6 @@ class ErrorAnalyzer(BaseEstimator):
 
         return path_to_node
 
-    #TODO naming is not very clear ?
     def _inverse_transform_features(self):
         """ Undo preprocessing of feature values.
 
@@ -412,7 +410,6 @@ class ErrorAnalyzer(BaseEstimator):
         return [self.pipeline_preprocessor.inverse_transform_feature_id(feat_idx) if feat_idx > 0 else feat_idx
             for feat_idx in self.error_tree.estimator_.tree_.feature]
 
-    #TODO naming is not very clear ?
     def _inverse_transform_thresholds(self):
         """  Undo preprocessing of feature threshold values.
 
@@ -425,4 +422,4 @@ class ErrorAnalyzer(BaseEstimator):
             numpy.ndarray:
                 thresholds of the Error Tree, possibly with preprocessing undone.
         """
-        return self.pipeline_preprocessor.inverse_thresholds(self.error_tree.estimator_.tree_, self._error_train_x.shape[1])
+        return self.pipeline_preprocessor.inverse_thresholds(self.error_tree.estimator_.tree_)

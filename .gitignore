@@ -1,4 +1,5 @@
 .coverage
+.coveragerc
 .python-version
 .idea/
 mealy/__pycache__/
@@ -6,4 +7,5 @@ mealy/__pycache__/
 build/
 dist/
 mealy.egg-info/
+cov_html/
 .vscode
