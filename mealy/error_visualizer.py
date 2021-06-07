@@ -44,7 +44,7 @@ class _BaseErrorVisualizer(object):
     @staticmethod
     def _add_new_plot(figsize, bins, x_ticks, feature_name, suptitle):
         plt.figure(figsize=figsize)
-        plt.xticks(x_ticks, rotation="45")
+        plt.xticks(x_ticks, rotation="90")
         plt.gca().set_xticklabels(labels=bins)
         plt.ylabel('Proportion of samples')
         plt.title('Distribution of {}'.format(feature_name))
