@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>mealy.preprocessing &mdash; mealy 0.2.0-git documentation</title>
+  <title>mealy.preprocessing &mdash; mealy 0.2.4-git documentation</title>
   
 
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/theme_override.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
@@ -36,6 +38,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -71,7 +74,7 @@
             
             
               <div class="version">
-                0.2.0
+                0.2.4
               </div>
             
           
@@ -180,12 +183,12 @@
             
   <h1>Source code for mealy.preprocessing</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">issparse</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">mealy.error_analysis_utils</span> <span class="kn">import</span> <span class="n">check_lists_having_same_elements</span><span class="p">,</span> <span class="n">get_feature_list_from_column_transformer</span>
+<span class="kn">from</span> <span class="nn">mealy.error_analysis_utils</span> <span class="kn">import</span> <span class="n">check_lists_having_same_elements</span><span class="p">,</span> <span class="n">generate_preprocessing_steps</span><span class="p">,</span> <span class="n">invert_transform_via_identity</span>
 <span class="kn">from</span> <span class="nn">mealy.constants</span> <span class="kn">import</span> <span class="n">ErrorAnalyzerConstants</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -193,197 +196,147 @@
 
 
 <div class="viewcode-block" id="FeatureNameTransformer"><a class="viewcode-back" href="../../gen_modules/mealy.preprocessing.html#mealy.preprocessing.FeatureNameTransformer">[docs]</a><span class="k">class</span> <span class="nc">FeatureNameTransformer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Transformer of feature names and indices.</span>
+    <span class="sd">&quot;&quot;&quot; Transformer of feature names and indices.</span>
 
-<span class="sd">    A FeatureNameTransformer parses an input Pipeline preprocessor and generate</span>
-<span class="sd">    a mapping between the input unprocessed feature names/indices and the output</span>
-<span class="sd">    preprocessed feature names/indices.</span>
+<span class="sd">        A FeatureNameTransformer parses an input Pipeline preprocessor and generate</span>
+<span class="sd">        a mapping between the input unprocessed feature names/indices and the output</span>
+<span class="sd">        preprocessed feature names/indices.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        ct_preprocessor (sklearn.compose.ColumnTransformer): Preprocessor.</span>
-<span class="sd">        original_features (list): List of original unpreprocessed feature names, default=None.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            ct_preprocessor (sklearn.compose.ColumnTransformer): preprocessor.</span>
+<span class="sd">            orig_feats (list): list of original unpreprocessed feature names, default=None.</span>
 
-<span class="sd">    Attributes:</span>
-<span class="sd">        original_feature_names (list): List of original unpreprocessed feature names.</span>
-<span class="sd">        preprocessed_feature_names (list): List of preprocessed feature names.</span>
+<span class="sd">        Attributes:</span>
+<span class="sd">            original_feature_names (list): list of original unpreprocessed feature names.</span>
+<span class="sd">            preprocessed_feature_names (list): list of preprocessed feature names.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ct_preprocessor</span><span class="p">,</span> <span class="n">original_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ct_preprocessor</span> <span class="o">=</span> <span class="n">ct_preprocessor</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">original_feature_names</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">categorical_features</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">original2preprocessed</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed2original</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed_feature_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">len_preproc</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">original_features</span><span class="p">,</span> <span class="n">preprocessed_features</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">original_feature_names</span> <span class="o">=</span> <span class="n">original_features</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed_feature_names</span> <span class="o">=</span> <span class="n">preprocessed_features</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Retrieving the list of features used in the pipeline&#39;</span><span class="p">)</span>
-        <span class="n">original_features_from_ct</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">categorical_features</span> <span class="o">=</span> <span class="n">get_feature_list_from_column_transformer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ct_preprocessor</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">original_features</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">original_feature_names</span> <span class="o">=</span> <span class="n">original_features_from_ct</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># If user explicitly gives a list of input features, we compare it with the list derived from the ColumnTransformer</span>
-            <span class="k">if</span> <span class="n">check_lists_having_same_elements</span><span class="p">(</span><span class="n">original_features</span><span class="p">,</span> <span class="n">original_features_from_ct</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">original_feature_names</span> <span class="o">=</span> <span class="n">original_features</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The list of features given by user does not correspond to the list of features handled by the Pipeline.&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_original_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_feature_names</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Generating the feature id mapping dict&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_create_feature_mapping</span><span class="p">(</span><span class="n">ct_preprocessor</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_preprocessed_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed_feature_names</span>
 
-<div class="viewcode-block" id="FeatureNameTransformer.get_original_feature_names"><a class="viewcode-back" href="../../gen_modules/mealy.preprocessing.html#mealy.preprocessing.FeatureNameTransformer.get_original_feature_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_original_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get the list of original unpreprocessed feature names.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_feature_names</span></div>
+    <span class="k">def</span> <span class="nf">is_categorical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
-<div class="viewcode-block" id="FeatureNameTransformer.get_preprocessed_feature_names"><a class="viewcode-back" href="../../gen_modules/mealy.preprocessing.html#mealy.preprocessing.FeatureNameTransformer.get_preprocessed_feature_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_preprocessed_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get the list of preprocessed feature names.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed_feature_names</span></div>
+    <span class="k">def</span> <span class="nf">inverse_transform_feature_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
-    <span class="k">def</span> <span class="nf">_create_feature_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ct_preprocessor</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Update the dicts of input &lt;-&gt; output feature id mapping: original2preprocessed and preprocessed2original.</span>
+    <span class="k">def</span> <span class="nf">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            ct_preprocessor (sklearn.compose.ColumnTransformer): a ColumnTransformer object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">transformer_name</span><span class="p">,</span> <span class="n">transformer</span><span class="p">,</span> <span class="n">transformer_feature_names</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ct_preprocessor</span><span class="o">.</span><span class="n">transformers_</span><span class="p">):</span>
-            <span class="n">orig_feats_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">original_feature_names</span><span class="p">,</span> <span class="n">transformer_feature_names</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformer</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">):</span>
-                <span class="c1"># The assumption here is that for each pipeline there is at most one step that change feature dimension</span>
-                <span class="c1"># For now, the only possible function is OneHotEncoder</span>
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
-                <span class="c1"># We take by default the first step in the pipeline</span>
-                <span class="n">single_tr</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-                <span class="c1"># Check if there is a step than changes the output dimension, if that&#39;s the case single_tr will be it</span>
-                <span class="k">for</span> <span class="p">(</span><span class="n">step_name</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span> <span class="ow">in</span> <span class="n">transformer</span><span class="o">.</span><span class="n">steps</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES</span><span class="p">):</span>
-                        <span class="n">single_tr</span> <span class="o">=</span> <span class="n">step</span>
-                        <span class="k">break</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">single_tr</span><span class="p">,</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">STEPS_THAT_DOES_NOT_CHANGE_OUTPUT_DIMENSION</span><span class="p">):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_update_feature_mapping_dict_using_input_names</span><span class="p">(</span><span class="n">transformer_feature_names</span><span class="p">,</span> <span class="n">orig_feats_ids</span><span class="p">)</span>
-                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">single_tr</span><span class="p">,</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES</span><span class="p">):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_update_feature_mapping_dict_using_output_names</span><span class="p">(</span><span class="n">single_tr</span><span class="p">,</span> <span class="n">transformer_feature_names</span><span class="p">,</span> <span class="n">orig_feats_ids</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The package does not support </span><span class="si">{}</span><span class="s1">, probably because it changes output dimension &#39;</span>
-                                     <span class="s1">&#39;but does not provide get_feature_names function to keep track of new features &#39;</span>
-                                     <span class="s1">&#39;generated.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">single_tr</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">get_top_ranked_feature_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_importances</span><span class="p">,</span> <span class="n">max_nr_features</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformer</span><span class="p">,</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">STEPS_THAT_DOES_NOT_CHANGE_OUTPUT_DIMENSION</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_update_feature_mapping_dict_using_input_names</span><span class="p">(</span><span class="n">transformer_feature_names</span><span class="p">,</span> <span class="n">orig_feats_ids</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformer</span><span class="p">,</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_update_feature_mapping_dict_using_output_names</span><span class="p">(</span><span class="n">transformer</span><span class="p">,</span> <span class="n">transformer_feature_names</span><span class="p">,</span> <span class="n">orig_feats_ids</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">transformer_name</span> <span class="o">==</span> <span class="s1">&#39;remainder&#39;</span> <span class="ow">and</span> <span class="n">transformer</span> <span class="o">==</span> <span class="s1">&#39;drop&#39;</span><span class="p">:</span>
-                <span class="c1"># skip the default drop step of ColumnTransformer</span>
-                <span class="k">continue</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The package does not support </span><span class="si">{}</span><span class="s1">, probably because it changes output dimension but &#39;</span>
-                                 <span class="s1">&#39;does not provide get_feature_names function to keep track of new &#39;</span>
-                                 <span class="s1">&#39;features generated.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">transformer</span><span class="p">))</span>
-
-    <span class="k">def</span> <span class="nf">_update_feature_mapping_dict_using_input_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transformer_feature_names</span><span class="p">,</span> <span class="n">orig_feats_ids</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed_feature_names</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">transformer_feature_names</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">original2preprocessed</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">in_i</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">len_preproc</span> <span class="o">+</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">in_i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">orig_feats_ids</span><span class="p">)})</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed2original</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">len_preproc</span> <span class="o">+</span> <span class="n">i</span><span class="p">:</span> <span class="n">in_i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">in_i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">orig_feats_ids</span><span class="p">)})</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">len_preproc</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">transformer_feature_names</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_update_feature_mapping_dict_using_output_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">single_transformer</span><span class="p">,</span> <span class="n">transformer_feature_names</span><span class="p">,</span> <span class="n">original_feature_ids</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        For now, this functions only applies for OnehotEncoder</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out_feature_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">single_transformer</span><span class="o">.</span><span class="n">get_feature_names</span><span class="p">(</span><span class="n">input_features</span><span class="o">=</span><span class="n">transformer_feature_names</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed_feature_names</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">out_feature_names</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">orig_id</span><span class="p">,</span> <span class="n">orig_name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">original_feature_ids</span><span class="p">,</span> <span class="n">transformer_feature_names</span><span class="p">):</span>
-            <span class="n">part_out_feature_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">out_feature_names</span><span class="p">)</span> <span class="k">if</span> <span class="n">orig_name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">original2preprocessed</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">orig_id</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">len_preproc</span> <span class="o">+</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">part_out_feature_names</span><span class="p">))]})</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed2original</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">len_preproc</span> <span class="o">+</span> <span class="n">i</span><span class="p">:</span> <span class="n">orig_id</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">part_out_feature_names</span><span class="p">))})</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">len_preproc</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">part_out_feature_names</span><span class="p">)</span>
-
-<div class="viewcode-block" id="FeatureNameTransformer.transform_feature_id"><a class="viewcode-back" href="../../gen_modules/mealy.preprocessing.html#mealy.preprocessing.FeatureNameTransformer.transform_feature_id">[docs]</a>    <span class="k">def</span> <span class="nf">transform_feature_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get the preprocessed feature names corresponding to an original feature.</span>
-
-<span class="sd">        The input feature can be specified either by index or name.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            index (int): Feature index.</span>
-<span class="sd">            name (str): Feature name.</span>
-
-<span class="sd">        Returns: index of output feature(s) generated after preprocessing of the input feature.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original2preprocessed</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_feature_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-            <span class="n">new_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original2preprocessed</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
-            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">preprocessed_feature_names</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">new_index</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;One of the input index or name should be specified.&quot;</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="FeatureNameTransformer.inverse_transform_feature_id"><a class="viewcode-back" href="../../gen_modules/mealy.preprocessing.html#mealy.preprocessing.FeatureNameTransformer.inverse_transform_feature_id">[docs]</a>    <span class="k">def</span> <span class="nf">inverse_transform_feature_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Undo preprocessing of feature name.</span>
-
-<span class="sd">        Transform the preprocessed feature name at given index or with given name</span>
-<span class="sd">        back into the original unprocessed feature name or index.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            index (int): Feature index.</span>
-<span class="sd">            name (str): Feature name.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            int or str: index (resp. name) of the unprocessed feature corresponding to the input preprocessed feature</span>
-<span class="sd">            index (resp.name). If both index and name are provided, the index is retained and an output index is</span>
-<span class="sd">            returned.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed2original</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed_feature_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-            <span class="n">new_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed2original</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_feature_names</span><span class="p">[</span><span class="n">new_index</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;One of the input index or name should be specified.&quot;</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="FeatureNameTransformer.is_categorical"><a class="viewcode-back" href="../../gen_modules/mealy.preprocessing.html#mealy.preprocessing.FeatureNameTransformer.is_categorical">[docs]</a>    <span class="k">def</span> <span class="nf">is_categorical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Check whether an unprocessed feature at a given index or with a given name is categorical.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            index (int): Feature index.</span>
-<span class="sd">            name (str): Feature name.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            bool: True if the input feature is categorical, else False. If both index and name are provided, the index</span>
-<span class="sd">            is retained.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_feature_names</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
-            <span class="k">return</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">categorical_features</span>
-        <span class="k">elif</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">categorical_features</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;One of the input index or name should be specified.&quot;</span><span class="p">)</span></div></div>
+    <span class="k">def</span> <span class="nf">inverse_thresholds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
 
 <div class="viewcode-block" id="PipelinePreprocessor"><a class="viewcode-back" href="../../gen_modules/mealy.preprocessing.html#mealy.preprocessing.PipelinePreprocessor">[docs]</a><span class="k">class</span> <span class="nc">PipelinePreprocessor</span><span class="p">(</span><span class="n">FeatureNameTransformer</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Transformer of feature values from the original values to preprocessed ones.</span>
 
-<span class="sd">    A PipelinePreprocessor parses an input Pipeline preprocessor and generate</span>
-<span class="sd">    a mapping between the input unprocessed feature values and the output</span>
-<span class="sd">    preprocessed feature values.</span>
+<span class="sd">        A PipelinePreprocessor parses an input Pipeline preprocessor and generate</span>
+<span class="sd">        a mapping between the input unprocessed feature values and the output</span>
+<span class="sd">        preprocessed feature values.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        ct_preprocessor (sklearn.compose.ColumnTransformer): Preprocessing steps</span>
-<span class="sd">        original_features (list): List of original unpreprocessed feature names, default=None.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            ct_preprocessor (sklearn.compose.ColumnTransformer): preprocessing steps.</span>
+<span class="sd">            original_features (list): list of original unpreprocessed feature names, default=None.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ct_preprocessor</span><span class="p">,</span> <span class="n">original_features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">FeatureNameTransformer</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ct_preprocessor</span><span class="p">,</span> <span class="n">original_features</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ct_preprocessor</span> <span class="o">=</span> <span class="n">ct_preprocessor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">original2preprocessed</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed2original</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">categorical_features</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Retrieving the list of features used in the pipeline&#39;</span><span class="p">)</span>
+        <span class="n">original_features_from_ct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_feature_list_from_column_transformer</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">original_features</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">original_features</span> <span class="o">=</span> <span class="n">original_features_from_ct</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">check_lists_having_same_elements</span><span class="p">(</span><span class="n">original_features</span><span class="p">,</span> <span class="n">original_features_from_ct</span><span class="p">):</span>
+            <span class="c1"># If user explicitly gives a list of input features, we compare it with the list derived from the ColumnTransformer</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The list of features given by user does not correspond to the list of features handled by the Pipeline.&#39;</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">PipelinePreprocessor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">original_features</span><span class="o">=</span><span class="n">original_features</span><span class="p">,</span> <span class="n">preprocessed_features</span><span class="o">=</span><span class="p">[])</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Generating the feature id mapping dict&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_feature_mapping</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_get_feature_list_from_column_transformer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">all_features</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">transformer</span><span class="p">,</span> <span class="n">feature_names</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ct_preprocessor</span><span class="o">.</span><span class="n">transformers_</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">generate_preprocessing_steps</span><span class="p">(</span><span class="n">transformer</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">VALID_CATEGORICAL_STEPS</span><span class="p">):</span>
+                    <span class="c1"># Check for categorical features</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">categorical_features</span> <span class="o">+=</span> <span class="n">feature_names</span>
+                    <span class="k">break</span>
+
+            <span class="n">all_features</span> <span class="o">+=</span> <span class="n">feature_names</span>
+        <span class="k">return</span> <span class="n">all_features</span>
+
+    <span class="k">def</span> <span class="nf">_create_feature_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the dicts of input &lt;-&gt; output feature id mapping: self.original2preprocessed and self.preprocessed2original</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">transformer</span><span class="p">,</span> <span class="n">feature_names</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ct_preprocessor</span><span class="o">.</span><span class="n">transformers_</span><span class="p">:</span>
+            <span class="n">orig_feat_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">original_feature_names</span><span class="p">,</span> <span class="n">feature_names</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">generate_preprocessing_steps</span><span class="p">(</span><span class="n">transformer</span><span class="p">):</span>
+                <span class="n">output_dim_changed</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">STEPS_THAT_CHANGE_OUTPUT_DIMENSION_WITH_OUTPUT_FEATURE_NAMES</span><span class="p">):</span>
+                    <span class="c1"># It is assumed that for each pipeline, at most one step changes the feature&#39;s dimension</span>
+                    <span class="c1"># For now, it can only be a OneHotEncoder step</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_update_feature_mapping_dict_using_output_names</span><span class="p">(</span><span class="n">step</span><span class="p">,</span>
+                                                                        <span class="n">feature_names</span><span class="p">,</span>
+                                                                        <span class="n">orig_feat_ids</span><span class="p">)</span>
+                    <span class="n">output_dim_changed</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">output_dim_changed</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_update_feature_mapping_dict_using_input_names</span><span class="p">(</span><span class="n">feature_names</span><span class="p">,</span> <span class="n">orig_feat_ids</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_update_feature_mapping_dict_using_input_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transformer_feature_names</span><span class="p">,</span> <span class="n">original_feature_ids</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed_feature_names</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">transformer_feature_names</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">original_feat_id</span> <span class="ow">in</span> <span class="n">original_feature_ids</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">preprocessed2original</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">original2preprocessed</span><span class="p">[</span><span class="n">original_feat_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed2original</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">original_feat_id</span>
+
+    <span class="k">def</span> <span class="nf">_update_feature_mapping_dict_using_output_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">single_transformer</span><span class="p">,</span> <span class="n">transformer_feature_names</span><span class="p">,</span> <span class="n">original_feature_ids</span><span class="p">):</span>
+        <span class="n">out_feature_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">single_transformer</span><span class="o">.</span><span class="n">get_feature_names</span><span class="p">(</span><span class="n">input_features</span><span class="o">=</span><span class="n">transformer_feature_names</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed_feature_names</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">out_feature_names</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">orig_id</span><span class="p">,</span> <span class="n">orig_name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">original_feature_ids</span><span class="p">,</span> <span class="n">transformer_feature_names</span><span class="p">):</span>
+            <span class="n">part_out_feature_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">out_feature_names</span> <span class="k">if</span> <span class="n">orig_name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">]</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">preprocessed2original</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">part_out_feature_names</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">original2preprocessed</span><span class="p">[</span><span class="n">orig_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed2original</span><span class="p">[</span><span class="n">offset</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">orig_id</span>
+
+    <span class="k">def</span> <span class="nf">_transform_feature_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            index: int</span>
+
+<span class="sd">        Returns: index of output feature(s) generated by the requested feature.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">original2preprocessed</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
 
 <div class="viewcode-block" id="PipelinePreprocessor.transform"><a class="viewcode-back" href="../../gen_modules/mealy.preprocessing.html#mealy.preprocessing.PipelinePreprocessor.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Transform the input feature values according to the preprocessing pipeline.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            x (numpy.ndarray or pandas.DataFrame): Input feature values.</span>
+<span class="sd">            x (array-like or dataframe of shape (number of samples, number of features)): input feature values.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            numpy.ndarray: Transformed feature values.</span>
+<span class="sd">        Return:</span>
+<span class="sd">            numpy.ndarray: transformed feature values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ct_preprocessor</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
 
@@ -392,96 +345,150 @@
         <span class="n">original_feature_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="n">original_features</span><span class="p">,</span> <span class="n">transformer_feature_names</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">preprocessed_feature_ids</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">original_feature_ids</span><span class="p">:</span>
-            <span class="n">out_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_feature_id</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out_ids</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-                <span class="n">preprocessed_feature_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out_ids</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>  <span class="c1"># list of ids</span>
-                <span class="n">preprocessed_feature_ids</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">out_ids</span><span class="p">)</span>
+            <span class="n">preprocessed_feature_ids</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transform_feature_id</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">original_feature_ids</span><span class="p">,</span> <span class="n">preprocessed_feature_ids</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_inverse_single_step</span><span class="p">(</span><span class="n">single_step</span><span class="p">,</span> <span class="n">step_output</span><span class="p">,</span> <span class="n">transformer_feature_names</span><span class="p">):</span>
+        <span class="n">inverse_transform_function_available</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">single_step</span><span class="p">,</span> <span class="s2">&quot;inverse_transform&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">invert_transform_via_identity</span><span class="p">(</span><span class="n">single_step</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reversing step using identity transformation on column(s): </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">single_step</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">transformer_feature_names</span><span class="p">)))</span>
+            <span class="k">return</span> <span class="n">step_output</span>
+        <span class="k">if</span> <span class="n">inverse_transform_function_available</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reversing step using inverse_transform() method on column(s): </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">single_step</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">transformer_feature_names</span><span class="p">)))</span>
+            <span class="k">return</span> <span class="n">single_step</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">step_output</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;The package does not support </span><span class="si">{}</span><span class="s1"> because it does not provide inverse_transform function.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">single_step</span><span class="p">))</span>
 
 <div class="viewcode-block" id="PipelinePreprocessor.inverse_transform"><a class="viewcode-back" href="../../gen_modules/mealy.preprocessing.html#mealy.preprocessing.PipelinePreprocessor.inverse_transform">[docs]</a>    <span class="k">def</span> <span class="nf">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preprocessed_x</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Invert the preprocessing pipeline and inverse transform feature values.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            preprocessed_x (numpy.ndarray): Preprocessed feature values.</span>
+<span class="sd">            preprocessed_x (numpy.ndarray or scipy sparse matrix): preprocessed feature values.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            numpy.ndarray: Feature values without preprocessing.</span>
+<span class="sd">        Return:</span>
+<span class="sd">            numpy.ndarray: feature values without preprocessing.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">def</span> <span class="nf">_inverse_single_step</span><span class="p">(</span><span class="n">single_step</span><span class="p">,</span> <span class="n">step_output</span><span class="p">):</span>
-            <span class="n">inverse_transform_function_available</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">single_step</span><span class="p">,</span> <span class="s2">&quot;inverse_transform&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">inverse_transform_function_available</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reversing step </span><span class="si">{}</span><span class="s2"> using inverse_transform() function on column(s): </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">single_step</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">transformer_feature_names</span><span class="p">])))</span>
-                <span class="n">step_input</span> <span class="o">=</span> <span class="n">single_step</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">step_output</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">single_step</span><span class="p">,</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">STEPS_THAT_CAN_BE_INVERSED_WITH_IDENTICAL_FUNCTION</span><span class="p">):</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reversing step </span><span class="si">{}</span><span class="s2"> using identity transformation on column(s): </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">single_step</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">transformer_feature_names</span><span class="p">])))</span>
-                <span class="n">step_input</span> <span class="o">=</span> <span class="n">step_output</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The package does not support </span><span class="si">{}</span><span class="s1"> because it does not provide inverse_transform function.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">single_step</span><span class="p">))</span>
-            <span class="k">return</span> <span class="n">step_input</span>
+        <span class="n">nr_original_features</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_original_feature_names</span><span class="p">())</span>
+        <span class="n">undo_prep_test_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">preprocessed_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">nr_original_features</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;O&#39;</span><span class="p">)</span>
+        <span class="n">any_cat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_categorical</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
 
-        <span class="n">original_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_original_feature_names</span><span class="p">()</span>
-        <span class="n">undo_prep_test_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">preprocessed_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">original_features</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;O&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">transformer</span><span class="p">,</span> <span class="n">feature_names</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ct_preprocessor</span><span class="o">.</span><span class="n">transformers_</span><span class="p">):</span>
+            <span class="n">original_feature_ids</span><span class="p">,</span> <span class="n">preprocessed_feature_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_feature_ids_related_to_transformer</span><span class="p">(</span><span class="n">feature_names</span><span class="p">)</span>
+            <span class="n">transformer_output</span> <span class="o">=</span> <span class="n">preprocessed_x</span><span class="p">[:,</span> <span class="n">preprocessed_feature_ids</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">issparse</span><span class="p">(</span><span class="n">transformer_output</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">any_cat</span><span class="p">(</span><span class="n">original_feature_ids</span><span class="p">)):</span>
+                <span class="n">transformer_output</span> <span class="o">=</span> <span class="n">transformer_output</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span>
 
-        <span class="k">for</span> <span class="p">(</span><span class="n">transformer_name</span><span class="p">,</span> <span class="n">transformer</span><span class="p">,</span> <span class="n">transformer_feature_names</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ct_preprocessor</span><span class="o">.</span><span class="n">transformers_</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">transformer_name</span> <span class="o">==</span> <span class="s1">&#39;remainder&#39;</span> <span class="ow">and</span> <span class="n">transformer</span> <span class="o">==</span> <span class="s1">&#39;drop&#39;</span><span class="p">:</span>
-                <span class="k">continue</span>
-            <span class="n">original_feature_ids</span><span class="p">,</span> <span class="n">preprocessed_feature_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_feature_ids_related_to_transformer</span><span class="p">(</span><span class="n">transformer_feature_names</span><span class="p">)</span>
-            <span class="n">output_of_transformer</span> <span class="o">=</span> <span class="n">preprocessed_x</span><span class="p">[:,</span> <span class="n">preprocessed_feature_ids</span><span class="p">]</span>
+            <span class="c1"># TODO: could be simplified as sklearn.Pipeline implements inverse_transform</span>
+            <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">generate_preprocessing_steps</span><span class="p">(</span><span class="n">transformer</span><span class="p">,</span> <span class="n">invert_order</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                <span class="n">transformer_input</span> <span class="o">=</span> <span class="n">PipelinePreprocessor</span><span class="o">.</span><span class="n">_inverse_single_step</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">transformer_output</span><span class="p">,</span> <span class="n">feature_names</span><span class="p">)</span>
+                <span class="n">transformer_output</span> <span class="o">=</span> <span class="n">transformer_input</span>
+            <span class="n">undo_prep_test_x</span><span class="p">[:,</span> <span class="n">original_feature_ids</span><span class="p">]</span> <span class="o">=</span> <span class="n">transformer_input</span>
 
-            <span class="n">is_cat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_categorical</span><span class="p">)</span>
-            <span class="n">any_numeric</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="o">~</span><span class="n">is_cat</span><span class="p">(</span><span class="n">original_feature_ids</span><span class="p">))</span>
-            <span class="k">if</span> <span class="n">issparse</span><span class="p">(</span><span class="n">output_of_transformer</span><span class="p">)</span> <span class="ow">and</span> <span class="n">any_numeric</span><span class="p">:</span>
-                <span class="n">output_of_transformer</span> <span class="o">=</span> <span class="n">output_of_transformer</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">undo_prep_test_x</span></div>
 
-            <span class="n">input_of_transformer</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transformer</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">):</span>
-                <span class="k">for</span> <span class="n">step_name</span><span class="p">,</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">transformer</span><span class="o">.</span><span class="n">steps</span><span class="p">):</span>
-                    <span class="n">input_of_transformer</span> <span class="o">=</span> <span class="n">_inverse_single_step</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="n">output_of_transformer</span><span class="p">)</span>
-                    <span class="n">output_of_transformer</span> <span class="o">=</span> <span class="n">input_of_transformer</span>
-                <span class="n">undo_prep_test_x</span><span class="p">[:,</span> <span class="n">original_feature_ids</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_of_transformer</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">input_of_transformer</span> <span class="o">=</span> <span class="n">_inverse_single_step</span><span class="p">(</span><span class="n">transformer</span><span class="p">,</span> <span class="n">output_of_transformer</span><span class="p">)</span>
-                <span class="n">undo_prep_test_x</span><span class="p">[:,</span> <span class="n">original_feature_ids</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_of_transformer</span>
-
-        <span class="k">return</span> <span class="n">undo_prep_test_x</span></div></div>
-
-
-<div class="viewcode-block" id="DummyPipelinePreprocessor"><a class="viewcode-back" href="../../gen_modules/mealy.preprocessing.html#mealy.preprocessing.DummyPipelinePreprocessor">[docs]</a><span class="k">class</span> <span class="nc">DummyPipelinePreprocessor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_performance_predictor_features</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model_performance_predictor_features</span> <span class="o">=</span> <span class="n">model_performance_predictor_features</span>
-
-<div class="viewcode-block" id="DummyPipelinePreprocessor.transform"><a class="viewcode-back" href="../../gen_modules/mealy.preprocessing.html#mealy.preprocessing.DummyPipelinePreprocessor.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Identity transformation of the input.</span>
+<div class="viewcode-block" id="PipelinePreprocessor.is_categorical"><a class="viewcode-back" href="../../gen_modules/mealy.preprocessing.html#mealy.preprocessing.PipelinePreprocessor.is_categorical">[docs]</a>    <span class="k">def</span> <span class="nf">is_categorical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check whether an unprocessed feature at a given index or with a given name is categorical.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            x (numpy.ndarray or pandas.DataFrame): Input feature values.</span>
+<span class="sd">            index (int): feature index.</span>
+<span class="sd">            name (str): feature name.</span>
 
+<span class="sd">        Return:</span>
+<span class="sd">            bool: True if the input feature is categorical, else False. If both index and name are provided, the index</span>
+<span class="sd">                is retained.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_feature_names</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">categorical_features</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Either the input index or its name should be specified.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PipelinePreprocessor.inverse_transform_feature_id"><a class="viewcode-back" href="../../gen_modules/mealy.preprocessing.html#mealy.preprocessing.PipelinePreprocessor.inverse_transform_feature_id">[docs]</a>    <span class="k">def</span> <span class="nf">inverse_transform_feature_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Undo preprocessing of feature name.</span>
+
+<span class="sd">        Transform the preprocessed feature name at given index back into the original unprocessed feature index.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            index (int): feature index.</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            int : index of the unprocessed feature corresponding to the input preprocessed feature index.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocessed2original</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div>
+
+    <span class="k">def</span> <span class="nf">get_top_ranked_feature_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_importances</span><span class="p">,</span> <span class="n">max_nr_features</span><span class="p">):</span>
+        <span class="n">ranked_transformed_feature_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span> <span class="n">feature_importances</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">max_nr_features</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">max_nr_features</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_original_feature_names</span><span class="p">())</span>
+
+        <span class="n">ranked_feature_ids</span><span class="p">,</span> <span class="n">seen</span> <span class="o">=</span> <span class="p">[],</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">ranked_transformed_feature_ids</span><span class="p">:</span>
+            <span class="n">inverse_transformed_feature_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inverse_transform_feature_id</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">inverse_transformed_feature_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+                <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">inverse_transformed_feature_id</span><span class="p">)</span>
+                <span class="n">ranked_feature_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inverse_transformed_feature_id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">max_nr_features</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">ranked_feature_ids</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">ranked_feature_ids</span>
+        <span class="k">return</span> <span class="n">ranked_feature_ids</span> <span class="c1"># should never be reached, but just in case</span>
+
+    <span class="k">def</span> <span class="nf">inverse_thresholds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>
+        <span class="n">used_feature_mask</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">feature</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+        <span class="n">feats_idx</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="n">used_feature_mask</span><span class="p">]</span>
+        <span class="n">thresholds</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">threshold</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;O&#39;</span><span class="p">)</span>
+        <span class="n">thresh</span> <span class="o">=</span> <span class="n">thresholds</span><span class="p">[</span><span class="n">used_feature_mask</span><span class="p">]</span>
+        <span class="n">n_cols</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_preprocessed_feature_names</span><span class="p">())</span>
+
+        <span class="n">dummy_x</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">feats_idx</span><span class="p">,</span> <span class="n">thresh</span><span class="p">):</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">n_cols</span>
+            <span class="n">row</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span>
+            <span class="n">dummy_x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+            <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inverse_transform_feature_id</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+
+        <span class="n">undo_dummy_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dummy_x</span><span class="p">))</span>
+        <span class="n">descaled_thresh</span> <span class="o">=</span> <span class="p">[</span><span class="n">undo_dummy_x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">indices</span><span class="p">)]</span>
+        <span class="n">thresholds</span><span class="p">[</span><span class="n">used_feature_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">descaled_thresh</span>
+        <span class="k">return</span> <span class="n">thresholds</span></div>
+
+
+<div class="viewcode-block" id="DummyPipelinePreprocessor"><a class="viewcode-back" href="../../gen_modules/mealy.preprocessing.html#mealy.preprocessing.DummyPipelinePreprocessor">[docs]</a><span class="k">class</span> <span class="nc">DummyPipelinePreprocessor</span><span class="p">(</span><span class="n">FeatureNameTransformer</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_performance_predictor_features</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DummyPipelinePreprocessor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">original_features</span><span class="o">=</span><span class="n">model_performance_predictor_features</span><span class="p">,</span>
+            <span class="n">preprocessed_features</span><span class="o">=</span><span class="n">model_performance_predictor_features</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DummyPipelinePreprocessor.transform"><a class="viewcode-back" href="../../gen_modules/mealy.preprocessing.html#mealy.preprocessing.DummyPipelinePreprocessor.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            x (array-like or dataframe of shape (number of samples, number of features)): input feature values.</span>
 <span class="sd">        Returns:</span>
-<span class="sd">            numpy.ndarray: Transformed feature values.</span>
+<span class="sd">            ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">values</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">or</span> <span class="n">issparse</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">x</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;x should be either a pandas dataframe or a numpy ndarray&#39;</span><span class="p">)</span></div>
-
-    <span class="k">def</span> <span class="nf">get_original_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_performance_predictor_features</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;x should be either a pandas dataframe, a numpy ndarray or a scipy sparse matrix&#39;</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">is_categorical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">inverse_transform_feature_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">index</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">name</span>
+    <span class="k">def</span> <span class="nf">inverse_transform_feature_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">index</span>
 
     <span class="k">def</span> <span class="nf">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">x</span></div>
+        <span class="k">return</span> <span class="n">x</span>
+
+    <span class="k">def</span> <span class="nf">get_top_ranked_feature_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_importances</span><span class="p">,</span> <span class="n">max_nr_features</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">max_nr_features</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span> <span class="n">feature_importances</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span> <span class="n">feature_importances</span><span class="p">)[:</span><span class="n">max_nr_features</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">inverse_thresholds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">tree</span><span class="o">.</span><span class="n">threshold</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;O&#39;</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

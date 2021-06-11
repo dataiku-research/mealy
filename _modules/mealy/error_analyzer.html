@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>mealy.error_analyzer &mdash; mealy 0.2.0-git documentation</title>
+  <title>mealy.error_analyzer &mdash; mealy 0.2.4-git documentation</title>
   
 
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/theme_override.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
@@ -36,6 +38,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -71,7 +74,7 @@
             
             
               <div class="version">
-                0.2.0
+                0.2.4
               </div>
             
           
@@ -189,11 +192,13 @@
 <span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="kn">import</span> <span class="n">ColumnTransformer</span>
 <span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">BaseEstimator</span>
 <span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">make_scorer</span>
-<span class="kn">from</span> <span class="nn">mealy.error_analysis_utils</span> <span class="kn">import</span> <span class="n">check_enough_data</span><span class="p">,</span> <span class="n">get_epsilon</span>
-<span class="kn">from</span> <span class="nn">mealy.constants</span> <span class="kn">import</span> <span class="n">ErrorAnalyzerConstants</span>
-<span class="kn">from</span> <span class="nn">mealy.metrics</span> <span class="kn">import</span> <span class="n">error_decision_tree_report</span><span class="p">,</span> <span class="n">fidelity_balanced_accuracy_score</span>
-<span class="kn">from</span> <span class="nn">mealy.preprocessing</span> <span class="kn">import</span> <span class="n">PipelinePreprocessor</span><span class="p">,</span> <span class="n">DummyPipelinePreprocessor</span>
-<span class="kn">from</span> <span class="nn">mealy.error_tree</span> <span class="kn">import</span> <span class="n">ErrorTree</span>
+<span class="kn">from</span> <span class="nn">.error_analysis_utils</span> <span class="kn">import</span> <span class="n">check_enough_data</span><span class="p">,</span> <span class="n">get_epsilon</span><span class="p">,</span> <span class="n">format_float</span>
+<span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="n">ErrorAnalyzerConstants</span>
+<span class="kn">from</span> <span class="nn">.metrics</span> <span class="kn">import</span> <span class="n">error_decision_tree_report</span><span class="p">,</span> <span class="n">fidelity_balanced_accuracy_score</span>
+<span class="kn">from</span> <span class="nn">.preprocessing</span> <span class="kn">import</span> <span class="n">PipelinePreprocessor</span><span class="p">,</span> <span class="n">DummyPipelinePreprocessor</span>
+<span class="kn">from</span> <span class="nn">.error_tree</span> <span class="kn">import</span> <span class="n">ErrorTree</span>
+<span class="kn">from</span> <span class="nn">sklearn.exceptions</span> <span class="kn">import</span> <span class="n">NotFittedError</span>
+
 <span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -201,90 +206,54 @@
 
 
 <div class="viewcode-block" id="ErrorAnalyzer"><a class="viewcode-back" href="../../gen_modules/mealy.error_analyzer.html#mealy.error_analyzer.ErrorAnalyzer">[docs]</a><span class="k">class</span> <span class="nc">ErrorAnalyzer</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;ErrorAnalyzer analyzes the errors of a prediction model on a test set.</span>
+    <span class="sd">&quot;&quot;&quot; ErrorAnalyzer analyzes the errors of a prediction model on a test set.</span>
 
 <span class="sd">    It uses model predictions and ground truth target to compute the model errors on the test set.</span>
 <span class="sd">    It then trains a Decision Tree, called a Error Analyzer Tree, on the same test set by using the model error</span>
 <span class="sd">    as target. The nodes of the decision tree are different segments of errors to be studied individually.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        primary_model (sklearn.base.BaseEstimator or sklearn.pipeline.Pipeline): A sklearn model to analyze. Either an estimator</span>
+<span class="sd">        primary_model (sklearn.base.BaseEstimator or sklearn.pipeline.Pipeline): a sklearn model to analyze. Either an estimator</span>
 <span class="sd">            or a Pipeline containing a ColumnTransformer with the preprocessing steps and an estimator as last step.</span>
-<span class="sd">        feature_names (list): List of feature names, default=None.</span>
-<span class="sd">        max_num_row (int): Maximum number of rows to process.</span>
-<span class="sd">        param_grid (dict): The sklearn.tree.DecisionTree hyper-parameters values for grid search.</span>
-<span class="sd">        random_state (int): Random seed.</span>
+<span class="sd">        feature_names (list of str): list of feature names. Defaults to None.</span>
+<span class="sd">        param_grid (dict): sklearn.tree.DecisionTree hyper-parameters values for grid search.</span>
+<span class="sd">        random_state (int): random seed.</span>
 
 <span class="sd">    Attributes:</span>
-<span class="sd">        primary_model (sklearn.base.BaseEstimator or sklearn.pipeline.Pipeline): A sklearn model to analyze. Either an estimator</span>
-<span class="sd">            or a Pipeline containing a ColumnTransformer with the preprocessing steps and an estimator as last step.</span>
-<span class="sd">        feature_names (list): List of feature names.</span>
-<span class="sd">        max_num_row (int): Maximum number of rows to process.</span>
-<span class="sd">        param_grid (dict): The sklearn.tree.DecisionTreeClassifier hyper-parameters values for grid search.</span>
-<span class="sd">        random_state (int): Random seed.</span>
-<span class="sd">        preprocessed_feature_names (list): List of preprocessed feature names.</span>
-<span class="sd">        error_tree (ErrorTree): the Error Tree.</span>
+<span class="sd">        _error_tree (DecisionTreeClassifier): the estimator used to train the Error Analyzer Tree</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">primary_model</span><span class="p">,</span>
-                 <span class="n">feature_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">max_num_row</span><span class="o">=</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">MAX_NUM_ROW</span><span class="p">,</span>
-                 <span class="n">param_grid</span><span class="o">=</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">PARAMETERS_GRID</span><span class="p">,</span>
-                 <span class="n">random_state</span><span class="o">=</span><span class="mi">65537</span><span class="p">):</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span> <span class="o">=</span> <span class="n">feature_names</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">max_num_row</span> <span class="o">=</span> <span class="n">max_num_row</span>
+                <span class="n">feature_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">param_grid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">probability_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                <span class="n">random_state</span><span class="o">=</span><span class="mi">65537</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">param_grid</span> <span class="o">=</span> <span class="n">param_grid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">probability_threshold</span> <span class="o">=</span> <span class="n">probability_threshold</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">primary_model</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">primary_model</span><span class="o">.</span><span class="n">steps</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Pipeline should have two steps: the preprocessing of the features, and the primary model to analyze.&quot;</span><span class="p">)</span>
             <span class="n">estimator</span> <span class="o">=</span> <span class="n">primary_model</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">BaseEstimator</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;The last step of the pipeline has to be a BaseEstimator.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The last step of the pipeline has to be a BaseEstimator.&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_primary_model</span> <span class="o">=</span> <span class="n">estimator</span>
-            <span class="n">ct_preprocessor</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">primary_model</span><span class="o">.</span><span class="n">steps</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">ct_preprocessor</span> <span class="o">=</span> <span class="n">primary_model</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ct_preprocessor</span><span class="p">,</span> <span class="n">ColumnTransformer</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;The input preprocessor has to be a ColumnTransformer.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The input preprocessor has to be a ColumnTransformer.&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span> <span class="o">=</span> <span class="n">PipelinePreprocessor</span><span class="p">(</span><span class="n">ct_preprocessor</span><span class="p">,</span> <span class="n">feature_names</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_preprocessed_feature_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">get_preprocessed_feature_names</span><span class="p">()</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">primary_model</span><span class="p">,</span> <span class="n">BaseEstimator</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_primary_model</span> <span class="o">=</span> <span class="n">primary_model</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_preprocessed_feature_names</span> <span class="o">=</span> <span class="n">feature_names</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span> <span class="o">=</span> <span class="n">DummyPipelinePreprocessor</span><span class="p">(</span><span class="n">feature_names</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;ErrorAnalyzer needs as input either a scikit Estimator or a scikit Pipeline.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;ErrorAnalyzer needs as input either a scikit BaseEstimator or a scikit Pipeline.&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_is_regression</span> <span class="o">=</span> <span class="n">is_regressor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_primary_model</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_error_train_x</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_error_train_y</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_epsilon</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_error_train_leaf_id</span> <span class="o">=</span> <span class="kc">None</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_feature_names</span>
-
-    <span class="nd">@feature_names</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_feature_names</span> <span class="o">=</span> <span class="n">value</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">primary_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_primary_model</span>
-
-    <span class="nd">@primary_model</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">primary_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_primary_model</span> <span class="o">=</span> <span class="n">value</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">max_num_row</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_num_row</span>
-
-    <span class="nd">@max_num_row</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">max_num_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_max_num_row</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">param_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -298,36 +267,38 @@
     <span class="k">def</span> <span class="nf">random_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_random_state</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">regression_error_tolerance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epsilon</span>
-
     <span class="nd">@random_state</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">random_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_random_state</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">error_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NotFittedError</span><span class="p">(</span><span class="s2">&quot;The error tree is not fitted yet. Call &#39;fit&#39; method with appropriate arguments before using this estimator.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span>
+
+    <span class="nd">@error_tree</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">error_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">get_preprocessed_feature_names</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">preprocessed_feature_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;feature#</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">feature_index</span>
+                <span class="k">for</span> <span class="n">feature_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">n_features_</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span> <span class="o">=</span> <span class="n">tree</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">preprocessed_feature_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_preprocessed_feature_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_preprocessed_feature_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;feature#</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">feature_index</span>
-                                                <span class="k">for</span> <span class="n">feature_index</span> <span class="ow">in</span>
-                                                <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">n_features_</span><span class="p">)]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_preprocessed_feature_names</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">get_preprocessed_feature_names</span><span class="p">()</span>
 
 <div class="viewcode-block" id="ErrorAnalyzer.fit"><a class="viewcode-back" href="../../gen_modules/mealy.error_analyzer.html#mealy.error_analyzer.ErrorAnalyzer.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Fit the Error Analyzer Tree.</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit the Error Analyzer Tree.</span>
 
 <span class="sd">        Trains the Error Analyzer Tree, a Decision Tree to discriminate between samples that are correctly</span>
 <span class="sd">        predicted or wrongly predicted (errors) by a primary model.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            X (numpy.ndarray or pandas.DataFrame): Feature data from a test set to evaluate the primary predictor and</span>
+<span class="sd">            X (numpy.ndarray or pandas.DataFrame): feature data from a test set to evaluate the primary predictor and</span>
 <span class="sd">                train a Error Analyzer Tree.</span>
-<span class="sd">            y (numpy.ndarray or pandas.DataFrame): Target data from a test set to evaluate the primary predictor and</span>
+<span class="sd">            y (numpy.ndarray or pandas.DataFrame): target data from a test set to evaluate the primary predictor and</span>
 <span class="sd">                train a Error Analyzer Tree.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Preparing the Error Analyzer Tree...&quot;</span><span class="p">)</span>
@@ -343,13 +314,13 @@
         <span class="c1"># entropy/mutual information is used to split nodes in Microsoft Pandora system</span>
         <span class="n">dt_clf</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">criterion</span><span class="o">=</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">CRITERION</span><span class="p">,</span>
                                              <span class="n">random_state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_random_state</span><span class="p">)</span>
-
-        <span class="c1"># for the min_sample_leaf, the min value should be 0.01</span>
-        <span class="n">min_samples_leaf_max</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">error_rate</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
-        <span class="n">param_grid</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;max_depth&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span>
-            <span class="s1">&#39;min_samples_leaf&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">min_samples_leaf_max</span><span class="o">/</span><span class="mi">5</span><span class="p">,</span> <span class="n">min_samples_leaf_max</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-        <span class="p">}</span>
+        <span class="n">param_grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_grid</span>
+        <span class="k">if</span> <span class="n">param_grid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">min_samples_leaf_max</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">error_rate</span><span class="p">,</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">MIN_SAMPLES_LEAF_LOWEST_UPPER_BOUND</span><span class="p">)</span>
+            <span class="n">param_grid</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;max_depth&#39;</span><span class="p">:</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">MAX_DEPTH</span><span class="p">,</span>
+                <span class="s1">&#39;min_samples_leaf&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">min_samples_leaf_max</span><span class="o">/</span><span class="mi">5</span><span class="p">,</span> <span class="n">min_samples_leaf_max</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+            <span class="p">}</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Grid search the Error Tree with the following grid: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">param_grid</span><span class="p">))</span>
         <span class="n">gs_clf</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">dt_clf</span><span class="p">,</span>
@@ -358,12 +329,12 @@
                               <span class="n">scoring</span><span class="o">=</span><span class="n">make_scorer</span><span class="p">(</span><span class="n">fidelity_balanced_accuracy_score</span><span class="p">))</span>
 
         <span class="n">gs_clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_train_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_train_y</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span> <span class="o">=</span> <span class="n">ErrorTree</span><span class="p">(</span><span class="n">error_decision_tree</span><span class="o">=</span><span class="n">gs_clf</span><span class="o">.</span><span class="n">best_estimator_</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_tree</span> <span class="o">=</span> <span class="n">ErrorTree</span><span class="p">(</span><span class="n">error_decision_tree</span><span class="o">=</span><span class="n">gs_clf</span><span class="o">.</span><span class="n">best_estimator_</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Chosen parameters: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">gs_clf</span><span class="o">.</span><span class="n">best_params_</span><span class="p">))</span></div>
 
-    <span class="c1">#TODO rewrite this method using the ranking arrays</span>
-<div class="viewcode-block" id="ErrorAnalyzer.get_error_leaf_summary"><a class="viewcode-back" href="../../gen_modules/mealy.error_analyzer.html#mealy.error_analyzer.ErrorAnalyzer.get_error_leaf_summary">[docs]</a>    <span class="k">def</span> <span class="nf">get_error_leaf_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">leaf_selector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_path_to_leaves</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;dict&#39;</span><span class="p">,</span> <span class="n">rank_by</span><span class="o">=</span><span class="s1">&#39;total_error_fraction&#39;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return summary information regarding leaves.</span>
+<div class="viewcode-block" id="ErrorAnalyzer.get_error_leaf_summary"><a class="viewcode-back" href="../../gen_modules/mealy.error_analyzer.html#mealy.error_analyzer.ErrorAnalyzer.get_error_leaf_summary">[docs]</a>    <span class="k">def</span> <span class="nf">get_error_leaf_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">leaf_selector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_path_to_leaves</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                               <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;dict&#39;</span><span class="p">,</span> <span class="n">rank_by</span><span class="o">=</span><span class="s1">&#39;total_error_fraction&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return summary information regarding leaves.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            leaf_selector (None, int or array-like): The leaves whose information will be returned</span>
@@ -371,25 +342,25 @@
 <span class="sd">                * array-like: Only return information of the leaves corresponding to these ids</span>
 <span class="sd">                * None (default): Return information of all the leaves</span>
 <span class="sd">            add_path_to_leaves (bool): Whether to add information of the path across the tree till the selected node. Defaults to False.</span>
-<span class="sd">            output_format (str): Return format used for the report. Valid values are &#39;dict&#39; or &#39;str&#39;. Defaults to &#39;dict&#39;.</span>
+<span class="sd">            output_format (string): Return format used for the report. Valid values are &#39;dict&#39; or &#39;str&#39;. Defaults to &#39;dict&#39;.</span>
 <span class="sd">            rank_by (str): Ranking criterion for the leaves. Valid values are:</span>
 <span class="sd">                * &#39;total_error_fraction&#39; (default): rank by the fraction of total error in the node</span>
 <span class="sd">                * &#39;purity&#39;: rank by the purity (ratio of wrongly predicted samples over the total number of node samples)</span>
 <span class="sd">                * &#39;class_difference&#39;: rank by the difference of number of wrongly and correctly predicted samples</span>
 <span class="sd">                in a node.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dict or str: List of reports (as dictionary or string) with different information on each selected leaf.</span>
+<span class="sd">        Return:</span>
+<span class="sd">            dict or str: list of reports (as dictionary or string) with different information on each selected leaf.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">leaf_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_ranked_leaf_ids</span><span class="p">(</span><span class="n">leaf_selector</span><span class="o">=</span><span class="n">leaf_selector</span><span class="p">,</span> <span class="n">rank_by</span><span class="o">=</span><span class="n">rank_by</span><span class="p">)</span>
 
         <span class="n">leaves_summary</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">leaf_id</span> <span class="ow">in</span> <span class="n">leaf_nodes</span><span class="p">:</span>
-            <span class="n">n_errors</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">leaf_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">error_class_idx</span><span class="p">])</span>
-            <span class="n">n_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">n_node_samples</span><span class="p">[</span><span class="n">leaf_id</span><span class="p">]</span>
+            <span class="n">n_errors</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_tree</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">leaf_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_tree</span><span class="o">.</span><span class="n">error_class_idx</span><span class="p">])</span>
+            <span class="n">n_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_tree</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">n_node_samples</span><span class="p">[</span><span class="n">leaf_id</span><span class="p">]</span>
             <span class="n">local_error</span> <span class="o">=</span> <span class="n">n_errors</span> <span class="o">/</span> <span class="n">n_samples</span>
-            <span class="n">total_error_fraction</span> <span class="o">=</span> <span class="n">n_errors</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">n_total_errors</span>
+            <span class="n">total_error_fraction</span> <span class="o">=</span> <span class="n">n_errors</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_tree</span><span class="o">.</span><span class="n">n_total_errors</span>
             <span class="n">n_corrects</span> <span class="o">=</span> <span class="n">n_samples</span> <span class="o">-</span> <span class="n">n_errors</span>
 
             <span class="k">if</span> <span class="n">output_format</span> <span class="o">==</span> <span class="s1">&#39;dict&#39;</span><span class="p">:</span>
@@ -413,65 +384,88 @@
                     <span class="k">for</span> <span class="p">(</span><span class="n">step_idx</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_path_to_node</span><span class="p">(</span><span class="n">leaf_id</span><span class="p">)):</span>
                         <span class="n">leaf_summary</span> <span class="o">+=</span> <span class="s1">&#39;     &#39;</span> <span class="o">+</span> <span class="s1">&#39;   &#39;</span> <span class="o">*</span> <span class="n">step_idx</span> <span class="o">+</span> <span class="n">step</span>  <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
 
+                <span class="n">leaves_summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">leaf_summary</span><span class="p">)</span>
+
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Output format should either be &#39;dict&#39; or &#39;str&#39;&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">leaves_summary</span></div>
 
 <div class="viewcode-block" id="ErrorAnalyzer.evaluate"><a class="viewcode-back" href="../../gen_modules/mealy.error_analyzer.html#mealy.error_analyzer.ErrorAnalyzer.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">output_format</span><span class="o">=</span><span class="s1">&#39;str&#39;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Evaluate performance of ErrorAnalyzer on new the given test data and labels.</span>
-
-<span class="sd">        Print ErrorAnalyzer summary metrics regarding the Error Tree.</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate performance of ErrorAnalyzer on the given test data and labels.</span>
+<span class="sd">        Return ErrorAnalyzer summary metrics regarding the Error Tree.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            X (numpy.ndarray or pandas.DataFrame): Feature data from a test set to evaluate the primary predictor</span>
+<span class="sd">            X (numpy.ndarray or pandas.DataFrame): feature data from a test set to evaluate the primary predictor</span>
 <span class="sd">                and train a Error Analyzer Tree.</span>
-<span class="sd">            y (numpy.ndarray or pandas.DataFrame): Target data from a test set to evaluate the primary predictor and</span>
+<span class="sd">            y (numpy.ndarray or pandas.DataFrame): target data from a test set to evaluate the primary predictor and</span>
 <span class="sd">                train a Error Analyzer Tree.</span>
-<span class="sd">            output_format (str): Return format used for the report. Valid values are &#39;dict&#39; or &#39;str&#39;. Defaults to &#39;str&#39;.</span>
+<span class="sd">            output_format (string): Return format used for the report. Valid values are &#39;dict&#39; or &#39;str&#39;. Defaults to &#39;str&#39;.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            dict or str: Dictionary or string report storing different metrics regarding the Error Tree.</span>
+<span class="sd">        Return:</span>
+<span class="sd">            dict or str: dictionary or string report storing different metrics regarding the Error Decision Tree.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">prep_x</span><span class="p">,</span> <span class="n">prep_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_tree</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">prep_x</span><span class="p">)</span>
         <span class="n">y_true</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_primary_model_error</span><span class="p">(</span><span class="n">prep_x</span><span class="p">,</span> <span class="n">prep_y</span><span class="p">)</span>
-        <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">prep_x</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">error_decision_tree_report</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">output_format</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_compute_primary_model_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Computes the errors of the primary model predictions and samples.</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes the errors of the primary model predictions and samples</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            X (numpy.ndarray):  Input samples of shape `(n_samples, n_features)`.</span>
-<span class="sd">            y (numpy.ndarray):  True target values for `X` of shape `(n_samples,)`.</span>
+<span class="sd">            X: array-like of shape (n_samples, n_features)</span>
+<span class="sd">            Input samples.</span>
+
+<span class="sd">            y: array-like of shape (n_samples,)</span>
+<span class="sd">            True target values for `X`.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">             error_y (numpy.ndarray): Array of booleans of shape `(len(y),)`, containing a boolean value of whether or</span>
-<span class="sd">                not the primary model got the prediction right.</span>
-<span class="sd">             error_rate (float): Accuracy of the primary model.</span>
+<span class="sd">             sampled_X: ndarray</span>
+<span class="sd">             A sample of `X`.</span>
+
+<span class="sd">             error_y: array of string of shape (n_sampled_X, )</span>
+<span class="sd">             Boolean value of whether or not the primary model predicted correctly or incorrectly the samples in sampled_X.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_primary_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">is_regressor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_primary_model</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="c1"># regression or multiclass classification models: no proba threshold</span>
+            <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_primary_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1"># binary -&gt; need to check the proba threshold</span>
+            <span class="n">prediction_index</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_primary_model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">probability_threshold</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="c1"># map the prediction indexes to the original target values</span>
+            <span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_primary_model</span><span class="o">.</span><span class="n">classes_</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prediction_index</span><span class="p">])</span>
+
         <span class="n">error_y</span><span class="p">,</span> <span class="n">error_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_primary_model_predictions</span><span class="p">(</span><span class="n">y_true</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">y_pred</span><span class="o">=</span><span class="n">y_pred</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">error_y</span><span class="p">,</span> <span class="n">error_rate</span>
 
     <span class="k">def</span> <span class="nf">_evaluate_primary_model_predictions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Compute errors of the primary model on the test set.</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute errors of the primary model on the test set</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            y_true (numpy.ndarray): True target values.</span>
-<span class="sd">            y_pred (numpy.ndarray): Predictions of the primary model.</span>
+<span class="sd">            y_true: 1D array</span>
+<span class="sd">            True target values.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">             error_y (numpy.ndarray): Array of booleans of shape `(len(y),)`, containing a boolean value of whether or</span>
-<span class="sd">                not the primary model got the prediction right.</span>
-<span class="sd">             error_rate (float): Accuracy of the primary model.</span>
+<span class="sd">            y_pred: 1D array</span>
+<span class="sd">            Predictions of the primary model.</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            error_y: array of string of len(y_true)</span>
+<span class="sd">            Boolean value of whether or not the primary model got the prediction right.</span>
+
+<span class="sd">            error_rate: float</span>
+<span class="sd">            Accuracy of the primary model</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">error_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">CORRECT_PREDICTION</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;O&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_regression</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">is_regressor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_primary_model</span><span class="p">):</span>
             <span class="n">difference</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y_true</span> <span class="o">-</span> <span class="n">y_pred</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_epsilon</span> <span class="o">=</span> <span class="n">get_epsilon</span><span class="p">(</span><span class="n">difference</span><span class="p">)</span>
-            <span class="n">error_mask</span> <span class="o">=</span> <span class="n">difference</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_epsilon</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># only compute epsilon when fitting the model (not while evaluating)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span> <span class="o">=</span> <span class="n">get_epsilon</span><span class="p">(</span><span class="n">difference</span><span class="p">)</span>
+            <span class="n">error_mask</span> <span class="o">=</span> <span class="n">difference</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">error_mask</span> <span class="o">=</span> <span class="n">y_true</span> <span class="o">!=</span> <span class="n">y_pred</span>
 
@@ -482,83 +476,76 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;All predictions are </span><span class="si">{}</span><span class="s1">. To build a proper ErrorAnalyzer decision tree we need both correct and incorrect predictions&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">error_y</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 
         <span class="n">error_rate</span> <span class="o">=</span> <span class="n">n_wrong_preds</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">error_y</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;The primary model has an error rate of </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">error_rate</span><span class="p">,</span> <span class="mi">3</span><span class="p">)))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;The primary model has an error rate of </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">format_float</span><span class="p">(</span><span class="n">error_rate</span><span class="p">,</span> <span class="mi">3</span><span class="p">)))</span>
         <span class="k">return</span> <span class="n">error_y</span><span class="p">,</span> <span class="n">error_rate</span>
 
     <span class="k">def</span> <span class="nf">_get_ranked_leaf_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">leaf_selector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rank_by</span><span class="o">=</span><span class="s1">&#39;total_error_fraction&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Select error nodes and rank them by importance.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            leaf_selector (None, int or array-like): The leaves whose information will be returned</span>
+<span class="sd">            leaf_selector (None, int or array-like): the leaves whose information will be returned</span>
 <span class="sd">                * int: Only return information of the leaf with the corresponding id</span>
 <span class="sd">                * array-like: Only return information of the leaves corresponding to these ids</span>
 <span class="sd">                * None (default): Return information of all the leaves</span>
-<span class="sd">            rank_by (str): Ranking criterion for the leaves. Valid values are:</span>
+<span class="sd">            rank_by (str): ranking criterion for the leaves. Valid values are:</span>
 <span class="sd">                * &#39;total_error_fraction&#39;: rank by the fraction of total error in the node</span>
 <span class="sd">                * &#39;purity&#39;: rank by the purity (ratio of wrongly predicted samples over the total number of node samples)</span>
 <span class="sd">                * &#39;class_difference&#39;: rank by the difference of number of wrongly and correctly predicted samples</span>
 <span class="sd">                in a node.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            list or numpy.ndarray: List of selected leaves indices.</span>
+<span class="sd">        Return:</span>
+<span class="sd">            list or numpy.ndarray: list of selected leaves indices.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">apply_leaf_selector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_leaf_selector</span><span class="p">(</span><span class="n">leaf_selector</span><span class="p">)</span>
-        <span class="n">selected_leaves</span> <span class="o">=</span> <span class="n">apply_leaf_selector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">leaf_ids</span><span class="p">)</span>
+        <span class="n">apply_leaf_selector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_leaf_selector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_tree</span><span class="o">.</span><span class="n">leaf_ids</span><span class="p">,</span> <span class="n">leaf_selector</span><span class="p">)</span>
+        <span class="n">selected_leaves</span> <span class="o">=</span> <span class="n">apply_leaf_selector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_tree</span><span class="o">.</span><span class="n">leaf_ids</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">selected_leaves</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">selected_leaves</span>
         <span class="k">if</span> <span class="n">rank_by</span> <span class="o">==</span> <span class="s1">&#39;total_error_fraction&#39;</span><span class="p">:</span>
-            <span class="n">sorted_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span class="n">apply_leaf_selector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">total_error_fraction</span><span class="p">))</span>
+            <span class="n">sorted_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span class="n">apply_leaf_selector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_tree</span><span class="o">.</span><span class="n">total_error_fraction</span><span class="p">))</span>
         <span class="k">elif</span> <span class="n">rank_by</span> <span class="o">==</span> <span class="s1">&#39;purity&#39;</span><span class="p">:</span>
-            <span class="n">sorted_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">lexsort</span><span class="p">((</span><span class="n">apply_leaf_selector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">difference</span><span class="p">),</span> <span class="n">apply_leaf_selector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">quantized_impurity</span><span class="p">)))</span>
+            <span class="n">sorted_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">lexsort</span><span class="p">((</span><span class="n">apply_leaf_selector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_tree</span><span class="o">.</span><span class="n">difference</span><span class="p">),</span> <span class="n">apply_leaf_selector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_tree</span><span class="o">.</span><span class="n">quantized_impurity</span><span class="p">)))</span>
         <span class="k">elif</span> <span class="n">rank_by</span> <span class="o">==</span> <span class="s1">&#39;class_difference&#39;</span><span class="p">:</span>
-            <span class="n">sorted_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">lexsort</span><span class="p">((</span><span class="n">apply_leaf_selector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">impurity</span><span class="p">),</span> <span class="n">apply_leaf_selector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">difference</span><span class="p">)))</span>
+            <span class="n">sorted_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">lexsort</span><span class="p">((</span><span class="n">apply_leaf_selector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_tree</span><span class="o">.</span><span class="n">impurity</span><span class="p">),</span> <span class="n">apply_leaf_selector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_tree</span><span class="o">.</span><span class="n">difference</span><span class="p">)))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;Input argument for rank_by is invalid. Should be &#39;total_error_fraction&#39;, &#39;purity&#39; or &#39;class_difference&#39;&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">selected_leaves</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">sorted_ids</span><span class="p">)</span>
 
-    <span class="c1">#TODO leaf_selector is taking too many different types of data ?</span>
-    <span class="k">def</span> <span class="nf">_get_leaf_selector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">leaf_selector</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return a function that select rows of provided arrays.</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_get_leaf_selector</span><span class="p">(</span><span class="n">leaf_ids</span><span class="p">,</span> <span class="n">leaf_selector</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a function that select rows of provided arrays. Arrays must be of shape (1, number of leaves)</span>
+<span class="sd">            Args:</span>
+<span class="sd">                leaf_selector: None, int or array-like</span>
+<span class="sd">                    How to select the rows of the array</span>
+<span class="sd">                      * int: Only keep the row corresponding to this leaf id</span>
+<span class="sd">                      * array-like: Only keep the rows corresponding to these leaf ids</span>
+<span class="sd">                      * None (default): Keep the whole array of leaf ids</span>
 
-<span class="sd">        Arrays must be of shape (1, number of leaves).</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            leaf_selector (None, int or array-like): How to select the rows of the array</span>
-<span class="sd">                * int: Only keep the row corresponding to this leaf id</span>
-<span class="sd">                * array-like: Only keep the rows corresponding to these leaf ids</span>
-<span class="sd">                * None (default): Keep the whole array of leaf ids</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            A function with one argument `array` as a selector of leaf ids.</span>
+<span class="sd">            Return:</span>
+<span class="sd">                A function with one argument array as a selector of leaf ids</span>
 <span class="sd">                Args:</span>
-<span class="sd">                    array (numpy.array): array of shape (1, number of leaves) of which we only want to keep some rows.</span>
+<span class="sd">                    array: numpy array of shape (1, number of leaves)</span>
+<span class="sd">                    An array of which we only want to keep some rows</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">leaf_selector</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="k">lambda</span> <span class="n">array</span><span class="p">:</span> <span class="n">array</span>
 
         <span class="n">leaf_selector_as_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">leaf_selector</span><span class="p">)</span>
-        <span class="n">leaf_selector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">leaf_ids</span><span class="p">,</span> <span class="n">leaf_selector_as_array</span><span class="p">)</span>
+        <span class="n">leaf_selector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="n">leaf_ids</span><span class="p">,</span> <span class="n">leaf_selector_as_array</span><span class="p">)</span>
         <span class="n">nr_kept_leaves</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">leaf_selector</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">nr_kept_leaves</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;None of the ids provided correspond to a leaf id.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;None of the ids provided correspond to a leaf id.&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">nr_kept_leaves</span> <span class="o">&lt;</span> <span class="n">leaf_selector_as_array</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Some of the ids provided do not belong to leaves. Only leaf ids are kept.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Some of the ids provided do not belong to leaves. Only leaf ids are kept.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="k">lambda</span> <span class="n">array</span><span class="p">:</span> <span class="n">array</span><span class="p">[</span><span class="n">leaf_selector</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_get_path_to_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Return path to node as a list of split steps from the nodes of the sklearn Tree object.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            node_id (int): Node identifier.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            path_to_node (str): Text describing the path from the root to the input node.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Return path to node as a list of split steps from the nodes of the sklearn Tree object &quot;&quot;&quot;</span>
         <span class="n">feature_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">get_original_feature_names</span><span class="p">()</span>
-        <span class="n">children_left</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">children_left</span><span class="p">)</span>
-        <span class="n">children_right</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">children_right</span><span class="p">)</span>
+        <span class="n">children_left</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_tree</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">children_left</span><span class="p">)</span>
+        <span class="n">children_right</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_tree</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">children_right</span><span class="p">)</span>
         <span class="n">threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inverse_transform_thresholds</span><span class="p">()</span>
         <span class="n">feature</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inverse_transform_features</span><span class="p">()</span>
 
@@ -576,13 +563,13 @@
             <span class="n">thresh</span> <span class="o">=</span> <span class="n">threshold</span><span class="p">[</span><span class="n">parent_id</span><span class="p">]</span>
 
             <span class="n">is_categorical</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">is_categorical</span><span class="p">(</span><span class="n">feat</span><span class="p">)</span>
-            <span class="n">thresh</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">thresh</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_categorical</span> <span class="k">else</span> <span class="s2">&quot;</span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">thresh</span><span class="p">)</span>
+            <span class="n">thresh</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">thresh</span><span class="p">)</span> <span class="k">if</span> <span class="n">is_categorical</span> <span class="k">else</span> <span class="n">format_float</span><span class="p">(</span><span class="n">thresh</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
             <span class="n">decision_rule</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
             <span class="k">if</span> <span class="n">node_is_left_child</span><span class="p">:</span>
-                <span class="n">decision_rule</span> <span class="o">+=</span> <span class="s1">&#39; &lt;= &#39;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">is_categorical</span> <span class="k">else</span> <span class="s1">&#39; != &#39;</span>
+                <span class="n">decision_rule</span> <span class="o">+=</span> <span class="s1">&#39; &lt;= &#39;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">is_categorical</span> <span class="k">else</span> <span class="s1">&#39; is not &#39;</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">decision_rule</span> <span class="o">+=</span> <span class="s2">&quot; &gt; &quot;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">is_categorical</span> <span class="k">else</span> <span class="s1">&#39; == &#39;</span>
+                <span class="n">decision_rule</span> <span class="o">+=</span> <span class="s2">&quot; &gt; &quot;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">is_categorical</span> <span class="k">else</span> <span class="s1">&#39; is &#39;</span>
 
             <span class="n">decision_rule</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">feature_names</span><span class="p">[</span><span class="n">feat</span><span class="p">])</span> <span class="o">+</span> <span class="n">decision_rule</span> <span class="o">+</span> <span class="n">thresh</span>
             <span class="n">path_to_node</span><span class="o">.</span><span class="n">appendleft</span><span class="p">(</span><span class="n">decision_rule</span><span class="p">)</span>
@@ -590,7 +577,6 @@
 
         <span class="k">return</span> <span class="n">path_to_node</span>
 
-    <span class="c1">#TODO naming is not very clear ?</span>
     <span class="k">def</span> <span class="nf">_inverse_transform_features</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Undo preprocessing of feature values.</span>
 
@@ -600,20 +586,14 @@
 <span class="sd">        indicate what features are used to split the training set at each node.</span>
 <span class="sd">        See https://scikit-learn.org/stable/auto_examples/tree/plot_unveil_tree_structure.html.</span>
 
-<span class="sd">        Returns:</span>
+<span class="sd">        Return:</span>
 <span class="sd">            list or numpy.ndarray:</span>
 <span class="sd">                indices of features of the Error Analyzer Tree, possibly mapped back to the</span>
 <span class="sd">                original unprocessed feature space.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">feats_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">feature</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">inverse_transform_feature_id</span><span class="p">(</span><span class="n">feat_idx</span><span class="p">)</span> <span class="k">if</span> <span class="n">feat_idx</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">feat_idx</span>
+            <span class="k">for</span> <span class="n">feat_idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_tree</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">feature</span><span class="p">]</span>
 
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">feats_idx</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">f</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">feats_idx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">inverse_transform_feature_id</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">feats_idx</span>
-
-    <span class="c1">#TODO naming is not very clear ?</span>
     <span class="k">def</span> <span class="nf">_inverse_transform_thresholds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;  Undo preprocessing of feature threshold values.</span>
 
@@ -622,31 +602,11 @@
 <span class="sd">        the decision tree. The thresholds of a decision tree are the feature values used to split the training set at</span>
 <span class="sd">        each node. See https://scikit-learn.org/stable/auto_examples/tree/plot_unveil_tree_structure.html.</span>
 
-<span class="sd">        Returns:</span>
+<span class="sd">        Return:</span>
 <span class="sd">            numpy.ndarray:</span>
 <span class="sd">                thresholds of the Error Tree, possibly with preprocessing undone.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="n">used_feature_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">feature</span> <span class="o">&gt;</span> <span class="mi">0</span>
-        <span class="n">feats_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="n">used_feature_mask</span><span class="p">]</span>
-        <span class="n">thresholds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">threshold</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;O&#39;</span><span class="p">)</span>
-        <span class="n">thresh</span> <span class="o">=</span> <span class="n">thresholds</span><span class="p">[</span><span class="n">used_feature_mask</span><span class="p">]</span>
-        <span class="n">n_rows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">feats_idx</span><span class="p">)</span>
-        <span class="n">n_cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_train_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">dummy_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_rows</span><span class="p">,</span> <span class="n">n_cols</span><span class="p">))</span>
-
-        <span class="n">indices</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
-
-        <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">feats_idx</span><span class="p">,</span> <span class="n">thresh</span><span class="p">):</span>
-            <span class="n">dummy_x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span>
-            <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">inverse_transform_feature_id</span><span class="p">(</span><span class="n">f</span><span class="p">)))</span>
-            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-
-        <span class="n">undo_dummy_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">dummy_x</span><span class="p">)</span>
-        <span class="n">descaled_thresh</span> <span class="o">=</span> <span class="p">[</span><span class="n">undo_dummy_x</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span>
-        <span class="n">thresholds</span><span class="p">[</span><span class="n">used_feature_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">descaled_thresh</span>
-        <span class="k">return</span> <span class="n">thresholds</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">inverse_thresholds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_tree</span><span class="o">.</span><span class="n">estimator_</span><span class="o">.</span><span class="n">tree_</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

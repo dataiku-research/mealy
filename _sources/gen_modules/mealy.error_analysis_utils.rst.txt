@@ -30,6 +30,22 @@ mealy.error_analysis_utils
 
 	       <div class="sphx-glr-clear"></div>
 
+   .. autofunction:: format_float
+
+   .. include:: backreferences/mealy.error_analysis_utils.format_float.examples
+
+   .. raw:: html
+
+	       <div class="sphx-glr-clear"></div>
+
+   .. autofunction:: generate_preprocessing_steps
+
+   .. include:: backreferences/mealy.error_analysis_utils.generate_preprocessing_steps.examples
+
+   .. raw:: html
+
+	       <div class="sphx-glr-clear"></div>
+
    .. autofunction:: get_epsilon
 
    .. include:: backreferences/mealy.error_analysis_utils.get_epsilon.examples
@@ -38,17 +54,9 @@ mealy.error_analysis_utils
 
 	       <div class="sphx-glr-clear"></div>
 
-   .. autofunction:: get_feature_list_from_column_transformer
+   .. autofunction:: invert_transform_via_identity
 
-   .. include:: backreferences/mealy.error_analysis_utils.get_feature_list_from_column_transformer.examples
-
-   .. raw:: html
-
-	       <div class="sphx-glr-clear"></div>
-
-   .. autofunction:: rank_features_by_error_correlation
-
-   .. include:: backreferences/mealy.error_analysis_utils.rank_features_by_error_correlation.examples
+   .. include:: backreferences/mealy.error_analysis_utils.invert_transform_via_identity.examples
 
    .. raw:: html
 

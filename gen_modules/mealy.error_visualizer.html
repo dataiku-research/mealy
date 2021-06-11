@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>mealy.error_visualizer &mdash; mealy 0.2.0-git documentation</title>
+  <title>mealy.error_visualizer &mdash; mealy 0.2.4-git documentation</title>
   
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/theme_override.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
@@ -36,6 +38,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -73,7 +76,7 @@
             
             
               <div class="version">
-                0.2.0
+                0.2.4
               </div>
             
           
@@ -195,17 +198,17 @@
 <div class="section" id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="mealy.error_visualizer.ErrorVisualizer">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mealy.error_visualizer.</span></code><code class="sig-name descname"><span class="pre">ErrorVisualizer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error_analyzer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/error_visualizer.html#ErrorVisualizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.error_visualizer.ErrorVisualizer" title="Permalink to this definition">¶</a></dt>
-<dd><p>ErrorVisualizer provides visual utilities to analyze the Error Tree in ErrorAnalyzer.</p>
+<dt class="sig sig-object py" id="mealy.error_visualizer.ErrorVisualizer">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">mealy.error_visualizer.</span></span><span class="sig-name descname"><span class="pre">ErrorVisualizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">error_analyzer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/error_visualizer.html#ErrorVisualizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.error_visualizer.ErrorVisualizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>ErrorVisualizer provides visual utilities to analyze the Error Tree in ErrorAnalyzer</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>error_analyzer</strong> (<a class="reference internal" href="mealy.error_analyzer.html#mealy.error_analyzer.ErrorAnalyzer" title="mealy.error_analyzer.ErrorAnalyzer"><em>ErrorAnalyzer</em></a>) – fitted ErrorAnalyzer representing the performance of a primary model.</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt id="mealy.error_visualizer.ErrorVisualizer.plot_error_tree">
-<code class="sig-name descname"><span class="pre">plot_error_tree</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/error_visualizer.html#ErrorVisualizer.plot_error_tree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.error_visualizer.ErrorVisualizer.plot_error_tree" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="mealy.error_visualizer.ErrorVisualizer.plot_error_tree">
+<span class="sig-name descname"><span class="pre">plot_error_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(50,</span> <span class="pre">50)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/error_visualizer.html#ErrorVisualizer.plot_error_tree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.error_visualizer.ErrorVisualizer.plot_error_tree" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the graph of the decision tree.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -221,31 +224,34 @@
 </dd></dl>
 
 <dl class="py method">
-<dt id="mealy.error_visualizer.ErrorVisualizer.plot_feature_distributions_on_leaves">
-<code class="sig-name descname"><span class="pre">plot_feature_distributions_on_leaves</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">leaf_selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_k_features</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_global</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank_leaves_by</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'total_error_fraction'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nr_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(15,</span> <span class="pre">10)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/error_visualizer.html#ErrorVisualizer.plot_feature_distributions_on_leaves"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.error_visualizer.ErrorVisualizer.plot_feature_distributions_on_leaves" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return plot of error node feature distribution and compare to global baseline.</p>
-<p>The top-k features are sorted by importance in the ErrorAnalyzer.
-The most important are more correlated with the errors. When no specific node is selected,
-the leaves are ranked by an importance criterium and presented in relevance order.</p>
+<dt class="sig sig-object py" id="mealy.error_visualizer.ErrorVisualizer.plot_feature_distributions_on_leaves">
+<span class="sig-name descname"><span class="pre">plot_feature_distributions_on_leaves</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">leaf_selector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_k_features</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_global</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank_leaves_by</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'total_error_fraction'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nr_bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(15,</span> <span class="pre">10)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/error_visualizer.html#ErrorVisualizer.plot_feature_distributions_on_leaves"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.error_visualizer.ErrorVisualizer.plot_feature_distributions_on_leaves" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return feature distribution plots at the selected leaves.</p>
+<p>The leaves for which the distributions are plotted are determined by the leaf_selector argument.
+By default, no specific leaves are selected, and so the distributions are plotted for all the leaves.
+The leaves are ranked following a criterion set via the argument rank_leaves_by.</p>
+<p>The features are sorted by feature importance in the Error Tree. The more important a feature is, the more correlated with the errors it is.
+The number of feature distributions to plot is set via top_k_features.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>leaf_selector</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em> or </em><em>array-like</em>) – the leaves whose information will be returned
-* int: Only return information of the leaf with the corresponding id
-* array-like: Only return information of the leaves corresponding to these ids
-* None (default): Return information of all the leaves</p></li>
-<li><p><strong>top_k_features</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – number of features to plot per node.</p></li>
-<li><p><strong>show_global</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – plot the feature distribution of samples in a node vs. samples in the whole data
-(global baseline).</p></li>
-<li><p><strong>show_class</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – show the proportion of Wrongly and Correctly predicted samples in the feature
-distributions.</p></li>
-<li><p><strong>rank_leaves_by</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – ranking criterion for the leaves. Valid values are:
+* int: Only plot the feature distributions for the leaf matching the id
+* array-like of int: Only plot the feature distributions for the leaves matching the ids
+* None (default): Plot the feature distributions for all the leaves</p></li>
+<li><p><strong>top_k_features</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of features to plot per node.
+* If a positive integer k is given, the distributions of the first k features (first in the sense of their importance) are plotted
+* If a negative integer k is given, the distributions of all but the k last features (last in the sense of their importance) are plotted
+* If k is 0, all the feature distributions are plotted</p></li>
+<li><p><strong>show_global</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Whether to plot the feature distributions for the whole data (global baseline) along with the ones for the leaf samples.</p></li>
+<li><p><strong>show_class</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Whether to show the proportion of Wrongly and Correctly predicted samples for each bin.</p></li>
+<li><p><strong>rank_leaves_by</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Ranking criterion for the leaves. Valid values are:
 * ‘total_error_fraction’: rank by the fraction of total error in the node
 * ‘purity’: rank by the purity (ratio of wrongly predicted samples over the total number of node samples)
 * ‘class_difference’: rank by the difference of number of wrongly and correctly predicted samples
 in a node.</p></li>
-<li><p><strong>nr_bins</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – number of bins in the feature distribution plots.</p></li>
-<li><p><strong>figsize</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.9)"><em>tuple</em></a>) – size of the plots.</p></li>
+<li><p><strong>nr_bins</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of bins in the feature distribution plots. Defaults to 10.</p></li>
+<li><p><strong>figsize</strong> (<em>tuple of float</em>) – Tuple of size 2 for the size of the plots as (width, height) in inches. Defaults to (15, 10).</p></li>
 </ul>
 </dd>
 </dl>

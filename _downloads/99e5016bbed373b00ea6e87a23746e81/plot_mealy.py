@@ -32,8 +32,8 @@ import matplotlib.pyplot as plt
 
 from mealy.error_analyzer import ErrorAnalyzer
 from mealy.error_visualizer import ErrorVisualizer
-
-
+import mealy
+print(mealy.__version__)
 default_seed = 10
 np.random.seed(default_seed)
 random.seed(default_seed)

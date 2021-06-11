@@ -236,12 +236,11 @@ Print metrics regarding the Error Tree.
 
  .. code-block:: none
 
-    The Error Tree was trained with accuracy 84.85% and balanced accuracy 51.29%.
-    The Decision Tree estimated the primary models accuracy to 99.16%.
+    The Error Decision Tree was trained with accuracy 85.09% and balanced accuracy 59.37%.
+    The Decision Tree estimated the primary models accuracy to 93.51%.
     The true accuracy of the primary model is 84.77.%
-    The Fidelity of the error tree is 85.61%.
-    Warning: the built tree might not be representative of the primary model performances.
-    The error tree predicted model accuracy is considered too different from the true model accuracy.
+    The Fidelity of the error tree is 91.26%.
+    The error tree is considered representative of the primary model performances.
 
 
 
@@ -313,18 +312,27 @@ Rank features by correlation to error.
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_mealy_pipeline_002.png
-    :alt: Distribution of age in leaf 107
-    :class: sphx-glr-single-img
+.. rst-class:: sphx-glr-horizontal
 
 
-.. rst-class:: sphx-glr-script-out
+    *
 
- Out:
+      .. image:: /auto_examples/images/sphx_glr_plot_mealy_pipeline_002.png
+          :alt: Leaf 139 (Wrong prediction: 0.351, Correct prediction: 0.649), Distribution of marital-status:
+          :class: sphx-glr-multi-img
 
- .. code-block:: none
+    *
 
-    Leaf 107 (Wrong prediction: 0.347, Correct prediction: 0.653)
+      .. image:: /auto_examples/images/sphx_glr_plot_mealy_pipeline_003.png
+          :alt: Leaf 139 (Wrong prediction: 0.351, Correct prediction: 0.649), Distribution of education-num:
+          :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mealy_pipeline_004.png
+          :alt: Leaf 139 (Wrong prediction: 0.351, Correct prediction: 0.649), Distribution of age
+          :class: sphx-glr-multi-img
+
 
 
 
@@ -361,7 +369,7 @@ subpopulations.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  10.465 seconds)
+   **Total running time of the script:** ( 0 minutes  7.435 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_mealy_pipeline.py:

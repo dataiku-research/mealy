@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>mealy.error_visualizer &mdash; mealy 0.2.0-git documentation</title>
+  <title>mealy.error_visualizer &mdash; mealy 0.2.4-git documentation</title>
   
 
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/theme_override.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery-binder.css" type="text/css" />
@@ -36,6 +38,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -71,7 +74,7 @@
             
             
               <div class="version">
-                0.2.0
+                0.2.4
               </div>
             
           
@@ -181,13 +184,12 @@
   <h1>Source code for mealy.error_visualizer</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">graphviz</span> <span class="k">as</span> <span class="nn">gv</span>
-<span class="kn">import</span> <span class="nn">pydotplus</span>
-<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">export_graphviz</span>
+<span class="kn">from</span> <span class="nn">graphviz</span> <span class="kn">import</span> <span class="n">Source</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">mealy.error_analysis_utils</span> <span class="kn">import</span> <span class="n">rank_features_by_error_correlation</span>
-<span class="kn">from</span> <span class="nn">mealy.constants</span> <span class="kn">import</span> <span class="n">ErrorAnalyzerConstants</span>
-<span class="kn">from</span> <span class="nn">mealy.error_analyzer</span> <span class="kn">import</span> <span class="n">ErrorAnalyzer</span>
+<span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="n">ErrorAnalyzerConstants</span>
+<span class="kn">from</span> <span class="nn">.error_analyzer</span> <span class="kn">import</span> <span class="n">ErrorAnalyzer</span>
+<span class="kn">from</span> <span class="nn">.error_analysis_utils</span> <span class="kn">import</span> <span class="n">format_float</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">&#39;font&#39;</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s2">&quot;sans-serif&quot;</span><span class="p">)</span>
 <span class="n">SMALL_SIZE</span><span class="p">,</span> <span class="n">MEDIUM_SIZE</span><span class="p">,</span> <span class="n">BIGGER_SIZE</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">12</span>
@@ -201,55 +203,61 @@
 <span class="k">class</span> <span class="nc">_BaseErrorVisualizer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_analyzer</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error_analyzer</span><span class="p">,</span> <span class="n">ErrorAnalyzer</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;You need to input an ErrorAnalyzer object.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;You need to input an ErrorAnalyzer object.&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span> <span class="o">=</span> <span class="n">error_analyzer</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_get_ranked_leaf_ids</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">leaf_selector</span><span class="p">,</span> <span class="n">rank_by</span><span class="p">:</span> <span class="n">error_analyzer</span><span class="o">.</span><span class="n">_get_ranked_leaf_ids</span><span class="p">(</span><span class="n">leaf_selector</span><span class="p">,</span> <span class="n">rank_by</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_get_ranked_leaf_ids</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">leaf_selector</span><span class="p">,</span> <span class="n">rank_by</span><span class="p">:</span> \
+            <span class="n">error_analyzer</span><span class="o">.</span><span class="n">_get_ranked_leaf_ids</span><span class="p">(</span><span class="n">leaf_selector</span><span class="p">,</span> <span class="n">rank_by</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_plot_histograms</span><span class="p">(</span><span class="n">hist_data</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
         <span class="n">bottom</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">for</span> <span class="n">class_value</span><span class="p">,</span> <span class="n">bar_heights</span> <span class="ow">in</span> <span class="n">hist_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="n">bar_heights</span><span class="p">,</span>
-                    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">class_value</span><span class="p">,</span> <span class="n">label</span><span class="p">),</span>
-                    <span class="n">color</span><span class="o">=</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">ERROR_TREE_COLORS</span><span class="p">[</span><span class="n">class_value</span><span class="p">],</span>
-                    <span class="n">bottom</span><span class="o">=</span><span class="n">bottom</span><span class="p">,</span>
-                    <span class="n">align</span><span class="o">=</span><span class="s2">&quot;edge&quot;</span><span class="p">,</span>
-                    <span class="n">alpha</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
-                    <span class="o">**</span><span class="n">params</span><span class="p">)</span>
-            <span class="n">bottom</span> <span class="o">=</span> <span class="n">bar_heights</span>
+        <span class="k">for</span> <span class="n">class_value</span> <span class="ow">in</span> <span class="p">[</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">CORRECT_PREDICTION</span><span class="p">,</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">WRONG_PREDICTION</span><span class="p">]:</span>
+            <span class="n">bar_heights</span> <span class="o">=</span> <span class="n">hist_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">class_value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">bar_heights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="n">bar_heights</span><span class="p">,</span>
+                        <span class="n">label</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">class_value</span><span class="p">,</span> <span class="n">label</span><span class="p">),</span>
+                        <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+                        <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">color</span><span class="o">=</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">ERROR_TREE_COLORS</span><span class="p">[</span><span class="n">class_value</span><span class="p">],</span>
+                        <span class="n">bottom</span><span class="o">=</span><span class="n">bottom</span><span class="p">,</span>
+                        <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+                <span class="n">bottom</span> <span class="o">=</span> <span class="n">bar_heights</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_add_new_plot</span><span class="p">(</span><span class="n">figsize</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">feature_name</span><span class="p">,</span> <span class="n">leaf_id</span><span class="p">):</span>
-        <span class="n">x_ticks</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">_add_new_plot</span><span class="p">(</span><span class="n">figsize</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">x_ticks</span><span class="p">,</span> <span class="n">feature_name</span><span class="p">,</span> <span class="n">suptitle</span><span class="p">):</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">x_ticks</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">x_ticks</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="s2">&quot;90&quot;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="n">bins</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature_name</span><span class="p">))</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Proportion of samples&#39;</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Distribution of </span><span class="si">{}</span><span class="s1"> in leaf </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature_name</span><span class="p">,</span> <span class="n">leaf_id</span><span class="p">))</span>
-
-        <span class="k">return</span> <span class="n">x_ticks</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Distribution of </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature_name</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">suptitle</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_plot_feature_distribution</span><span class="p">(</span><span class="n">x_ticks</span><span class="p">,</span> <span class="n">feature_is_numerical</span><span class="p">,</span> <span class="n">leaf_data</span><span class="p">,</span> <span class="n">root_data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">width</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">x_ticks</span>
+        <span class="n">align</span> <span class="o">=</span> <span class="s2">&quot;edge&quot;</span>
         <span class="k">if</span> <span class="n">root_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">width</span> <span class="o">/=</span> <span class="mi">2</span>
             <span class="k">if</span> <span class="n">feature_is_numerical</span><span class="p">:</span>
                 <span class="n">x</span> <span class="o">=</span> <span class="n">x_ticks</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-            <span class="n">_BaseErrorVisualizer</span><span class="o">.</span><span class="n">_plot_histograms</span><span class="p">(</span><span class="n">root_data</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;global data&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">hatch</span><span class="o">=</span><span class="s2">&quot;///&quot;</span><span class="p">,</span> <span class="n">width</span><span class="o">=-</span><span class="n">width</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">feature_is_numerical</span><span class="p">:</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">x_ticks</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">_BaseErrorVisualizer</span><span class="o">.</span><span class="n">_plot_histograms</span><span class="p">(</span><span class="n">leaf_data</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;leaf data&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">)</span>
-
+            <span class="n">_BaseErrorVisualizer</span><span class="o">.</span><span class="n">_plot_histograms</span><span class="p">(</span><span class="n">root_data</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;global data&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">hatch</span><span class="o">=</span><span class="s2">&quot;///&quot;</span><span class="p">,</span>
+                                                  <span class="n">width</span><span class="o">=-</span><span class="n">width</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="n">align</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">leaf_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">feature_is_numerical</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">x_ticks</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">root_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">align</span> <span class="o">=</span> <span class="s2">&quot;center&quot;</span>
+            <span class="n">_BaseErrorVisualizer</span><span class="o">.</span><span class="n">_plot_histograms</span><span class="p">(</span><span class="n">leaf_data</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;leaf data&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+                                                  <span class="n">align</span><span class="o">=</span><span class="n">align</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="ErrorVisualizer"><a class="viewcode-back" href="../../gen_modules/mealy.error_visualizer.html#mealy.error_visualizer.ErrorVisualizer">[docs]</a><span class="k">class</span> <span class="nc">ErrorVisualizer</span><span class="p">(</span><span class="n">_BaseErrorVisualizer</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;ErrorVisualizer provides visual utilities to analyze the Error Tree in ErrorAnalyzer.</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ErrorVisualizer provides visual utilities to analyze the Error Tree in ErrorAnalyzer</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        error_analyzer (ErrorAnalyzer): fitted ErrorAnalyzer representing the performance of a primary model.</span>
@@ -261,170 +269,136 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">error_tree</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">estimator_</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_train_leaf_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">_error_train_x</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_thresholds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">_inverse_transform_thresholds</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">_inverse_transform_features</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_thresholds</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_features</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">pipeline_preprocessor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_original_feature_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">preprocessed_feature_names</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_numerical_feature_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">preprocessed_feature_names</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_original_feature_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">get_original_feature_names</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_numerical_feature_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_feature_names</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">is_categorical</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">f</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_original_feature_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">get_original_feature_names</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_numerical_feature_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_feature_names</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">is_categorical</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">f</span><span class="p">)]</span>
 
-<div class="viewcode-block" id="ErrorVisualizer.plot_error_tree"><a class="viewcode-back" href="../../gen_modules/mealy.error_visualizer.html#mealy.error_visualizer.ErrorVisualizer.plot_error_tree">[docs]</a>    <span class="k">def</span> <span class="nf">plot_error_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Plot the graph of the decision tree.</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">thresholds_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thresholds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_thresholds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">_inverse_transform_thresholds</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thresholds</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">features_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">_inverse_transform_features</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span>
+
+<div class="viewcode-block" id="ErrorVisualizer.plot_error_tree"><a class="viewcode-back" href="../../gen_modules/mealy.error_visualizer.html#mealy.error_visualizer.ErrorVisualizer.plot_error_tree">[docs]</a>    <span class="k">def</span> <span class="nf">plot_error_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">)):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the graph of the decision tree.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            size (tuple): size of the output plot.</span>
 
-<span class="sd">        Returns:</span>
+<span class="sd">        Return:</span>
 <span class="sd">            graphviz.Source: graph of the Error Analyzer Tree.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">digraph_tree</span> <span class="o">=</span> <span class="n">export_graphviz</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="p">,</span>
-                                       <span class="n">feature_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">preprocessed_feature_names</span><span class="p">,</span>
-                                       <span class="n">class_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="o">.</span><span class="n">classes_</span><span class="p">,</span>
-                                       <span class="n">node_ids</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                       <span class="n">proportion</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                       <span class="n">rotate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                       <span class="n">out_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                                       <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                       <span class="n">rounded</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                       <span class="n">impurity</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">dot_str</span> <span class="o">=</span> <span class="s1">&#39;digraph Tree {{</span><span class="se">\n</span><span class="s1"> size=&quot;</span><span class="si">{0}</span><span class="s1">,</span><span class="si">{1}</span><span class="s1">!&quot;;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">dot_str</span> <span class="o">+=</span> <span class="s1">&#39;node [shape=box, style=&quot;filled, rounded&quot;, color=&quot;black&quot;, fontname=helvetica] ;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">dot_str</span> <span class="o">+=</span> <span class="s1">&#39;edge [fontname=helvetica] ;</span><span class="se">\n</span><span class="s1">graph [ranksep=equally, splines=polyline] ;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">ERROR_TREE_COLORS</span><span class="p">[</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">WRONG_PREDICTION</span><span class="p">]</span>
+        <span class="n">leaves</span><span class="p">,</span> <span class="n">left_child_to_parent</span><span class="p">,</span> <span class="n">right_child_to_parent</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(),</span> <span class="p">{},</span> <span class="p">{}</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+        <span class="n">ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-        <span class="n">pydot_graph</span> <span class="o">=</span> <span class="n">pydotplus</span><span class="o">.</span><span class="n">graph_from_dot_data</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">digraph_tree</span><span class="p">))</span>
+        <span class="k">while</span> <span class="n">ids</span><span class="p">:</span>
+            <span class="n">node_id</span> <span class="o">=</span> <span class="n">ids</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+            <span class="n">dot_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{0}</span><span class="s1"> [label=&quot;node #</span><span class="si">{0}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
 
-        <span class="c1"># descale threshold value</span>
-        <span class="n">thresholds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thresholds</span>
-        <span class="n">features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_features</span>
+            <span class="n">parent_id</span> <span class="o">=</span> <span class="n">left_child_to_parent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">right_child_to_parent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">node_id</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">parent_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">rule</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_decision_rule</span><span class="p">(</span><span class="n">parent_id</span><span class="p">,</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="n">left_child_to_parent</span><span class="p">)</span>
+                <span class="n">dot_str</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">((</span><span class="n">rule</span><span class="p">[:</span><span class="mi">32</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rule</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">35</span> <span class="k">else</span> <span class="n">rule</span><span class="p">)</span>
 
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">_error_train_y</span>
-        <span class="n">nodes</span> <span class="o">=</span> <span class="n">pydot_graph</span><span class="o">.</span><span class="n">get_node_list</span><span class="p">()</span>
+            <span class="n">n_wrong_preds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">node_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">error_class_idx</span><span class="p">]</span>
+            <span class="n">total_error_fraction</span> <span class="o">=</span> <span class="n">n_wrong_preds</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">n_total_errors</span>
+            <span class="n">samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">n_node_samples</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span>
+            <span class="n">local_error</span> <span class="o">=</span> <span class="n">n_wrong_preds</span> <span class="o">/</span> <span class="n">samples</span>
+            <span class="n">dot_str</span> <span class="o">+=</span> <span class="s1">&#39;samples = </span><span class="si">{}</span><span class="s1">%</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">format_float</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="n">samples</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">n_node_samples</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">3</span><span class="p">))</span>
+            <span class="n">dot_str</span> <span class="o">+=</span> <span class="s1">&#39;local error = </span><span class="si">{}</span><span class="s1">%</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">format_float</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="n">local_error</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+            <span class="n">dot_str</span> <span class="o">+=</span> <span class="s1">&#39;fraction of total error = </span><span class="si">{}</span><span class="s1">%</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">format_float</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="n">total_error_fraction</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
 
-        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">get_label</span><span class="p">():</span>
-                <span class="n">node_label</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get_label</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
-                <span class="n">idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">node_label</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;node #&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
-                <span class="n">n_wrong_preds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">error_class_idx</span><span class="p">]</span>
-                <span class="n">total_error_fraction</span> <span class="o">=</span> <span class="n">n_wrong_preds</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">n_total_errors</span>
-                <span class="n">local_error</span> <span class="o">=</span> <span class="n">n_wrong_preds</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">n_node_samples</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
-                <span class="k">if</span> <span class="s1">&#39; &lt;= &#39;</span> <span class="ow">in</span> <span class="n">node_label</span><span class="p">:</span>
-                    <span class="n">lte_split</span> <span class="o">=</span> <span class="n">node_label</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &lt;= &#39;</span><span class="p">)</span>
-                    <span class="n">samples_split</span> <span class="o">=</span> <span class="n">lte_split</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">nsamples&#39;</span><span class="p">)</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:02x}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">local_error</span><span class="o">*</span><span class="mi">255</span><span class="p">))</span>
+            <span class="n">dot_str</span> <span class="o">+=</span> <span class="s1">&#39;&quot;, fillcolor=&quot;</span><span class="si">{}</span><span class="s1">&quot;, tooltip=&quot;</span><span class="si">{}</span><span class="s1">&quot;] ;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">color</span><span class="o">+</span><span class="n">alpha</span><span class="p">,</span> <span class="s2">&quot;root&quot;</span> <span class="k">if</span> <span class="n">parent_id</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">rule</span><span class="p">)</span>
 
-                    <span class="n">split_feature</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_feature_names</span><span class="p">[</span><span class="n">features</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span>
-                    <span class="n">descaled_value</span> <span class="o">=</span> <span class="n">thresholds</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">parent_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">edge_width</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">GRAPH_MAX_EDGE_WIDTH</span> <span class="o">*</span> <span class="n">total_error_fraction</span><span class="p">)</span>
+                <span class="n">dot_str</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> -&gt; </span><span class="si">{}</span><span class="s1"> [penwidth=</span><span class="si">{}</span><span class="s1">];</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">parent_id</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">edge_width</span><span class="p">)</span>
+            <span class="n">left_child_id</span><span class="p">,</span> <span class="n">right_child_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">children_left</span><span class="p">[</span><span class="n">node_id</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">children_right</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">left_child_id</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">ids</span> <span class="o">+=</span> <span class="p">[</span><span class="n">left_child_id</span><span class="p">,</span> <span class="n">right_child_id</span><span class="p">]</span>
+                <span class="n">left_child_to_parent</span><span class="p">[</span><span class="n">left_child_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">node_id</span>
+                <span class="n">right_child_to_parent</span><span class="p">[</span><span class="n">right_child_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">node_id</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">leaves</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
 
-                    <span class="k">if</span> <span class="n">split_feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numerical_feature_names</span><span class="p">:</span>
-                        <span class="n">descaled_value</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">descaled_value</span>
-                        <span class="n">lte_modified</span> <span class="o">=</span> <span class="s1">&#39; &lt;= &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">lte_split</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">descaled_value</span><span class="p">])</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">lte_split_without_feature</span> <span class="o">=</span> <span class="n">lte_split</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-                        <span class="n">lte_split_with_new_feature</span> <span class="o">=</span> <span class="n">lte_split_without_feature</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n&#39;</span> <span class="o">+</span> <span class="n">split_feature</span>
-                        <span class="n">lte_modified</span> <span class="o">=</span> <span class="s1">&#39; != &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">lte_split_with_new_feature</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">descaled_value</span><span class="p">)])</span>
-                    <span class="n">new_label</span> <span class="o">=</span> <span class="n">lte_modified</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">samples_split</span> <span class="o">=</span> <span class="n">node_label</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">nsamples&#39;</span><span class="p">)</span>
-                    <span class="n">new_label</span> <span class="o">=</span> <span class="n">samples_split</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">dot_str</span> <span class="o">+=</span> <span class="s1">&#39;{rank=same ; &#39;</span><span class="o">+</span> <span class="s1">&#39;; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">leaves</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;} ;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">dot_str</span> <span class="o">+=</span> <span class="s2">&quot;}&quot;</span>
+        <span class="k">return</span> <span class="n">Source</span><span class="p">(</span><span class="n">dot_str</span><span class="p">)</span></div>
 
-                <span class="n">value_split</span> <span class="o">=</span> <span class="n">samples_split</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">nvalue&#39;</span><span class="p">)</span>
-
-                <span class="n">new_label</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">nsamples&#39;</span> <span class="o">+</span> <span class="n">value_split</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> \
-                             <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">nlocal error = </span><span class="si">%.3f</span><span class="s1"> </span><span class="si">%%</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">local_error</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span> <span class="o">+</span> \
-                             <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">nfraction of total error = </span><span class="si">%.3f</span><span class="s1"> </span><span class="si">%%</span><span class="se">\\</span><span class="s1">n&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">total_error_fraction</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
-
-                <span class="n">node</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">new_label</span><span class="p">)</span>
-
-                <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.0</span>
-                <span class="k">if</span> <span class="s1">&#39;value = [&#39;</span> <span class="ow">in</span> <span class="n">node_label</span><span class="p">:</span>
-                    <span class="c1"># transparency as the local error</span>
-                    <span class="k">if</span> <span class="n">local_error</span> <span class="o">&gt;=</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">GRAPH_MIN_LOCAL_ERROR_OPAQUE</span><span class="p">:</span>
-                        <span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.0</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">alpha</span> <span class="o">=</span> <span class="n">local_error</span>
-
-                <span class="n">node_class</span> <span class="o">=</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">CORRECT_PREDICTION</span> <span class="k">if</span> <span class="n">total_error_fraction</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">WRONG_PREDICTION</span>
-                <span class="n">class_color</span> <span class="o">=</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">ERROR_TREE_COLORS</span><span class="p">[</span><span class="n">node_class</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">)</span>
-                <span class="n">class_color_rgb</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">class_color</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-                <span class="c1"># compute the color as alpha against white</span>
-                <span class="n">color_rgb</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">c</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">class_color_rgb</span><span class="p">]</span>
-                <span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;#</span><span class="si">{:02x}{:02x}{:02x}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">color_rgb</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">color_rgb</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color_rgb</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-                <span class="n">node</span><span class="o">.</span><span class="n">set_fillcolor</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
-
-                <span class="k">if</span> <span class="n">idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">children_left</span><span class="p">:</span>
-                    <span class="n">parent_id</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">children_left</span> <span class="o">==</span> <span class="n">idx</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-                <span class="k">elif</span> <span class="n">idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">children_right</span><span class="p">:</span>
-                    <span class="n">parent_id</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">children_right</span> <span class="o">==</span> <span class="n">idx</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">parent_id</span> <span class="o">=</span> <span class="kc">None</span>
-
-                <span class="k">if</span> <span class="n">parent_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">parent_edge</span> <span class="o">=</span> <span class="n">pydot_graph</span><span class="o">.</span><span class="n">get_edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">parent_id</span><span class="p">),</span> <span class="n">node</span><span class="o">.</span><span class="n">get_name</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="n">parent_edge</span><span class="o">.</span><span class="n">set_penwidth</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">GRAPH_MAX_EDGE_WIDTH</span> <span class="o">*</span> <span class="n">total_error_fraction</span><span class="p">))</span>
-
-        <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">pydot_graph</span><span class="o">.</span><span class="n">set_size</span><span class="p">(</span><span class="s1">&#39;&quot;</span><span class="si">%d</span><span class="s1">,</span><span class="si">%d</span><span class="s1">!&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-        <span class="n">gvz_graph</span> <span class="o">=</span> <span class="n">gv</span><span class="o">.</span><span class="n">Source</span><span class="p">(</span><span class="n">pydot_graph</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
-
-        <span class="k">return</span> <span class="n">gvz_graph</span></div>
+    <span class="k">def</span> <span class="nf">node_decision_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="n">left_child</span><span class="p">):</span>
+        <span class="n">feature</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_feature_names</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">features_</span><span class="p">[</span><span class="n">parent_id</span><span class="p">]]</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds_</span><span class="p">[</span><span class="n">parent_id</span><span class="p">]</span>
+        <span class="n">numerical_split</span> <span class="o">=</span> <span class="n">feature</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numerical_feature_names</span>
+        <span class="k">if</span> <span class="n">numerical_split</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">left_child</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> &lt;= </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">format_float</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> &lt; </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">format_float</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">feature</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">feature</span> <span class="o">+</span> <span class="s1">&#39; is &#39;</span> <span class="o">+</span> <span class="p">(</span> <span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">left_child</span> <span class="k">else</span> <span class="s1">&#39;not &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ErrorVisualizer.plot_feature_distributions_on_leaves"><a class="viewcode-back" href="../../gen_modules/mealy.error_visualizer.html#mealy.error_visualizer.ErrorVisualizer.plot_feature_distributions_on_leaves">[docs]</a>    <span class="k">def</span> <span class="nf">plot_feature_distributions_on_leaves</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">leaf_selector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                              <span class="n">top_k_features</span><span class="o">=</span><span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">TOP_K_FEATURES</span><span class="p">,</span>
                                              <span class="n">show_global</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_class</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">rank_leaves_by</span><span class="o">=</span><span class="s2">&quot;total_error_fraction&quot;</span><span class="p">,</span>
                                              <span class="n">nr_bins</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">)):</span>
 
-        <span class="sd">&quot;&quot;&quot;Return plot of error node feature distribution and compare to global baseline.</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return feature distribution plots at the selected leaves.</span>
 
-<span class="sd">        The top-k features are sorted by importance in the ErrorAnalyzer.</span>
-<span class="sd">        The most important are more correlated with the errors. When no specific node is selected,</span>
-<span class="sd">        the leaves are ranked by an importance criterium and presented in relevance order.</span>
+<span class="sd">        The leaves for which the distributions are plotted are determined by the leaf_selector argument.</span>
+<span class="sd">        By default, no specific leaves are selected, and so the distributions are plotted for all the leaves.</span>
+<span class="sd">        The leaves are ranked following a criterion set via the argument rank_leaves_by.</span>
+
+<span class="sd">        The features are sorted by feature importance in the Error Tree. The more important a feature is, the more correlated with the errors it is.</span>
+<span class="sd">        The number of feature distributions to plot is set via top_k_features.</span>
 
 <span class="sd">        Args:</span>
-
 <span class="sd">            leaf_selector (None, int or array-like): the leaves whose information will be returned</span>
-<span class="sd">                * int: Only return information of the leaf with the corresponding id</span>
-<span class="sd">                * array-like: Only return information of the leaves corresponding to these ids</span>
-<span class="sd">                * None (default): Return information of all the leaves</span>
+<span class="sd">                * int: Only plot the feature distributions for the leaf matching the id</span>
+<span class="sd">                * array-like of int: Only plot the feature distributions for the leaves matching the ids</span>
+<span class="sd">                * None (default): Plot the feature distributions for all the leaves</span>
 
-<span class="sd">            top_k_features (int): number of features to plot per node.</span>
+<span class="sd">            top_k_features (int): Number of features to plot per node.</span>
+<span class="sd">                * If a positive integer k is given, the distributions of the first k features (first in the sense of their importance) are plotted</span>
+<span class="sd">                * If a negative integer k is given, the distributions of all but the k last features (last in the sense of their importance) are plotted</span>
+<span class="sd">                * If k is 0, all the feature distributions are plotted</span>
 
-<span class="sd">            show_global (bool): plot the feature distribution of samples in a node vs. samples in the whole data</span>
-<span class="sd">                (global baseline).</span>
+<span class="sd">            show_global (bool): Whether to plot the feature distributions for the whole data (global baseline) along with the ones for the leaf samples.</span>
 
-<span class="sd">            show_class (bool): show the proportion of Wrongly and Correctly predicted samples in the feature</span>
-<span class="sd">                distributions.</span>
+<span class="sd">            show_class (bool): Whether to show the proportion of Wrongly and Correctly predicted samples for each bin.</span>
 
-<span class="sd">            rank_leaves_by (str): ranking criterion for the leaves. Valid values are:</span>
+<span class="sd">            rank_leaves_by (str): Ranking criterion for the leaves. Valid values are:</span>
 <span class="sd">                * &#39;total_error_fraction&#39;: rank by the fraction of total error in the node</span>
 <span class="sd">                * &#39;purity&#39;: rank by the purity (ratio of wrongly predicted samples over the total number of node samples)</span>
 <span class="sd">                * &#39;class_difference&#39;: rank by the difference of number of wrongly and correctly predicted samples</span>
 <span class="sd">                in a node.</span>
 
-<span class="sd">            nr_bins (int): number of bins in the feature distribution plots.</span>
+<span class="sd">            nr_bins (int): Number of bins in the feature distribution plots. Defaults to 10.</span>
 
-<span class="sd">            figsize (tuple): size of the plots.</span>
+<span class="sd">            figsize (tuple of float): Tuple of size 2 for the size of the plots as (width, height) in inches. Defaults to (15, 10).</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ranked_feature_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">get_top_ranked_feature_ids</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="o">.</span><span class="n">feature_importances_</span><span class="p">,</span> <span class="n">top_k_features</span><span class="p">)</span>
 
-        <span class="n">ranked_feature_ids</span> <span class="o">=</span> <span class="n">rank_features_by_error_correlation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="o">.</span><span class="n">feature_importances_</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">pipeline_preprocessor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">top_k_features</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">ranked_feature_ids</span> <span class="o">=</span> <span class="n">ranked_feature_ids</span><span class="p">[:</span><span class="n">top_k_features</span><span class="p">]</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">_error_train_x</span><span class="p">)[:,</span> <span class="n">ranked_feature_ids</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">_error_train_y</span>
+        <span class="n">feature_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_feature_names</span>
 
-            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">_error_train_x</span><span class="p">[:,</span> <span class="n">ranked_feature_ids</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">_error_train_y</span>
-            <span class="n">min_values</span><span class="p">,</span> <span class="n">max_values</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-            <span class="n">feature_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">preprocessed_feature_names</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">ranked_feature_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">inverse_transform_feature_id</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span>
-                                          <span class="n">ranked_feature_ids</span><span class="p">))</span>
-            <span class="k">if</span> <span class="n">top_k_features</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">ranked_feature_ids</span> <span class="o">=</span> <span class="n">ranked_feature_ids</span><span class="p">[:</span><span class="n">top_k_features</span><span class="p">]</span>
-
-            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">_error_train_x</span><span class="p">)[:,</span> <span class="n">ranked_feature_ids</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">_error_train_y</span>
-            <span class="c1"># TODO to do what ?</span>
-            <span class="n">min_values</span><span class="p">,</span> <span class="n">max_values</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-            <span class="n">feature_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_feature_names</span>
-
+        <span class="n">min_values</span><span class="p">,</span> <span class="n">max_values</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">total_error_fraction_sample_ids</span> <span class="o">=</span> <span class="n">y</span> <span class="o">==</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">WRONG_PREDICTION</span>
         <span class="n">nr_wrong</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">value</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">error_class_idx</span><span class="p">]</span>
 
@@ -433,14 +407,13 @@
             <span class="n">leaf_sample_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_leaf_ids</span> <span class="o">==</span> <span class="n">leaf</span>
             <span class="n">nr_leaf_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_clf</span><span class="o">.</span><span class="n">tree_</span><span class="o">.</span><span class="n">n_node_samples</span><span class="p">[</span><span class="n">leaf</span><span class="p">]</span>
             <span class="n">proba_wrong_leaf</span> <span class="o">=</span> <span class="n">nr_wrong</span><span class="p">[</span><span class="n">leaf</span><span class="p">]</span> <span class="o">/</span> <span class="n">nr_leaf_samples</span>
-            <span class="n">proba_correct_leaf</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">proba_wrong_leaf</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Leaf </span><span class="si">{}</span><span class="s1"> (Wrong prediction: </span><span class="si">{:.3f}</span><span class="s1">, Correct prediction: </span><span class="si">{:.3f}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">leaf</span><span class="p">,</span> <span class="n">proba_wrong_leaf</span><span class="p">,</span> <span class="n">proba_correct_leaf</span><span class="p">))</span>
+            <span class="n">suptitle</span> <span class="o">=</span> <span class="s1">&#39;Leaf </span><span class="si">{}</span><span class="s1"> (Wrong prediction: </span><span class="si">{}</span><span class="s1">,&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">leaf</span><span class="p">,</span> <span class="n">format_float</span><span class="p">(</span><span class="n">proba_wrong_leaf</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+            <span class="n">suptitle</span> <span class="o">+=</span> <span class="s1">&#39; Correct prediction: </span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">format_float</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">proba_wrong_leaf</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
 
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">feature_idx</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ranked_feature_ids</span><span class="p">):</span>
-
                 <span class="n">feature_name</span> <span class="o">=</span> <span class="n">feature_names</span><span class="p">[</span><span class="n">feature_idx</span><span class="p">]</span>
-                <span class="n">feature_is_numerical</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">pipeline_preprocessor</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span>
-                    <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">is_categorical</span><span class="p">(</span><span class="n">feature_idx</span><span class="p">))</span>
+                <span class="c1"># TODO: use self._numerical_feature_names instead</span>
+                <span class="n">feature_is_numerical</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_analyzer</span><span class="o">.</span><span class="n">pipeline_preprocessor</span><span class="o">.</span><span class="n">is_categorical</span><span class="p">(</span><span class="n">feature_idx</span><span class="p">)</span>
 
                 <span class="n">feature_column</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span>
 
@@ -454,11 +427,10 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">feature_column</span><span class="p">)[:</span><span class="n">nr_bins</span><span class="p">]</span>
                     <span class="k">if</span> <span class="n">show_class</span><span class="p">:</span>
-                        <span class="n">histogram_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">f_samples</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="n">f_samples</span><span class="p">),</span> <span class="n">minlength</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">))[:</span><span class="n">nr_bins</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+                        <span class="n">histogram_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">f_samples</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="n">f_samples</span><span class="p">),</span> <span class="n">minlength</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">))[:</span><span class="n">nr_bins</span><span class="p">]</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">histogram_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">f_samples</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="n">f_samples</span><span class="p">),</span> <span class="n">minlength</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">))[:</span><span class="n">nr_bins</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">f_samples</span><span class="p">)</span>
+                        <span class="n">histogram_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">f_samples</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">bincount</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="n">f_samples</span><span class="p">),</span> <span class="n">minlength</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">))[:</span><span class="n">nr_bins</span><span class="p">]</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">f_samples</span><span class="p">)</span>
 
-                <span class="n">root_hist_data</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="k">if</span> <span class="n">show_global</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">show_class</span><span class="p">:</span>
                         <span class="n">hist_wrong</span> <span class="o">=</span> <span class="n">histogram_func</span><span class="p">(</span><span class="n">feature_column</span><span class="p">[</span><span class="n">total_error_fraction_sample_ids</span><span class="p">])</span>
@@ -473,6 +445,8 @@
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">root_prediction</span> <span class="o">=</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">CORRECT_PREDICTION</span> <span class="k">if</span> <span class="n">nr_wrong</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_tree</span><span class="o">.</span><span class="n">n_total_errors</span> <span class="o">/</span> <span class="mi">2</span> <span class="k">else</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">WRONG_PREDICTION</span>
                         <span class="n">root_hist_data</span> <span class="o">=</span> <span class="p">{</span><span class="n">root_prediction</span><span class="p">:</span> <span class="n">histogram_func</span><span class="p">(</span><span class="n">feature_column</span><span class="p">)}</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">root_hist_data</span> <span class="o">=</span> <span class="kc">None</span>
 
                 <span class="k">if</span> <span class="n">show_class</span><span class="p">:</span>
                     <span class="n">hist_wrong</span> <span class="o">=</span> <span class="n">histogram_func</span><span class="p">(</span><span class="n">feature_column</span><span class="p">[</span><span class="n">leaf_sample_ids</span> <span class="o">&amp;</span> <span class="n">total_error_fraction_sample_ids</span><span class="p">])</span>
@@ -481,18 +455,16 @@
                     <span class="n">normalized_hist_wrong</span> <span class="o">=</span> <span class="n">hist_wrong</span> <span class="o">/</span> <span class="n">n_samples</span>
                     <span class="n">normalized_hist_correct</span> <span class="o">=</span> <span class="n">hist_correct</span> <span class="o">/</span> <span class="n">n_samples</span>
                     <span class="n">leaf_hist_data</span> <span class="o">=</span> <span class="p">{</span>
-                        <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">WRONG_PREDICTION</span><span class="p">:</span>
-                            <span class="n">normalized_hist_wrong</span><span class="p">,</span>
-                        <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">CORRECT_PREDICTION</span><span class="p">:</span>
-                            <span class="n">normalized_hist_correct</span>
+                        <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">WRONG_PREDICTION</span><span class="p">:</span> <span class="n">normalized_hist_wrong</span><span class="p">,</span>
+                        <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">CORRECT_PREDICTION</span><span class="p">:</span> <span class="n">normalized_hist_correct</span>
                     <span class="p">}</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">leaf_prediction</span> <span class="o">=</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">CORRECT_PREDICTION</span> <span class="k">if</span> <span class="n">proba_correct_leaf</span> <span class="o">&gt;</span> <span class="n">proba_wrong_leaf</span> <span class="k">else</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">WRONG_PREDICTION</span>
+                    <span class="n">leaf_prediction</span> <span class="o">=</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">CORRECT_PREDICTION</span> <span class="k">if</span> <span class="n">proba_wrong_leaf</span> <span class="o">&lt;</span> <span class="mf">.5</span> <span class="k">else</span> <span class="n">ErrorAnalyzerConstants</span><span class="o">.</span><span class="n">WRONG_PREDICTION</span>
                     <span class="n">leaf_hist_data</span> <span class="o">=</span> <span class="p">{</span><span class="n">leaf_prediction</span><span class="p">:</span> <span class="n">histogram_func</span><span class="p">(</span><span class="n">feature_column</span><span class="p">[</span><span class="n">leaf_sample_ids</span><span class="p">])}</span>
 
-                <span class="n">x_ticks</span> <span class="o">=</span> <span class="n">_BaseErrorVisualizer</span><span class="o">.</span><span class="n">_add_new_plot</span><span class="p">(</span><span class="n">figsize</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">feature_name</span><span class="p">,</span> <span class="n">leaf</span><span class="p">)</span>
-                <span class="n">_BaseErrorVisualizer</span><span class="o">.</span><span class="n">_plot_feature_distribution</span><span class="p">(</span><span class="n">x_ticks</span><span class="p">,</span> <span class="n">feature_is_numerical</span><span class="p">,</span> <span class="n">leaf_hist_data</span><span class="p">,</span> <span class="n">root_hist_data</span> <span class="k">if</span> <span class="n">show_global</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
-                <span class="k">break</span>
+                <span class="n">x_ticks</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">))</span>
+                <span class="n">_BaseErrorVisualizer</span><span class="o">.</span><span class="n">_add_new_plot</span><span class="p">(</span><span class="n">figsize</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">x_ticks</span><span class="p">,</span> <span class="n">feature_name</span><span class="p">,</span> <span class="n">suptitle</span><span class="p">)</span>
+                <span class="n">_BaseErrorVisualizer</span><span class="o">.</span><span class="n">_plot_feature_distribution</span><span class="p">(</span><span class="n">x_ticks</span><span class="p">,</span> <span class="n">feature_is_numerical</span><span class="p">,</span> <span class="n">leaf_hist_data</span><span class="p">,</span> <span class="n">root_hist_data</span><span class="p">)</span>
 
         <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div></div>
 </pre></div>

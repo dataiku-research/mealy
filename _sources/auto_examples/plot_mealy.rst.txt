@@ -55,8 +55,8 @@ Those are the necessary imports and initializations.
 
     from mealy.error_analyzer import ErrorAnalyzer
     from mealy.error_visualizer import ErrorVisualizer
-
-
+    import mealy
+    print(mealy.__version__)
     default_seed = 10
     np.random.seed(default_seed)
     random.seed(default_seed)
@@ -64,6 +64,14 @@ Those are the necessary imports and initializations.
 
 
 
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    0.2.4
 
 
 
@@ -161,7 +169,7 @@ Print metrics regarding the Error Tree.
 
  .. code-block:: none
 
-    The Error Tree was trained with accuracy 98.43% and balanced accuracy 94.74%.
+    The Error Decision Tree was trained with accuracy 98.43% and balanced accuracy 94.74%.
     The Decision Tree estimated the primary models accuracy to 86.61%.
     The true accuracy of the primary model is 85.04.%
     The Fidelity of the error tree is 98.43%.
@@ -237,18 +245,27 @@ Rank features by correlation to error.
 
 
 
-.. image:: /auto_examples/images/sphx_glr_plot_mealy_002.png
-    :alt: Distribution of CRIM in leaf 12
-    :class: sphx-glr-single-img
+.. rst-class:: sphx-glr-horizontal
 
 
-.. rst-class:: sphx-glr-script-out
+    *
 
- Out:
+      .. image:: /auto_examples/images/sphx_glr_plot_mealy_002.png
+          :alt: Leaf 12 (Wrong prediction: 1, Correct prediction: 0), Distribution of LSTAT
+          :class: sphx-glr-multi-img
 
- .. code-block:: none
+    *
 
-    Leaf 12 (Wrong prediction: 1.000, Correct prediction: 0.000)
+      .. image:: /auto_examples/images/sphx_glr_plot_mealy_003.png
+          :alt: Leaf 12 (Wrong prediction: 1, Correct prediction: 0), Distribution of AGE
+          :class: sphx-glr-multi-img
+
+    *
+
+      .. image:: /auto_examples/images/sphx_glr_plot_mealy_004.png
+          :alt: Leaf 12 (Wrong prediction: 1, Correct prediction: 0), Distribution of TAX
+          :class: sphx-glr-multi-img
+
 
 
 
@@ -288,7 +305,7 @@ subpopulations.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.249 seconds)
+   **Total running time of the script:** ( 0 minutes  3.588 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_mealy.py:

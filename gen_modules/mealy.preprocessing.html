@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>mealy.preprocessing &mdash; mealy 0.2.0-git documentation</title>
+  <title>mealy.preprocessing &mdash; mealy 0.2.4-git documentation</title>
   
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/theme_override.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery-binder.css" type="text/css" />
@@ -36,6 +38,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -73,7 +76,7 @@
             
             
               <div class="version">
-                0.2.0
+                0.2.4
               </div>
             
           
@@ -195,21 +198,17 @@
 <div class="section" id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="mealy.preprocessing.DummyPipelinePreprocessor">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mealy.preprocessing.</span></code><code class="sig-name descname"><span class="pre">DummyPipelinePreprocessor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_performance_predictor_features</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#DummyPipelinePreprocessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.preprocessing.DummyPipelinePreprocessor" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="mealy.preprocessing.DummyPipelinePreprocessor">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">mealy.preprocessing.</span></span><span class="sig-name descname"><span class="pre">DummyPipelinePreprocessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_performance_predictor_features</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#DummyPipelinePreprocessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.preprocessing.DummyPipelinePreprocessor" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py method">
-<dt id="mealy.preprocessing.DummyPipelinePreprocessor.transform">
-<code class="sig-name descname"><span class="pre">transform</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#DummyPipelinePreprocessor.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.preprocessing.DummyPipelinePreprocessor.transform" title="Permalink to this definition">¶</a></dt>
-<dd><p>Identity transformation of the input.</p>
-<dl class="field-list simple">
+<dt class="sig sig-object py" id="mealy.preprocessing.DummyPipelinePreprocessor.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#DummyPipelinePreprocessor.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.preprocessing.DummyPipelinePreprocessor.transform" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.4)"><em>pandas.DataFrame</em></a>) – Input feature values.</p>
+<dd class="field-odd"><p><strong>x</strong> (<em>array-like</em><em> or </em><em>dataframe of shape</em><em> (</em><em>number of samples</em><em>, </em><em>number of features</em><em>)</em>) – input feature values.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Transformed feature values.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a></p>
+<dd class="field-even"><p>ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -217,8 +216,8 @@
 </dd></dl>
 
 <div class="sphx-glr-clear"></div><dl class="py class">
-<dt id="mealy.preprocessing.FeatureNameTransformer">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mealy.preprocessing.</span></code><code class="sig-name descname"><span class="pre">FeatureNameTransformer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ct_preprocessor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_features</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#FeatureNameTransformer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.preprocessing.FeatureNameTransformer" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="mealy.preprocessing.FeatureNameTransformer">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">mealy.preprocessing.</span></span><span class="sig-name descname"><span class="pre">FeatureNameTransformer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preprocessed_features</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#FeatureNameTransformer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.preprocessing.FeatureNameTransformer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transformer of feature names and indices.</p>
 <p>A FeatureNameTransformer parses an input Pipeline preprocessor and generate
 a mapping between the input unprocessed feature names/indices and the output
@@ -226,15 +225,15 @@ preprocessed feature names/indices.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ct_preprocessor</strong> (<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html#sklearn.compose.ColumnTransformer" title="(in scikit-learn v0.24)"><em>sklearn.compose.ColumnTransformer</em></a>) – Preprocessor.</p></li>
-<li><p><strong>original_features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – List of original unpreprocessed feature names, default=None.</p></li>
+<li><p><strong>ct_preprocessor</strong> (<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html#sklearn.compose.ColumnTransformer" title="(in scikit-learn v0.24)"><em>sklearn.compose.ColumnTransformer</em></a>) – preprocessor.</p></li>
+<li><p><strong>orig_feats</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – list of original unpreprocessed feature names, default=None.</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py attribute">
-<dt id="mealy.preprocessing.FeatureNameTransformer.original_feature_names">
-<code class="sig-name descname"><span class="pre">original_feature_names</span></code><a class="headerlink" href="#mealy.preprocessing.FeatureNameTransformer.original_feature_names" title="Permalink to this definition">¶</a></dt>
-<dd><p>List of original unpreprocessed feature names.</p>
+<dt class="sig sig-object py" id="mealy.preprocessing.FeatureNameTransformer.original_feature_names">
+<span class="sig-name descname"><span class="pre">original_feature_names</span></span><a class="headerlink" href="#mealy.preprocessing.FeatureNameTransformer.original_feature_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of original unpreprocessed feature names.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
@@ -243,9 +242,9 @@ preprocessed feature names/indices.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="mealy.preprocessing.FeatureNameTransformer.preprocessed_feature_names">
-<code class="sig-name descname"><span class="pre">preprocessed_feature_names</span></code><a class="headerlink" href="#mealy.preprocessing.FeatureNameTransformer.preprocessed_feature_names" title="Permalink to this definition">¶</a></dt>
-<dd><p>List of preprocessed feature names.</p>
+<dt class="sig sig-object py" id="mealy.preprocessing.FeatureNameTransformer.preprocessed_feature_names">
+<span class="sig-name descname"><span class="pre">preprocessed_feature_names</span></span><a class="headerlink" href="#mealy.preprocessing.FeatureNameTransformer.preprocessed_feature_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of preprocessed feature names.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
@@ -253,56 +252,75 @@ preprocessed feature names/indices.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="mealy.preprocessing.FeatureNameTransformer.get_original_feature_names">
-<code class="sig-name descname"><span class="pre">get_original_feature_names</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#FeatureNameTransformer.get_original_feature_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.preprocessing.FeatureNameTransformer.get_original_feature_names" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the list of original unpreprocessed feature names.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="mealy.preprocessing.FeatureNameTransformer.get_preprocessed_feature_names">
-<code class="sig-name descname"><span class="pre">get_preprocessed_feature_names</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#FeatureNameTransformer.get_preprocessed_feature_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.preprocessing.FeatureNameTransformer.get_preprocessed_feature_names" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the list of preprocessed feature names.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="mealy.preprocessing.FeatureNameTransformer.inverse_transform_feature_id">
-<code class="sig-name descname"><span class="pre">inverse_transform_feature_id</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#FeatureNameTransformer.inverse_transform_feature_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.preprocessing.FeatureNameTransformer.inverse_transform_feature_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Undo preprocessing of feature name.</p>
-<p>Transform the preprocessed feature name at given index or with given name
-back into the original unprocessed feature name or index.</p>
+<div class="sphx-glr-clear"></div><dl class="py class">
+<dt class="sig sig-object py" id="mealy.preprocessing.PipelinePreprocessor">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">mealy.preprocessing.</span></span><span class="sig-name descname"><span class="pre">PipelinePreprocessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ct_preprocessor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_features</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#PipelinePreprocessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.preprocessing.PipelinePreprocessor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transformer of feature values from the original values to preprocessed ones.</p>
+<p>A PipelinePreprocessor parses an input Pipeline preprocessor and generate
+a mapping between the input unprocessed feature values and the output
+preprocessed feature values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Feature index.</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Feature name.</p></li>
+<li><p><strong>ct_preprocessor</strong> (<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html#sklearn.compose.ColumnTransformer" title="(in scikit-learn v0.24)"><em>sklearn.compose.ColumnTransformer</em></a>) – preprocessing steps.</p></li>
+<li><p><strong>original_features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – list of original unpreprocessed feature names, default=None.</p></li>
 </ul>
 </dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="mealy.preprocessing.PipelinePreprocessor.inverse_transform">
+<span class="sig-name descname"><span class="pre">inverse_transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">preprocessed_x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#PipelinePreprocessor.inverse_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.preprocessing.PipelinePreprocessor.inverse_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Invert the preprocessing pipeline and inverse transform feature values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>preprocessed_x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a><em> or </em><em>scipy sparse matrix</em>) – preprocessed feature values.</p>
+</dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>index (resp. name) of the unprocessed feature corresponding to the input preprocessed feature
-index (resp.name). If both index and name are provided, the index is retained and an output index is
-returned.</p>
+<dd class="field-even"><p>feature values without preprocessing.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="mealy.preprocessing.FeatureNameTransformer.is_categorical">
-<code class="sig-name descname"><span class="pre">is_categorical</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#FeatureNameTransformer.is_categorical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.preprocessing.FeatureNameTransformer.is_categorical" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="mealy.preprocessing.PipelinePreprocessor.inverse_transform_feature_id">
+<span class="sig-name descname"><span class="pre">inverse_transform_feature_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#PipelinePreprocessor.inverse_transform_feature_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.preprocessing.PipelinePreprocessor.inverse_transform_feature_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Undo preprocessing of feature name.</p>
+<p>Transform the preprocessed feature name at given index back into the original unprocessed feature index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – feature index.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>index of the unprocessed feature corresponding to the input preprocessed feature index.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mealy.preprocessing.PipelinePreprocessor.is_categorical">
+<span class="sig-name descname"><span class="pre">is_categorical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#PipelinePreprocessor.is_categorical"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.preprocessing.PipelinePreprocessor.is_categorical" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check whether an unprocessed feature at a given index or with a given name is categorical.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Feature index.</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Feature name.</p></li>
+<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – feature index.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – feature name.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>True if the input feature is categorical, else False. If both index and name are provided, the index
-is retained.</p>
+<dd class="field-even"><p><dl class="simple">
+<dt>True if the input feature is categorical, else False. If both index and name are provided, the index</dt><dd><p>is retained.</p>
+</dd>
+</dl>
+</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
@@ -311,65 +329,15 @@ is retained.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="mealy.preprocessing.FeatureNameTransformer.transform_feature_id">
-<code class="sig-name descname"><span class="pre">transform_feature_id</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#FeatureNameTransformer.transform_feature_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.preprocessing.FeatureNameTransformer.transform_feature_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the preprocessed feature names corresponding to an original feature.</p>
-<p>The input feature can be specified either by index or name.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Feature index.</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – Feature name.</p></li>
-</ul>
-</dd>
-</dl>
-<p>Returns: index of output feature(s) generated after preprocessing of the input feature.</p>
-</dd></dl>
-
-</dd></dl>
-
-<div class="sphx-glr-clear"></div><dl class="py class">
-<dt id="mealy.preprocessing.PipelinePreprocessor">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mealy.preprocessing.</span></code><code class="sig-name descname"><span class="pre">PipelinePreprocessor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ct_preprocessor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_features</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#PipelinePreprocessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.preprocessing.PipelinePreprocessor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transformer of feature values from the original values to preprocessed ones.</p>
-<p>A PipelinePreprocessor parses an input Pipeline preprocessor and generate
-a mapping between the input unprocessed feature values and the output
-preprocessed feature values.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ct_preprocessor</strong> (<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html#sklearn.compose.ColumnTransformer" title="(in scikit-learn v0.24)"><em>sklearn.compose.ColumnTransformer</em></a>) – Preprocessing steps</p></li>
-<li><p><strong>original_features</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a>) – List of original unpreprocessed feature names, default=None.</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt id="mealy.preprocessing.PipelinePreprocessor.inverse_transform">
-<code class="sig-name descname"><span class="pre">inverse_transform</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">preprocessed_x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#PipelinePreprocessor.inverse_transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.preprocessing.PipelinePreprocessor.inverse_transform" title="Permalink to this definition">¶</a></dt>
-<dd><p>Invert the preprocessing pipeline and inverse transform feature values.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>preprocessed_x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a>) – Preprocessed feature values.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Feature values without preprocessing.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="mealy.preprocessing.PipelinePreprocessor.transform">
-<code class="sig-name descname"><span class="pre">transform</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#PipelinePreprocessor.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.preprocessing.PipelinePreprocessor.transform" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="mealy.preprocessing.PipelinePreprocessor.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mealy/preprocessing.html#PipelinePreprocessor.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mealy.preprocessing.PipelinePreprocessor.transform" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transform the input feature values according to the preprocessing pipeline.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>numpy.ndarray</em></a><em> or </em><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.2.4)"><em>pandas.DataFrame</em></a>) – Input feature values.</p>
+<dd class="field-odd"><p><strong>x</strong> (<em>array-like</em><em> or </em><em>dataframe of shape</em><em> (</em><em>number of samples</em><em>, </em><em>number of features</em><em>)</em>) – input feature values.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Transformed feature values.</p>
+<dd class="field-even"><p>transformed feature values.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)">numpy.ndarray</a></p>
