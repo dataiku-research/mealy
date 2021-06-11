@@ -10,10 +10,10 @@ This is an alpha version.
 
 ## Getting started
 
-MEA [documentation](https://dataiku.github.io/mealy/) features some examples helping you getting started with Model Error Analysis:
+MEA [documentation](https://dataiku-research.github.io/mealy/) features some examples helping you getting started with Model Error Analysis:
 
-- [Error Analysis on scikit-learn model](https://dataiku.github.io/mealy/auto_examples/plot_mealy.html) presents a basic error analysis on a regression model for structured data.
-- [Error Analysis on pipeline model](https://dataiku.github.io/mealy/auto_examples/plot_mealy_pipeline.html) presents a basic error analysis on a classification pipeline for structured data.
+- [Error Analysis on scikit-learn model](https://dataiku-research.github.io/mealy/auto_examples/plot_mealy.html) presents a basic error analysis on a regression model for structured data.
+- [Error Analysis on pipeline model](https://dataiku-research.github.io/mealy/auto_examples/plot_mealy_pipeline.html) presents a basic error analysis on a classification pipeline for structured data.
 
 ## Model Error Analysis
 
