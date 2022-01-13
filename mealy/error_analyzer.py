@@ -67,7 +67,7 @@ class ErrorAnalyzer(BaseEstimator):
             raise TypeError('ErrorAnalyzer needs as input either a scikit BaseEstimator or a scikit Pipeline.')
 
         if not hasattr(self._primary_model, "_estimator_type"):
-            raise ValueError("The primary model is missing the required parameter '_estimator_type'.")
+            raise ValueError("The primary model is missing the required parameter '_estimator_type'. It should be 'regressor' or 'classifier'.")
         if self._primary_model._estimator_type not in {"regressor", "classifier"}:
             raise ValueError("The primary model is neither a classifier nor a regressor.")
 
