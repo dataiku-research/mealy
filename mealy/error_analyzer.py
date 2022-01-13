@@ -66,6 +66,11 @@ class ErrorAnalyzer(BaseEstimator):
         else:
             raise TypeError('ErrorAnalyzer needs as input either a scikit BaseEstimator or a scikit Pipeline.')
 
+        if not hasattr(self._primary_model, "_estimator_type"):
+            raise ValueError("The primary model is missing the required parameter '_estimator_type'.")
+        if self._primary_model._estimator_type not in {"regressor", "classifier"}:
+            raise ValueError("The primary model is neither a classifier nor a regressor.")
+
         self._error_tree = None
         self._error_train_x = None
         self._error_train_y = None
@@ -289,7 +294,7 @@ class ErrorAnalyzer(BaseEstimator):
         error_y[error_mask] = ErrorAnalyzerConstants.WRONG_PREDICTION
 
         if n_wrong_preds == 0 or n_wrong_preds == len(error_y):
-            logger.warning('All predictions are {}. To build a proper ErrorAnalyzer decision tree we need both correct and incorrect predictions'.format(error_y[0]))
+            raise RuntimeError('All predictions are {}. To build a proper ErrorAnalyzer decision tree both correct and incorrect predictions are needed'.format(error_y[0]))
 
         error_rate = n_wrong_preds / len(error_y)
         logger.info('The primary model has an error rate of {}'.format(format_float(error_rate, 3)))
