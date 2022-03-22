@@ -4,7 +4,7 @@
 
 mealy is a Python package to perform **M**odel **E**rror **A**na**LY**sis of scikit-learn models leveraging an Error Tree.
 
-The project is currently maintained by [Dataiku's](https://www.dataiku.com/) research team.
+The project is currently maintained by [Dataiku's](https://www.dataiku.com/) research and engineering team.
 
 This is an alpha version.
 
